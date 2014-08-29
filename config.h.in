@@ -1,0 +1,7 @@
+#ifndef BUILD_CONFIG_H
+#define BUILD_CONFIG_H
+
+#cmakedefine SHADOWD_VERSION "@SHADOWD_VERSION@"
+#cmakedefine HAVE_DBI_NEW 1
+
+#endif /* BUILD_CONFIG_H */

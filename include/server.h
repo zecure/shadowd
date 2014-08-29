@@ -1,0 +1,102 @@
+/**
+ * Shadow Daemon -- High-Interaction Web Honeypot
+ *
+ *   Copyright (C) 2014 Hendrik Buchwald <hb@zecure.org>
+ *
+ * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, version 2.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef SERVER_H
+#define SERVER_H
+
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include "connection.h"
+#include "request_handler.h"
+
+namespace swd {
+	/**
+	 * @brief Initializes the network server and adds threads to a thread pool.
+	 */
+	class server :
+	 private boost::noncopyable {
+		public:
+			/**
+			 * @brief Construct an object and connect the attributes.
+			 */
+			server();
+
+			/**
+			 * @brief Initialize the server.
+			 *
+			 * This method opens the tcp port. It is called before root
+			 * privileges are dropped, so every free port can be used.
+			 */
+			void init();
+
+			/**
+			 * @brief Add threads to the thread pool and start accepting connections.
+			 *
+			 * @param thread_pool_size The number of threads that should be
+			 *  added to the thread pool
+			 */
+			void start(std::size_t thread_pool_size);
+
+		private:
+			/**
+			 * @brief Initiate an asynchronous accept operation.
+			 */
+			void start_accept();
+
+			/**
+			 * @brief Handle completion of an asynchronous accept operation.
+			 */
+			void handle_accept(const boost::system::error_code& e);
+
+			/**
+			 * @brief Handle a request to stop the server.
+			 */
+			void handle_stop();
+
+			/**
+			 * @brief The io_service used to perform asynchronous operations.
+			 */
+			boost::asio::io_service io_service_;
+
+			/**
+			 * @brief The signal_set is used to register for process termination
+			 *  notifications.
+			 */
+			boost::asio::signal_set signals_;
+
+			/**
+			 * @brief Acceptor used to listen for incoming connections.
+			 */
+			swd::acceptor acceptor_;
+
+			/**
+			 * @brief The ssl context that contains the settings if ssl is activated.
+			 */
+			swd::context context_;
+
+			/**
+			 * @brief The next connection to be accepted.
+			 */
+			swd::connection_ptr new_connection_;
+	};
+}
+
+#endif /* SERVER_H */
