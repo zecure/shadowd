@@ -8,10 +8,10 @@ add_executable(shadowd analyzer.cpp blacklist_filter.cpp config.cpp daemon.cpp
 	shadowd.cpp whitelist.cpp whitelist_rule.cpp)
 
 target_link_libraries(shadowd
-  pthread
+	pthread
 	dbi
-  cryptopp
-  jsoncpp
+	cryptopp
+	jsoncpp
 	${OPENSSL_LIBRARIES}
 	${Boost_LIBRARIES})
 

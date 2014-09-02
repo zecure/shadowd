@@ -8,7 +8,7 @@ CREATE TABLE tags (
 CREATE UNIQUE INDEX ON tags (tag);
 
 CREATE TABLE blacklist_filters (
-	id		SERIAL primary key,
+	id			SERIAL primary key,
 	rule		text NOT NULL,
 	impact		integer NOT NULL,
 	description	text
@@ -20,8 +20,8 @@ CREATE INDEX ON blacklist_filters (impact);
 CREATE TABLE tags_filters (
 	tag_id		integer NOT NULL,
 	filter_id	integer NOT NULL,
-	FOREIGN KEY (tag_id) REFERENCES tags (id),
-	FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id),
+	FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE,
+	FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id) ON DELETE CASCADE,
 	PRIMARY KEY (tag_id, filter_id)
 );
 
@@ -29,11 +29,11 @@ CREATE INDEX ON tags_filters (tag_id);
 CREATE INDEX ON tags_filters (filter_id);
 
 CREATE TABLE profiles (
-	id		SERIAL primary key,
+	id			SERIAL primary key,
 	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
 	server_ip	text NOT NULL,
 	name		text NOT NULL,
-	hmac_key		text NOT NULL,
+	hmac_key	text NOT NULL,
 	learning	smallint NOT NULL,
 	threshold	int NOT NULL
 );
@@ -41,13 +41,13 @@ CREATE TABLE profiles (
 CREATE UNIQUE INDEX ON profiles (server_ip);
 
 CREATE TABLE requests (
-	id		SERIAL primary key,
+	id			SERIAL primary key,
 	profile_id	int NOT NULL,
 	caller		text NOT NULL,
 	learning	smallint NOT NULL,
 	client_ip	text NOT NULL,
 	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
-	FOREIGN KEY (profile_id) REFERENCES profiles (id)
+	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
 
 CREATE INDEX ON requests (profile_id);
@@ -57,14 +57,14 @@ CREATE INDEX ON requests (client_ip);
 CREATE INDEX ON requests (date);
 
 CREATE TABLE parameters (
-	id		SERIAL primary key,
-	request_id	int NOT NULL,
-	path		text NOT NULL,
-	value		text NOT NULL,
-	total_rules	int NOT NULL,
+	id				SERIAL primary key,
+	request_id		int NOT NULL,
+	path			text NOT NULL,
+	value			text NOT NULL,
+	total_rules		int NOT NULL,
 	critical_impact	smallint NOT NULL,
-	threat		smallint NOT NULL,
-	FOREIGN KEY (request_id) REFERENCES requests (id)
+	threat			smallint NOT NULL,
+	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
 CREATE INDEX ON parameters (request_id);
@@ -75,10 +75,10 @@ CREATE INDEX ON parameters (critical_impact);
 CREATE INDEX ON parameters (threat);
 
 CREATE TABLE blacklist_parameters (
-	filter_id	int NOT NULL,
+	filter_id		int NOT NULL,
 	parameter_id	int NOT NULL,
-	FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id),
-	FOREIGN KEY (parameter_id) REFERENCES parameters (id),
+	FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id) ON DELETE CASCADE,
+	FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
 	PRIMARY KEY (filter_id, parameter_id)
 );
 
@@ -86,7 +86,7 @@ CREATE INDEX ON blacklist_parameters (filter_id);
 CREATE INDEX ON blacklist_parameters (parameter_id);
 
 CREATE TABLE whitelist_filters (
-	id		SERIAL primary key,
+	id			SERIAL primary key,
 	rule		text NOT NULL,
 	impact		integer NOT NULL,
 	description	text
@@ -96,7 +96,7 @@ CREATE INDEX ON whitelist_filters (rule);
 CREATE INDEX ON whitelist_filters (impact);
 
 CREATE TABLE whitelist_rules (
-	id		SERIAL primary key,
+	id			SERIAL primary key,
 	profile_id	integer NOT NULL,
 	path		text NOT NULL,
 	caller		text NOT NULL,
@@ -105,8 +105,8 @@ CREATE TABLE whitelist_rules (
 	filter_id	integer NOT NULL,
 	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
 	status		smallint NOT NULL,
-	FOREIGN KEY (profile_id) REFERENCES profiles (id),
-	FOREIGN KEY (filter_id) REFERENCES whitelist_filters (id)
+	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE,
+	FOREIGN KEY (filter_id) REFERENCES whitelist_filters (id) ON DELETE CASCADE
 );
 
 CREATE INDEX ON whitelist_rules (profile_id);
@@ -119,10 +119,10 @@ CREATE INDEX ON whitelist_rules (date);
 CREATE INDEX ON whitelist_rules (status);
 
 CREATE TABLE whitelist_parameters (
-	rule_id		int NOT NULL,
+	rule_id			int NOT NULL,
 	parameter_id	int NOT NULL,
-	FOREIGN KEY (rule_id) REFERENCES whitelist_rules (id),
-	FOREIGN KEY (parameter_id) REFERENCES parameters (id),
+	FOREIGN KEY (rule_id) REFERENCES whitelist_rules (id) ON DELETE CASCADE,
+	FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
 	PRIMARY KEY (rule_id, parameter_id)
 );
 
@@ -130,26 +130,27 @@ CREATE INDEX ON whitelist_parameters (rule_id);
 CREATE INDEX ON whitelist_parameters (parameter_id);
 
 -- Tables UI
+
 CREATE TABLE users (
-	id		SERIAL primary key,
-	username	text NOT NULL,
-	password	text NOT NULL,
-	email		text NOT NULL,
-	role		smallint NOT NULL,
+	id				SERIAL primary key,
+	username		text NOT NULL,
+	password		text NOT NULL,
+	email			text NOT NULL,
+	role			smallint NOT NULL,
 	change_password	boolean,
-	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp)
+	date			timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp)
 );
 
 CREATE UNIQUE INDEX ON users (username);
 
 CREATE TABLE settings (
-	id		SERIAL primary key,
+	id			SERIAL primary key,
 	page_limit	integer NOT NULL,
 	sort_order	smallint NOT NULL,
 	theme		text NOT NULL,
 	open_filter	boolean,
 	user_id		integer NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES users (id)
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 -- Data

@@ -20,8 +20,8 @@ CREATE INDEX idx_blacklistfilters2 ON blacklist_filters (impact);
 CREATE TABLE tags_filters (
     tag_id        INTEGER UNSIGNED NOT NULL,
     filter_id     INTEGER UNSIGNED NOT NULL,
-    CONSTRAINT fk_filters1 FOREIGN KEY (tag_id) REFERENCES tags (id),
-    CONSTRAINT fk_filters2 FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id),
+    CONSTRAINT fk_filters1 FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE,
+    CONSTRAINT fk_filters2 FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id) ON DELETE CASCADE,
     PRIMARY KEY (tag_id, filter_id)
 );
 
@@ -47,7 +47,7 @@ CREATE TABLE requests (
     learning      smallint NOT NULL,
     client_ip     text NOT NULL,
     date          DATETIME,
-    CONSTRAINT fk_requests FOREIGN KEY (profile_id) REFERENCES profiles (id)
+    CONSTRAINT fk_requests FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_requests1 ON requests (profile_id);
@@ -64,7 +64,7 @@ CREATE TABLE parameters (
     total_rules     int NOT NULL,
     critical_impact smallint NOT NULL,
     threat          smallint NOT NULL,
-    CONSTRAINT fk_parameters FOREIGN KEY (request_id) REFERENCES requests (id)
+    CONSTRAINT fk_parameters FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_parameters1 ON parameters (request_id);
@@ -77,8 +77,8 @@ CREATE INDEX idx_parameters6 ON parameters (threat);
 CREATE TABLE blacklist_parameters (
     filter_id    INTEGER UNSIGNED NOT NULL,
     parameter_id INTEGER UNSIGNED NOT NULL,
-    CONSTRAINT fk_blacklist_parameters1 FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id),
-    CONSTRAINT fk_blacklist_parameters2 FOREIGN KEY (parameter_id) REFERENCES parameters (id),
+    CONSTRAINT fk_blacklist_parameters1 FOREIGN KEY (filter_id) REFERENCES blacklist_filters (id) ON DELETE CASCADE,
+    CONSTRAINT fk_blacklist_parameters2 FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
     PRIMARY KEY (filter_id, parameter_id)
 );
 
@@ -105,8 +105,8 @@ CREATE TABLE whitelist_rules (
     filter_id   INTEGER UNSIGNED NOT NULL,
     date        DATETIME,
     status      smallint NOT NULL,
-    CONSTRAINT fk_whitelist_rules1 FOREIGN KEY (profile_id) REFERENCES profiles (id),
-    CONSTRAINT fk_whitelist_rules2 FOREIGN KEY (filter_id) REFERENCES whitelist_filters (id)
+    CONSTRAINT fk_whitelist_rules1 FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE,
+    CONSTRAINT fk_whitelist_rules2 FOREIGN KEY (filter_id) REFERENCES whitelist_filters (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_whitelist_rules1 ON whitelist_rules (profile_id);
@@ -121,8 +121,8 @@ CREATE INDEX idx_whitelist_rules8 ON whitelist_rules (status);
 CREATE TABLE whitelist_parameters (
     rule_id        INTEGER UNSIGNED NOT NULL,
     parameter_id   INTEGER UNSIGNED NOT NULL,
-    CONSTRAINT fk_whitelist_parameters1 FOREIGN KEY (rule_id) REFERENCES whitelist_rules (id),
-    CONSTRAINT fk_whitelist_parameters2 FOREIGN KEY (parameter_id) REFERENCES parameters (id),
+    CONSTRAINT fk_whitelist_parameters1 FOREIGN KEY (rule_id) REFERENCES whitelist_rules (id) ON DELETE CASCADE,
+    CONSTRAINT fk_whitelist_parameters2 FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
     PRIMARY KEY (rule_id, parameter_id)
 );
 
@@ -130,10 +130,11 @@ CREATE INDEX idx_whitelist_parameters1 ON whitelist_parameters (rule_id);
 CREATE INDEX idx_whitelist_parameters2 ON whitelist_parameters (parameter_id);
 
 -- Tables UI
+
 CREATE TABLE users (
     id              INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
     username        varchar(200) UNIQUE NOT NULL,
-    password        varchar(200) NOT NULL,
+    `password`      varchar(200) NOT NULL,
     email           varchar(200) NOT NULL,
     role            smallint NOT NULL,
     change_password boolean,
@@ -147,7 +148,7 @@ CREATE TABLE settings (
     theme           text NOT NULL,
     open_filter     boolean,
     user_id         INTEGER UNSIGNED NOT NULL,
-    CONSTRAINT fk_settings FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_settings FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 -- Data
