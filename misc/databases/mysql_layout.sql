@@ -447,7 +447,7 @@ INSERT INTO whitelist_filters VALUES (4, '^[0-9a-z]*$', 6, 'Alphanumeric');
 INSERT INTO whitelist_filters VALUES (5, '^[\\n0-9a-z+/]+={0,2}$', 10, 'Base64');
 INSERT INTO whitelist_filters VALUES (7, '^[\\w.:-]*$', 30, 'Word + Special Characters (Simple)');
 INSERT INTO whitelist_filters VALUES (6, '^[a-z0-9._%+\\-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 51, 'E-Mail');
-INSERT INTO whitelist_filters VALUES (8, '^((([a-z]{3,9}:(?:\\/\\/)?)(?:[\\-;:&=\\+\\$,\\w]+@)?[a-z0-9\\.\\-]+|(?:www\\.|[\\-;:&=\\+\\$,\\w]+@)[a-z0-9\\.\\-]+)(:\\d*)?((?:\\/[\\+~%\\/\\.\\w\\-_]*)?\\??(?:[\\-\\+=&;%@\\.\\w_]*)#?(?:[\\.\\!\\/\\\\\\w]*))?)$', 52, 'URL');
+INSERT INTO whitelist_filters VALUES (8, '^((([a-z]{3,9}:(?:\\/\\/)?)(?:[\\-;:&=\\+\\$,\\w]+@)?[a-z0-9\\.\\-]+|(?:www\\.|[\\-;:&=\\+\\$,\\w]+@)[a-z0-9\\.\\-]+)(:\\d*)?((?:\\/[\\+~%\\/\\.\\w\\-_]*)?\\??(?:[\\/\\(\\)\\-\\+=&;%@\\.\\w_]*)#?(?:[\\/\\-\\.\\!\\/\\\\\\w]*))?)$', 72, 'URL');
 INSERT INTO whitelist_filters VALUES (9, '^[\\w\\s/.,-]*$', 80, 'Word + Whitespace + Special Characters (Simple)');
 INSERT INTO whitelist_filters VALUES (10, '^[\\w\\s/.,=;:+-]*$', 81, 'Word + Whitespace + Special Characters (Medium)');
 INSERT INTO whitelist_filters VALUES (11, '^[\\w\\s/.,=;:()!?*+-]*$', 82, 'Word + Whitespace + Special Characters (Extended)');
