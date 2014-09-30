@@ -31,7 +31,7 @@ CREATE INDEX idx_tags_filters2 ON tags_filters (filter_id);
 CREATE TABLE profiles (
     id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
     date        DATETIME,
-    server_ip   varchar(200) UNIQUE NOT NULL,
+    server_ip   varchar(200) NOT NULL,
     name        varchar(200) NOT NULL,
     hmac_key    varchar(200) NOT NULL,
     learning    smallint NOT NULL,

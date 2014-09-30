@@ -38,7 +38,7 @@ CREATE TABLE profiles (
 	threshold	int NOT NULL
 );
 
-CREATE UNIQUE INDEX ON profiles (server_ip);
+CREATE INDEX ON profiles (server_ip);
 
 CREATE TABLE requests (
 	id			SERIAL primary key,
