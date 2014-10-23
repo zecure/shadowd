@@ -46,7 +46,7 @@ CREATE TABLE requests (
     caller        text NOT NULL,
     learning      smallint NOT NULL,
     client_ip     text NOT NULL,
-    date          DATETIME,
+    date          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_requests FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
 
