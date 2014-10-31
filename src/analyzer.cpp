@@ -48,7 +48,7 @@ void swd::analyzer::start() {
 		/**
 		 * The whitelist checks for all parameters if there exists a rule and if it
 		 * is adhered to. Every parameter that does not gets tagged in the request
-		 * object. At the moment three* things get checked: the existence of a rule,
+		 * object. At the moment three things get checked: the existence of a rule,
 		 * the length of the input and the character set.
 		 */
 		whitelist.scan();
