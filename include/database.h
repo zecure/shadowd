@@ -77,6 +77,16 @@ namespace swd {
 			void disconnect();
 
 			/**
+			 * @brief Ensure that the database connection is still open.
+			 *
+			 * This method tests the database connection and tries to reconnect
+			 * if the connection is closed. The manual of libdbi states that some
+			 * drivers attempt to reconnect automatically if dbi_conn_ping is called,
+			 * but this does not seem to be the norm.
+			 */
+			void ensure_connection();
+
+			/**
 			 * @brief Get a profile by the server ip.
 			 *
 			 * Since a single shadowd instance can observe multiple different

@@ -204,7 +204,19 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		}
 
 		/* Process the request. */
-		std::vector<std::string> threats = request_handler.process();
+		std::vector<std::string> threats;
+
+		try {
+			threats = request_handler.process();
+		} catch (swd::exceptions::database_exception& e) {
+			swd::log::i()->send(swd::uncritical_error, e.what());
+
+			/**
+			 * Problems with the database result in a bad request. If protection
+			 * is enabled access to the site will not be granted.
+			 */
+			throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+		}
 
 		if (!threats.empty()) {
 			reply_->set_threats(threats);

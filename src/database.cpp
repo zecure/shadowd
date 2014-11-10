@@ -40,6 +40,7 @@ void swd::database::connect(std::string driver, std::string host, std::string po
 	dbi_conn_set_option(conn_, "dbname", name.c_str());
 	dbi_conn_set_option(conn_, "encoding", encoding.c_str());
 
+	/* If the initial connection can not be established the process is shut down. */
 	if (dbi_conn_connect(conn_) < 0) {
 		throw swd::exceptions::core_exception("Can't connect to database server");
 	}
@@ -52,11 +53,17 @@ void swd::database::disconnect() {
 #endif
 }
 
+void swd::database::ensure_connection() {
+	if (dbi_conn_ping(conn_) < 1) {
+		if (dbi_conn_connect(conn_) < 0) {
+			throw swd::exceptions::database_exception("Lost database connection");
+		}
+	}
+}
+
 swd::database_row swd::database::get_profile(std::string server_ip, int profile_id) {
 	/* Test the database connection status. Tries to reconnect if disconnected. */
-	if (dbi_conn_ping(conn_) < 1) {
-		throw swd::exceptions::database_exception("Lost database connection");
-	}
+	ensure_connection();
 
 	/**
 	 * First we escape server_ip. It comes from a trusted source, but better safe
@@ -112,9 +119,7 @@ swd::database_row swd::database::get_profile(std::string server_ip, int profile_
 }
 
 swd::database_rows swd::database::get_blacklist_filters() {
-	if (dbi_conn_ping(conn_) < 1) {
-		throw swd::exceptions::database_exception("Lost database connection");
-	}
+	ensure_connection();
 
 	pthread_mutex_lock(&dbi_conn_query_lock);
 	dbi_result res = dbi_conn_query(conn_, "SELECT id, rule, impact FROM blacklist_filters");
@@ -149,9 +154,7 @@ swd::database_rows swd::database::get_blacklist_filters() {
 
 swd::database_rows swd::database::get_whitelist_rules(int profile,
  std::string caller) {
-	if (dbi_conn_ping(conn_) < 1) {
-		throw swd::exceptions::database_exception("Lost database connection");
-	}
+	ensure_connection();
 
 	char *caller_esc = strdup(caller.c_str());
 	dbi_conn_quote_string(conn_, &caller_esc);
@@ -214,9 +217,7 @@ swd::database_rows swd::database::get_whitelist_rules(int profile,
 
 int swd::database::save_request(int profile, std::string caller, int learning,
  std::string client_ip) {
-	if (dbi_conn_ping(conn_) < 1) {
-		throw swd::exceptions::database_exception("Lost database connection");
-	}
+	ensure_connection();
 
 	char *caller_esc = strdup(caller.c_str());
 	dbi_conn_quote_string(conn_, &caller_esc);
@@ -251,9 +252,7 @@ int swd::database::save_request(int profile, std::string caller, int learning,
 
 int swd::database::save_parameter(int request, std::string path, std::string value,
  int total_rules, int critical_impact, int threat) {
-	if (dbi_conn_ping(conn_) < 1) {
-		throw swd::exceptions::database_exception("Lost database connection");
-	}
+	ensure_connection();
 
 	char *path_esc = strdup(path.c_str());
 	dbi_conn_quote_string(conn_, &path_esc);
@@ -283,9 +282,7 @@ int swd::database::save_parameter(int request, std::string path, std::string val
 }
 
 void swd::database::add_blacklist_parameter_connector(int filter, int parameter) {
-	if (dbi_conn_ping(conn_) < 1) {
-		throw swd::exceptions::database_exception("Lost database connection");
-	}
+	ensure_connection();
 
 	pthread_mutex_lock(&dbi_conn_query_lock);
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO blacklist_parameters "
@@ -298,9 +295,7 @@ void swd::database::add_blacklist_parameter_connector(int filter, int parameter)
 }
 
 void swd::database::add_whitelist_parameter_connector(int rule, int parameter) {
-	if (dbi_conn_ping(conn_) < 1) {
-		throw swd::exceptions::database_exception("Lost database connection");
-	}
+	ensure_connection();
 
 	pthread_mutex_lock(&dbi_conn_query_lock);
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO whitelist_parameters "

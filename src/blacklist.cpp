@@ -28,16 +28,7 @@ swd::blacklist::blacklist(swd::request_ptr request)
 
 void swd::blacklist::init() {
 	/* Import the filters from the database. */
-	swd::database_rows filters;
-
-	try {
-		filters = swd::database::i()->get_blacklist_filters();
-	} catch (swd::exceptions::database_exception& e) {
-		swd::log::i()->send(swd::uncritical_error, e.what());
-
-		/* Without filters there is nothing to do for the blacklist. */
-		return;
-	}
+	swd::database_rows filters = swd::database::i()->get_blacklist_filters();
 
 	/**
 	 * Iterate over the filters from the database and save them in blacklist_filter

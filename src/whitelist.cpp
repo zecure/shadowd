@@ -26,19 +26,10 @@ swd::whitelist::whitelist(swd::request_ptr request)
 
 void swd::whitelist::init() {
 	/* Import the rules from the database. */
-	swd::database_rows rules;
-
-	try {
-		rules = swd::database::i()->get_whitelist_rules(
-			request_->get_profile()->get_id(),
-			request_->get_caller()
-		);
-	} catch (swd::exceptions::database_exception& e) {
-		swd::log::i()->send(swd::uncritical_error, e.what());
-
-		/* Without rules there is nothing to do for the whitelist. */
-		return;
-	}
+	swd::database_rows rules = swd::database::i()->get_whitelist_rules(
+		request_->get_profile()->get_id(),
+		request_->get_caller()
+	);
 
 	for (swd::database_rows::iterator it_rule = rules.begin();
 	 it_rule != rules.end(); ++it_rule) {
