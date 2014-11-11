@@ -54,11 +54,13 @@ void swd::database::disconnect() {
 }
 
 void swd::database::ensure_connection() {
+	pthread_mutex_lock(&dbi_conn_query_lock);
 	if (dbi_conn_ping(conn_) < 1) {
 		if (dbi_conn_connect(conn_) < 0) {
 			throw swd::exceptions::database_exception("Lost database connection");
 		}
 	}
+	pthread_mutex_unlock(&dbi_conn_query_lock);
 }
 
 swd::database_row swd::database::get_profile(std::string server_ip, int profile_id) {

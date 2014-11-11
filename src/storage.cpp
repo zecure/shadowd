@@ -45,7 +45,7 @@ void swd::storage::save(swd::request_ptr request) {
 		swd::log::i()->send(swd::uncritical_error, e.what());
 
 		/**
-		 * No need to continue if the request couldn't be save, but no need to
+		 * No need to continue if the request couldn't be saved, but no need to
 		 * completely block access to the site either.
 		 */
 		return;
