@@ -68,8 +68,6 @@ CREATE TABLE parameters (
 );
 
 CREATE INDEX ON parameters (request_id);
-CREATE INDEX ON parameters (path);
-CREATE INDEX ON parameters (value);
 CREATE INDEX ON parameters (total_rules);
 CREATE INDEX ON parameters (critical_impact);
 CREATE INDEX ON parameters (threat);

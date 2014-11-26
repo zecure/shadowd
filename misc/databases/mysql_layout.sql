@@ -45,7 +45,7 @@ CREATE TABLE requests (
     profile_id    INTEGER UNSIGNED NOT NULL,
     caller        text NOT NULL,
     learning      smallint NOT NULL,
-    client_ip     text NOT NULL,
+    client_ip     varchar(200) NOT NULL,
     date          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_requests FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
@@ -53,7 +53,7 @@ CREATE TABLE requests (
 CREATE INDEX idx_requests1 ON requests (profile_id);
 CREATE INDEX idx_requests2 ON requests (caller(20));
 CREATE INDEX idx_requests3 ON requests (learning);
-CREATE INDEX idx_requests4 ON requests (client_ip(20));
+CREATE INDEX idx_requests4 ON requests (client_ip);
 CREATE INDEX idx_requests5 ON requests (date);
 
 CREATE TABLE parameters (
@@ -68,8 +68,6 @@ CREATE TABLE parameters (
 );
 
 CREATE INDEX idx_parameters1 ON parameters (request_id);
-CREATE INDEX idx_parameters2 ON parameters (path(20));
-CREATE INDEX idx_parameters3 ON parameters (value(20));
 CREATE INDEX idx_parameters4 ON parameters (total_rules);
 CREATE INDEX idx_parameters5 ON parameters (critical_impact);
 CREATE INDEX idx_parameters6 ON parameters (threat);
