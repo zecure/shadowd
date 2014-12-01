@@ -18,21 +18,31 @@
 
 #include "profile.h"
 
-swd::profile::profile(std::string server_ip, int id, bool learning,
- std::string key, int threshold) :
+swd::profile::profile(std::string server_ip, int id, bool learning_enabled,
+ bool whitelist_enabled, bool blacklist_enabled, std::string key, int threshold) :
  server_ip_(server_ip),
  id_(id),
- learning_(learning),
- key_ (key),
- threshold_ (threshold) {
+ learning_enabled_(learning_enabled),
+ whitelist_enabled_(whitelist_enabled),
+ blacklist_enabled_(blacklist_enabled),
+ key_(key),
+ threshold_(threshold) {
 }
 
 int swd::profile::get_id() {
 	return id_;
 }
 
-bool swd::profile::is_learning() {
-	return learning_;
+bool swd::profile::is_learning_enabled() {
+	return learning_enabled_;
+}
+
+bool swd::profile::is_whitelist_enabled() {
+	return whitelist_enabled_;
+}
+
+bool swd::profile::is_blacklist_enabled() {
+	return blacklist_enabled_;
 }
 
 std::string swd::profile::get_key() {

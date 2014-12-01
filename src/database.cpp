@@ -83,8 +83,9 @@ swd::database_row swd::database::get_profile(std::string server_ip, int profile_
 	 * with a mutex. Stress tests have to be done.
 	 */
 	pthread_mutex_lock(&dbi_conn_query_lock);
-	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, learning, threshold "
-	 "FROM profiles WHERE server_ip = %s AND id = %i", server_ip_esc, profile_id);
+	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, learning_enabled, "
+	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE server_ip = "
+	 "%s AND id = %i", server_ip_esc, profile_id);
 	pthread_mutex_unlock(&dbi_conn_query_lock);
 
 	/* Don't forget to free server_ip_esc to avoid a memory leak. */
@@ -107,9 +108,17 @@ swd::database_row swd::database::get_profile(std::string server_ip, int profile_
 
 		row["key"] = dbi_result_get_string(res, "hmac_key");
 
-		std::stringstream learning;
-		learning << dbi_result_get_uint(res, "learning");
-		row["learning"] = learning.str();
+		std::stringstream learning_enabled;
+		learning_enabled << dbi_result_get_uint(res, "learning_enabled");
+		row["learning_enabled"] = learning_enabled.str();
+
+		std::stringstream whitelist_enabled;
+		whitelist_enabled << dbi_result_get_uint(res, "whitelist_enabled");
+		row["whitelist_enabled"] = whitelist_enabled.str();
+
+		std::stringstream blacklist_enabled;
+		blacklist_enabled << dbi_result_get_uint(res, "blacklist_enabled");
+		row["blacklist_enabled"] = blacklist_enabled.str();
 
 		std::stringstream threshold;
 		threshold << dbi_result_get_uint(res, "threshold");

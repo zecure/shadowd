@@ -171,7 +171,9 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 				new swd::profile(
 					remote_address_.to_string(),
 					atoi(row["id"].c_str()),
-					(row["learning"] == "1"),
+					(row["learning_enabled"] == "1"),
+					(row["whitelist_enabled"] == "1"),
+					(row["blacklist_enabled"] == "1"),
 					row["key"],
 					atoi(row["threshold"].c_str())
 				)

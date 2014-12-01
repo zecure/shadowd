@@ -33,12 +33,15 @@ namespace swd {
 			 *
 			 * @param server_ip The ip of the http server/shadowd client
 			 * @param id The id of the profile
-			 * @param learning The status of the learning mode
+			 * @param learning_enabled The status of the learning mode
+			 * @param whitelist_enabled The status of the whitelist
+			 * @param blacklist_enabled The status of the blacklist
 			 * @param key The key for the hmac check
 			 * @param threshold The threshold for blacklist impacts
 			 */
-			profile(std::string server_ip, int id, bool learning,
-			 std::string key, int threshold);
+			profile(std::string server_ip, int id, bool learning_enabled,
+			 bool whitelist_enabled, bool blacklist_enabled, std::string key,
+			 int threshold);
 
 			/**
 			 * @brief Get the ip of the http server/shadowd client.
@@ -59,7 +62,21 @@ namespace swd {
 			 *
 			 * @return The learning status
 			 */
-			bool is_learning();
+			bool is_learning_enabled();
+
+			/**
+			 * @brief Get the status of the whitelist for the profile.
+			 *
+			 * @return The whitelist status
+			 */
+			bool is_whitelist_enabled();
+
+			/**
+			 * @brief Get the status of the blacklist for the profile.
+			 *
+			 * @return The blacklist status
+			 */
+			bool is_blacklist_enabled();
 
 			/**
 			 * @brief Get the key/password for the profile.
@@ -87,7 +104,9 @@ namespace swd {
 		private:
 			std::string server_ip_;
 			int id_;
-			bool learning_;
+			bool learning_enabled_;
+			bool whitelist_enabled_;
+			bool blacklist_enabled_;
 			std::string key_;
 			int threshold_;
 

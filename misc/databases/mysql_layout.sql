@@ -29,13 +29,15 @@ CREATE INDEX idx_tags_filters1 ON tags_filters (tag_id);
 CREATE INDEX idx_tags_filters2 ON tags_filters (filter_id);
 
 CREATE TABLE profiles (
-    id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
-    date        DATETIME,
-    server_ip   varchar(200) NOT NULL,
-    name        varchar(200) NOT NULL,
-    hmac_key    varchar(200) NOT NULL,
-    learning    smallint NOT NULL,
-    threshold   int NOT NULL
+    id                  INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
+    date                DATETIME,
+    server_ip           varchar(200) NOT NULL,
+    name                varchar(200) NOT NULL,
+    hmac_key            varchar(200) NOT NULL,
+    learning_enabled    smallint NOT NULL,
+    whitelist_enabled   smallint NOT NULL,
+    blacklist_enabled   smallint NOT NULL,
+    threshold           int NOT NULL
 );
 
 CREATE INDEX idx_profiles ON profiles (server_ip);

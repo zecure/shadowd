@@ -29,13 +29,15 @@ CREATE INDEX ON tags_filters (tag_id);
 CREATE INDEX ON tags_filters (filter_id);
 
 CREATE TABLE profiles (
-	id			SERIAL primary key,
-	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
-	server_ip	text NOT NULL,
-	name		text NOT NULL,
-	hmac_key	text NOT NULL,
-	learning	smallint NOT NULL,
-	threshold	int NOT NULL
+	id					SERIAL primary key,
+	date				timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
+	server_ip			text NOT NULL,
+	name				text NOT NULL,
+	hmac_key			text NOT NULL,
+	learning_enabled	smallint NOT NULL,
+	whitelist_enabled	smallint NOT NULL,
+	blacklist_enabled	smallint NOT NULL,
+	threshold			int NOT NULL
 );
 
 CREATE INDEX ON profiles (server_ip);

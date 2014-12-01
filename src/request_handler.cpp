@@ -142,7 +142,7 @@ std::vector<std::string> swd::request_handler::process() {
 	 */
 	std::vector<std::string> threats;
 
-	if (!request_->get_profile()->is_learning()) {
+	if (!request_->get_profile()->is_learning_enabled()) {
 		swd::parameters& parameters = request_->get_parameters();
 
 		for (swd::parameters::iterator it_parameter = parameters.begin();

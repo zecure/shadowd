@@ -27,7 +27,7 @@ void swd::storage::save(swd::request_ptr request) {
 	 * Nothing to do if there are no threats and learning is disabled. If there
 	 * is at least one threat the complete request gets recorded.
 	 */
-	if (!request->has_threats() && !request->get_profile()->is_learning()) {
+	if (!request->has_threats() && !request->get_profile()->is_learning_enabled()) {
 		return;
 	}
 
@@ -38,7 +38,7 @@ void swd::storage::save(swd::request_ptr request) {
 		request_id = swd::database::i()->save_request(
 			request->get_profile()->get_id(),
 			request->get_caller(),
-			(request->get_profile()->is_learning() ? 1 : 0),
+			(request->get_profile()->is_learning_enabled() ? 1 : 0),
 			request->get_client_ip()
 		);
 	} catch (swd::exceptions::database_exception& e) {
