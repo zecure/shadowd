@@ -42,7 +42,7 @@ void swd::analyzer::start() {
 	}
 
 	/* If the (whitelist) learning mode is activated the whitelist check is disabled. */
-	if (request_->get_profile()->is_whitelist_enabled() && !request_->get_profile()->is_learning_enabled()) {
+	if (request_->get_profile()->is_whitelist_enabled()) {
 		/* The learning mode is not activated, so continue to create a whitelist object. */
 		swd::whitelist whitelist(request_);
 		whitelist.init();
@@ -72,7 +72,7 @@ void swd::analyzer::start() {
 			}
 		}
 
-		if (request_->get_profile()->is_whitelist_enabled() && !request_->get_profile()->is_learning_enabled()) {
+		if (request_->get_profile()->is_whitelist_enabled()) {
 			/* Check if there is no responsible whitelist rule. */
 			if (parameter->get_total_rules() == 0) {
 				parameter->is_threat(true);

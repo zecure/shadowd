@@ -65,9 +65,7 @@ void swd::storage::save(swd::request_ptr request) {
 				request_id,
 				(*it_parameter).first,
 				parameter->get_value(),
-				((request->get_profile()->is_whitelist_enabled() &&
-				 !request->get_profile()->is_learning_enabled()) ?
-				 parameter->get_total_rules() : -1),
+				(request->get_profile()->is_whitelist_enabled() ? parameter->get_total_rules() : -1),
 				(parameter->has_critical_impact() ? 1 : 0 ),
 				(parameter->is_threat() ? 1 : 0 )
 			);
