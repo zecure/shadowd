@@ -21,25 +21,18 @@
 
 #include <string>
 #include <vector>
-#include <map>
 #include <boost/shared_ptr.hpp>
 #include <dbi/dbi.h>
 #include <pthread.h>
 
+#include "profile.h"
+#include "whitelist_rule.h"
+#include "whitelist_filter.h"
+#include "blacklist_filter.h"
 #include "singleton.h"
 #include "shared.h"
 
 namespace swd {
-	/**
-	 * @brief Map of strings for single database row.
-	 */
-	typedef std::map<std::string, std::string> database_row;
-
-	/**
-	 * @brief List of map of strings for multiple database rows.
-	 */
-	typedef std::vector<swd::database_row> database_rows;
-
 	/**
 	 * @brief Encapsulates and handles the database communication.
 	 *
@@ -98,14 +91,14 @@ namespace swd {
 			 * @param profile_id The database id of the profile
 			 * @return The corresponding table row
 			 */
-			swd::database_row get_profile(std::string server_ip, int profile_id);
+			swd::profile_ptr get_profile(std::string server_ip, int profile_id);
 
 			/**
 			 * @brief Get all blacklist filters.
 			 *
 			 * @return The corresponding table rows
 			 */
-			swd::database_rows get_blacklist_filters();
+			swd::blacklist_filters get_blacklist_filters();
 
 			/**
 			 * @brief Get blacklist rules by the profile and caller.
@@ -114,7 +107,7 @@ namespace swd {
 			 * @param caller The caller (php file) that initiated the connection
 			 * @return The corresponding table rows
 			 */
-			swd::database_rows get_whitelist_rules(int profile, std::string caller);
+			swd::whitelist_rules get_whitelist_rules(int profile, std::string caller);
 
 			/**
 			 * @brief Save information about a request.

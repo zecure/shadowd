@@ -162,21 +162,9 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 
 		/* Try to add a profile for the request. */
 		try {
-			swd::database_row row = swd::database::i()->get_profile(
+			swd::profile_ptr profile = swd::database::i()->get_profile(
 				remote_address_.to_string(),
 				request_->get_profile_id()
-			);
-
-			swd::profile_ptr profile(
-				new swd::profile(
-					remote_address_.to_string(),
-					atoi(row["id"].c_str()),
-					(row["learning_enabled"] == "1"),
-					(row["whitelist_enabled"] == "1"),
-					(row["blacklist_enabled"] == "1"),
-					row["key"],
-					atoi(row["threshold"].c_str())
-				)
 			);
 
 			request_->set_profile(profile);

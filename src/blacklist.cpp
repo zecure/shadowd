@@ -24,30 +24,8 @@
 
 swd::blacklist::blacklist(swd::request_ptr request)
  : request_(request) {
-}
-
-void swd::blacklist::init() {
 	/* Import the filters from the database. */
-	swd::database_rows filters = swd::database::i()->get_blacklist_filters();
-
-	/**
-	 * Iterate over the filters from the database and save them in blacklist_filter
-	 * objects. This increases the performance, because the regex objects are only
-	 * created once per request. And it makes the code more readable.
-	 */
-	for (swd::database_rows::iterator it_filter = filters.begin();
-	 it_filter != filters.end(); ++it_filter) {
-		swd::blacklist_filter_ptr filter(
-			new swd::blacklist_filter(
-				atoi((*it_filter)["id"].c_str()),
-				(*it_filter)["rule"],
-				atoi((*it_filter)["impact"].c_str())
-			)
-		);
-
-		/* Save the smart pointer of the filter in a vector. */
-		filters_.push_back(filter);
-	}
+	filters_ = swd::database::i()->get_blacklist_filters();
 }
 
 void swd::blacklist::scan() {

@@ -64,7 +64,7 @@ void swd::database::ensure_connection() {
 	pthread_mutex_unlock(&dbi_conn_query_lock);
 }
 
-swd::database_row swd::database::get_profile(std::string server_ip, int profile_id) {
+swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_id) {
 	/* Test the database connection status. Tries to reconnect if disconnected. */
 	ensure_connection();
 
@@ -99,38 +99,28 @@ swd::database_row swd::database::get_profile(std::string server_ip, int profile_
 		throw swd::exceptions::database_exception("Can't get profile");
 	}
 
-	swd::database_row row;
-
-	if (dbi_result_next_row(res)) {
-		std::stringstream id;
-		id << dbi_result_get_uint(res, "id");
-		row["id"] = id.str();
-
-		row["key"] = dbi_result_get_string(res, "hmac_key");
-
-		std::stringstream learning_enabled;
-		learning_enabled << dbi_result_get_uint(res, "learning_enabled");
-		row["learning_enabled"] = learning_enabled.str();
-
-		std::stringstream whitelist_enabled;
-		whitelist_enabled << dbi_result_get_uint(res, "whitelist_enabled");
-		row["whitelist_enabled"] = whitelist_enabled.str();
-
-		std::stringstream blacklist_enabled;
-		blacklist_enabled << dbi_result_get_uint(res, "blacklist_enabled");
-		row["blacklist_enabled"] = blacklist_enabled.str();
-
-		std::stringstream threshold;
-		threshold << dbi_result_get_uint(res, "threshold");
-		row["threshold"] = threshold.str();
+	if (!dbi_result_next_row(res)) {
+		throw swd::exceptions::database_exception("No profile?");
 	}
+
+	swd::profile_ptr profile(
+		new swd::profile(
+			server_ip,
+			dbi_result_get_uint(res, "id"),
+			(dbi_result_get_uint(res, "learning_enabled") == 1),
+			(dbi_result_get_uint(res, "whitelist_enabled") == 1),
+			(dbi_result_get_uint(res, "blacklist_enabled") == 1),
+			dbi_result_get_string(res, "hmac_key"),
+			dbi_result_get_uint(res, "threshold")
+		)
+	);
 
 	dbi_result_free(res);
 
-	return row;
+	return profile;
 }
 
-swd::database_rows swd::database::get_blacklist_filters() {
+swd::blacklist_filters swd::database::get_blacklist_filters() {
 	ensure_connection();
 
 	pthread_mutex_lock(&dbi_conn_query_lock);
@@ -141,30 +131,26 @@ swd::database_rows swd::database::get_blacklist_filters() {
 		throw swd::exceptions::database_exception("Can't execute blacklist_filters query");
 	}
 
-	swd::database_rows rows;
+	swd::blacklist_filters filters;
 
 	while (dbi_result_next_row(res)) {
-		swd::database_row row;
+		swd::blacklist_filter_ptr filter(
+			new swd::blacklist_filter(
+				dbi_result_get_uint(res, "id"),
+				dbi_result_get_string(res, "rule"),
+				dbi_result_get_uint(res, "impact")
+			)
+		);
 
-		std::stringstream id;
-		id << dbi_result_get_uint(res, "id");
-		row["id"] = id.str();
-
-		std::stringstream impact;
-		impact << dbi_result_get_uint(res, "impact");
-		row["impact"] = impact.str();
-
-		row["rule"] = dbi_result_get_string(res, "rule");
-
-		rows.push_back(row);
+		filters.push_back(filter);
 	}
 
 	dbi_result_free(res);
 
-	return rows;
+	return filters;
 }
 
-swd::database_rows swd::database::get_whitelist_rules(int profile,
+swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
  std::string caller) {
 	ensure_connection();
 
@@ -190,41 +176,32 @@ swd::database_rows swd::database::get_whitelist_rules(int profile,
 		throw swd::exceptions::database_exception("Can't execute whitelist_rules query");
 	}
 
-	swd::database_rows rows;
+	swd::whitelist_rules rules;
 
 	while (dbi_result_next_row(res)) {
-		swd::database_row row;
+		swd::whitelist_filter_ptr filter(
+			new swd::whitelist_filter(
+				dbi_result_get_uint(res, "filter_id"),
+				dbi_result_get_string(res, "rule")
+			)
+		);
 
-		std::stringstream id;
-		id << dbi_result_get_uint(res, "id");
-		row["id"] = id.str();
+		swd::whitelist_rule_ptr rule(
+			new swd::whitelist_rule(
+				dbi_result_get_uint(res, "id"),
+				dbi_result_get_string(res, "path"),
+				filter,
+				dbi_result_get_uint(res, "min_length"),
+				dbi_result_get_uint(res, "max_length")
+			)
+		);
 
-		std::stringstream filter_id;
-		filter_id << dbi_result_get_uint(res, "filter_id");
-		row["filter_id"] = filter_id.str();
-
-		row["rule"] = dbi_result_get_string(res, "rule");
-
-		std::stringstream impact;
-		impact << dbi_result_get_uint(res, "impact");
-		row["impact"] = impact.str();
-
-		std::stringstream min_length;
-		min_length << dbi_result_get_uint(res, "min_length");
-		row["min_length"] = min_length.str();
-
-		std::stringstream max_length;
-		max_length << dbi_result_get_uint(res, "max_length");
-		row["max_length"] = max_length.str();
-
-		row["path"] = dbi_result_get_string(res, "path");
-
-		rows.push_back(row);
+		rules.push_back(rule);
 	}
 
 	dbi_result_free(res);
 
-	return rows;
+	return rules;
 }
 
 int swd::database::save_request(int profile, std::string caller, int learning,

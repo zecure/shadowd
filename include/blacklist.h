@@ -29,17 +29,12 @@ namespace swd {
 	class blacklist {
 		public:
 			/**
-			 * @brief Construct the blacklist.
+			 * @brief Construct the blacklist. Initialize the blacklist filters
+			 *  once to cache them for the life time of this request.
 			 *
 			 * @param request The pointer to the request object
 			 */
 			blacklist(swd::request_ptr request);
-
-			/**
-			 * @brief Initialize the blacklist filters once to cache them for the
-			 *  life time of this request.
-			 */
-			void init();
 
 			/**
 			 * @brief Scan all parameters in the request and add connections to

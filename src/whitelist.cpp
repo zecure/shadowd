@@ -22,37 +22,11 @@
 
 swd::whitelist::whitelist(swd::request_ptr request)
  : request_(request) {
-}
-
-void swd::whitelist::init() {
 	/* Import the rules from the database. */
-	swd::database_rows rules = swd::database::i()->get_whitelist_rules(
+	rules_ = swd::database::i()->get_whitelist_rules(
 		request_->get_profile()->get_id(),
 		request_->get_caller()
 	);
-
-	for (swd::database_rows::iterator it_rule = rules.begin();
-	 it_rule != rules.end(); ++it_rule) {
-		swd::whitelist_filter_ptr filter(
-			new swd::whitelist_filter(
-				atoi((*it_rule)["filter_id"].c_str()),
-				(*it_rule)["rule"]
-			)
-		);
-
-		swd::whitelist_rule_ptr rule(
-			new swd::whitelist_rule(
-				atoi((*it_rule)["id"].c_str()),
-				(*it_rule)["path"],
-				filter,
-				atoi((*it_rule)["min_length"].c_str()),
-				atoi((*it_rule)["max_length"].c_str())
-			)
-		);
-
-		/* Save the smart pointer of the rule in a vector. */
-		rules_.push_back(rule);
-	}
 }
 
 void swd::whitelist::scan() {

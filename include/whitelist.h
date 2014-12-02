@@ -32,17 +32,12 @@ namespace swd {
 	class whitelist {
 		public:
 			/**
-			 * @brief Construct the whitelist.
+			 * @brief Construct the whitelist. Initialize the whitelist rules
+			 * once to cache them for the life time of this request.
 			 *
 			 * @param request The pointer to the request object
 			 */
 			whitelist(swd::request_ptr request);
-
-			/**
-			 * @brief Initialize the whitelist rules once to cache them for the life
-			 *  time of this request.
-			 */
-			void init();
 
 			/**
 			 * @brief Scan all parameters in the request and add connections to broken

@@ -31,7 +31,6 @@ void swd::analyzer::start() {
 		 * request and we have a neat cache for the regex objects.
 		 */
 		swd::blacklist blacklist(request_);
-		blacklist.init();
 
 		/**
 		 * The blacklist checks the PHPIDS rules against all parameters and generates an
@@ -45,7 +44,6 @@ void swd::analyzer::start() {
 	if (request_->get_profile()->is_whitelist_enabled()) {
 		/* The learning mode is not activated, so continue to create a whitelist object. */
 		swd::whitelist whitelist(request_);
-		whitelist.init();
 
 		/**
 		 * The whitelist checks for all parameters if there exists a rule and if it
