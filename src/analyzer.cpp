@@ -40,9 +40,7 @@ void swd::analyzer::start() {
 		blacklist.scan();
 	}
 
-	/* If the (whitelist) learning mode is activated the whitelist check is disabled. */
 	if (request_->get_profile()->is_whitelist_enabled()) {
-		/* The learning mode is not activated, so continue to create a whitelist object. */
 		swd::whitelist whitelist(request_);
 
 		/**
