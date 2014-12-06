@@ -59,7 +59,7 @@ void swd::log::send(swd::log_level level, std::string message) {
 
 	/* Write the final line into a log file or stderr. */
 	if (!file_.empty()) {
-		std::ofstream out_file(file_.c_str());
+		std::ofstream out_file(file_.c_str(), std::ios_base::app);
 
 		if (!out_file.is_open()) {
 			return;
