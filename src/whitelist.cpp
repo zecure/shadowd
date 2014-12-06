@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/lexical_cast.hpp>
+
 #include "whitelist.h"
 #include "database.h"
 #include "log.h"
@@ -50,9 +52,16 @@ void swd::whitelist::scan() {
 				 */
 				parameter->increment_rules_counter();
 
-				/* Add pointers to all rules that are not adhered to by this parameter. */
-				if (!rule->is_adhered_to(parameter->get_value())) {
-					parameter->add_whitelist_rule(rule);
+				swd::log::i()->send(swd::notice, "Testing whitelist rule "
+				 + boost::lexical_cast<std::string>(rule->get_id()));
+
+				try {
+					/* Add pointers to all rules that are not adhered to by this parameter. */
+					if (!rule->is_adhered_to(parameter->get_value())) {
+						parameter->add_whitelist_rule(rule);
+					}
+				} catch (...) {
+					swd::log::i()->send(swd::uncritical_error, "Unexpected whitelist problem");
 				}
 			}
 		}

@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+#include <boost/lexical_cast.hpp>
 
 #include "blacklist.h"
 #include "database.h"
@@ -41,13 +42,18 @@ void swd::blacklist::scan() {
 		 it_filter != filters_.end(); it_filter++) {
 			swd::blacklist_filter_ptr filter(*it_filter);
 
+			swd::log::i()->send(swd::notice, "Testing blacklist filter "
+			 + boost::lexical_cast<std::string>(filter->get_id()));
+
 			/* If there is catastrophic backtracking boost throws an exception. */
 			try {
 				/* Add pointers to all filters that match to the parameter. */
 				if (filter->match(parameter->get_value())) {
 					parameter->add_blacklist_filter(filter);
 				}
-			} catch (...) {}
+			} catch (...) {
+				swd::log::i()->send(swd::uncritical_error, "Unexpected blacklist problem");
+			}
 		}
 	}
 }

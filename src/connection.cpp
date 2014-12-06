@@ -57,6 +57,9 @@ void swd::connection::start() {
 	remote_address_ = remote_endpoint.address();
 
 	if (ssl_) {
+		swd::log::i()->send(swd::notice, "Starting new ssl connection with "
+		 + remote_address_.to_string());
+
 		/**
 		 * If this is a SSL connection we have to do a handshake before we can
 		 * start reading.
@@ -72,6 +75,9 @@ void swd::connection::start() {
 			)
 		);
 	} else {
+		swd::log::i()->send(swd::notice, "Starting new connection with "
+		 + remote_address_.to_string());
+
 		/* No SSL, directly start reading the input. */
 		start_read();
 	}
@@ -179,7 +185,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		/* Only continue processing the reply if it is signed correctly. */
 		if (!request_handler.valid_signature()) {
 			swd::log::i()->send(swd::warning, "Bad signature from "
-			 + request_->get_profile()->get_server_ip());
+			 + remote_address_.to_string());
 			throw swd::exceptions::connection_exception(STATUS_BAD_SIGNATURE);
 		}
 
@@ -189,7 +195,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		 */
 		if (!request_handler.decode()) {
 			swd::log::i()->send(swd::warning, "Bad json from "
-			 + request_->get_profile()->get_server_ip());
+			 + remote_address_.to_string());
 			throw swd::exceptions::connection_exception(STATUS_BAD_JSON);
 		}
 

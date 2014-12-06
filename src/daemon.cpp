@@ -57,7 +57,7 @@ void swd::daemon::write_pid(std::string file) {
 	std::ofstream out_file(file.c_str());
 
 	if (!out_file.is_open()) {
-		throw swd::exceptions::core_exception("failed to write pid file");
+		throw swd::exceptions::core_exception("Failed to write pid file");
 	}
 
 	out_file << getpid();

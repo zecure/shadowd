@@ -87,7 +87,7 @@ void swd::config::parse_config_file(std::string file) {
 	std::ifstream ifs(file.c_str());
 
 	if (!ifs) {
-		throw swd::exceptions::core_exception("can't open config file");
+		throw swd::exceptions::core_exception("Can't open config file");
 	}
 
 	po::options_description combination;

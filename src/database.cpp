@@ -20,8 +20,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "database.h"
+#include "log.h"
 
 void swd::database::connect(std::string driver, std::string host, std::string port,
  std::string username, std::string password, std::string name, std::string encoding) {
@@ -56,6 +58,8 @@ void swd::database::disconnect() {
 void swd::database::ensure_connection() {
 	pthread_mutex_lock(&dbi_conn_query_lock);
 	if (dbi_conn_ping(conn_) < 1) {
+		swd::log::i()->send(swd::notice, "Dropped database connection");
+
 		if (dbi_conn_connect(conn_) < 0) {
 			pthread_mutex_unlock(&dbi_conn_query_lock);
 			throw swd::exceptions::database_exception("Lost database connection");
@@ -65,6 +69,9 @@ void swd::database::ensure_connection() {
 }
 
 swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_id) {
+	swd::log::i()->send(swd::notice, "Get profile -> server_ip: " + server_ip
+	 + "; profile_id: " + boost::lexical_cast<std::string>(profile_id));
+
 	/* Test the database connection status. Tries to reconnect if disconnected. */
 	ensure_connection();
 
@@ -121,6 +128,8 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 }
 
 swd::blacklist_filters swd::database::get_blacklist_filters() {
+	swd::log::i()->send(swd::notice, "Get blacklist filters");
+
 	ensure_connection();
 
 	pthread_mutex_lock(&dbi_conn_query_lock);
@@ -152,6 +161,8 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
 
 swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
  std::string caller) {
+	swd::log::i()->send(swd::notice, "Get whitelist rules");
+
 	ensure_connection();
 
 	char *caller_esc = strdup(caller.c_str());
@@ -206,6 +217,11 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 
 int swd::database::save_request(int profile, std::string caller, int learning,
  std::string client_ip) {
+	swd::log::i()->send(swd::notice, "Save request -> profile: "
+	 + boost::lexical_cast<std::string>(profile) + "; caller: " + caller
+	 + "; learning: " + boost::lexical_cast<std::string>(learning)
+	 + "; client_ip: " + client_ip);
+
 	ensure_connection();
 
 	char *caller_esc = strdup(caller.c_str());
