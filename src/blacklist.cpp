@@ -42,9 +42,6 @@ void swd::blacklist::scan() {
 		 it_filter != filters_.end(); it_filter++) {
 			swd::blacklist_filter_ptr filter(*it_filter);
 
-			swd::log::i()->send(swd::notice, "Testing blacklist filter "
-			 + boost::lexical_cast<std::string>(filter->get_id()));
-
 			/* If there is catastrophic backtracking boost throws an exception. */
 			try {
 				/* Add pointers to all filters that match to the parameter. */

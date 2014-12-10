@@ -52,9 +52,6 @@ void swd::whitelist::scan() {
 				 */
 				parameter->increment_rules_counter();
 
-				swd::log::i()->send(swd::notice, "Testing whitelist rule "
-				 + boost::lexical_cast<std::string>(rule->get_id()));
-
 				try {
 					/* Add pointers to all rules that are not adhered to by this parameter. */
 					if (!rule->is_adhered_to(parameter->get_value())) {
