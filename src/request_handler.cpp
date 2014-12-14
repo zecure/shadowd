@@ -1,5 +1,5 @@
 /**
- * Shadow Daemon -- High-Interaction Web Honeypot
+ * Shadow Daemon -- Web Application Firewall
  *
  *   Copyright (C) 2014 Hendrik Buchwald <hb@zecure.org>
  *

@@ -1,5 +1,5 @@
 /**
- * Shadow Daemon -- High-Interaction Web Honeypot
+ * Shadow Daemon -- Web Application Firewall
  *
  *   Copyright (C) 2014 Hendrik Buchwald <hb@zecure.org>
  *
@@ -77,7 +77,7 @@ void swd::config::parse_command_line(int argc, char** argv) {
 	}
 
 	if (this->defined("help")) {
-		std::cout << "Shadow Daemon " << SHADOWD_VERSION << " -- High-Interaction Web Honeypot"
+		std::cout << "Shadow Daemon " << SHADOWD_VERSION << " -- Web Application Firewall"
 				  << std::endl << combination << std::endl;
 		exit(0);
 	}

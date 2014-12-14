@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Shadow Daemon -- High-Interaction Web Honeypot
+# Shadow Daemon -- Web Application Firewall
 #
 #   Copyright (C) 2014 Hendrik Buchwald <hb@zecure.org>
 #
@@ -137,7 +137,7 @@ sub delete_filters {
 }
 
 sub help {
-	print "Shadow Daemon -- High-Interaction Web Honeypot\n" .
+	print "Shadow Daemon -- Web Application Firewall\n" .
 	 "PHPIDS default_filter.json Database Importer\n" .
 	 "usage: " . $0 . " [options]\n" .
 	 "  -i <file>: Path to input file\n" .
