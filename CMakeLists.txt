@@ -46,3 +46,6 @@ include_directories(${PROJECT_BINARY_DIR})
 
 # Add source
 add_subdirectory(src)
+
+# Add misc
+add_subdirectory(misc)
