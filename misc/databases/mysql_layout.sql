@@ -135,7 +135,7 @@ CREATE TABLE users (
     id              INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
     username        varchar(200) UNIQUE NOT NULL,
     `password`      varchar(200) NOT NULL,
-    email           varchar(200) NOT NULL,
+    email           varchar(200),
     role            smallint NOT NULL,
     change_password boolean,
     date            DATETIME

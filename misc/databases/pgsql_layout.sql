@@ -135,7 +135,7 @@ CREATE TABLE users (
 	id				SERIAL primary key,
 	username		text NOT NULL,
 	password		text NOT NULL,
-	email			text NOT NULL,
+	email			text,
 	role			smallint NOT NULL,
 	change_password	boolean,
 	date			timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp)
