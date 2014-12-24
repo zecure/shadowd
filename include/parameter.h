@@ -109,12 +109,12 @@ namespace swd {
 			bool has_critical_impact();
 
 			/**
-			 * @brief Increment the whitelist rules counter.
+			 * @brief Set the number of whitelist rules.
 			 *
 			 * Parameters with not whitelist rule are also classified as an
 			 * attack, so we have to keep track of the responsible rules.
 			 */
-			void increment_rules_counter();
+			void set_total_rules(int total_rules);
 
 			/**
 			 * @brief Get the total number of responsible whitelist rules.
@@ -129,7 +129,7 @@ namespace swd {
 			swd::whitelist_rules rules_;
 			bool threat_;
 			bool critical_impact_;
-			int rules_counter_;
+			int total_rules_;
 	};
 
 	/**

@@ -19,6 +19,8 @@
 #include "analyzer.h"
 #include "blacklist.h"
 #include "whitelist.h"
+#include "blacklist_rule.h"
+#include "database.h"
 
 swd::analyzer::analyzer(swd::request_ptr request) :
  request_(request) {
@@ -61,8 +63,32 @@ void swd::analyzer::start() {
 		swd::parameter_ptr parameter((*it_parameter).second);
 
 		if (request_->get_profile()->is_blacklist_enabled()) {
+			int threshold = request_->get_profile()->get_threshold();
+
+			swd::blacklist_rules rules = swd::database::i()->get_blacklist_rules(
+				request_->get_profile()->get_id(),
+				request_->get_caller(),
+				(*it_parameter).first
+			);
+
+			if (rules.size() > 0) {
+				/* Get the most secure threshold in case of an overlap. */
+				for (swd::blacklist_rules::iterator it_rule = rules.begin();
+				 it_rule != rules.end(); it_rule++) {
+					swd::blacklist_rule_ptr rule(*it_rule);
+
+					if (it_rule == rules.begin()) {
+						threshold = rule->get_threshold();
+					} else if (rule->get_threshold() > -1) {
+						if ((threshold < 0) || (rule->get_threshold() < threshold)) {
+							threshold = rule->get_threshold();
+						}
+					}
+				}
+			}
+
 			/* Check if the impact is higher than the threshold. */
-			if (parameter->get_impact() > request_->get_profile()->get_threshold()) {
+			if ((threshold > -1) && (parameter->get_impact() > threshold)) {
 				parameter->is_threat(true);
 				parameter->has_critical_impact(true);
 			}

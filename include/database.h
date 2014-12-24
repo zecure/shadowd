@@ -28,6 +28,7 @@
 #include "profile.h"
 #include "whitelist_rule.h"
 #include "whitelist_filter.h"
+#include "blacklist_rule.h"
 #include "blacklist_filter.h"
 #include "singleton.h"
 #include "shared.h"
@@ -94,6 +95,17 @@ namespace swd {
 			swd::profile_ptr get_profile(std::string server_ip, int profile_id);
 
 			/**
+			 * @brief Get blacklist rules by the profile and caller.
+			 *
+			 * @param profile The profile id of the request
+			 * @param caller The caller (php file) that initiated the connection
+			 * @param path The path of the parameter
+			 * @return The corresponding table rows
+			 */
+			swd::blacklist_rules get_blacklist_rules(int profile, std::string caller,
+			 std::string path);
+
+			/**
 			 * @brief Get all blacklist filters.
 			 *
 			 * @return The corresponding table rows
@@ -101,13 +113,15 @@ namespace swd {
 			swd::blacklist_filters get_blacklist_filters();
 
 			/**
-			 * @brief Get blacklist rules by the profile and caller.
+			 * @brief Get whitelist rules by the profile and caller.
 			 *
 			 * @param profile The profile id of the request
-			 * @param caller The caller (php file) that initiated the connection
+			 * @param caller The caller (resource) that initiated the connection
+			 * @param path The path of the parameter
 			 * @return The corresponding table rows
 			 */
-			swd::whitelist_rules get_whitelist_rules(int profile, std::string caller);
+			swd::whitelist_rules get_whitelist_rules(int profile, std::string caller,
+			 std::string path);
 
 			/**
 			 * @brief Save information about a request.

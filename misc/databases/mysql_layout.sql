@@ -74,6 +74,24 @@ CREATE INDEX idx_parameters4 ON parameters (total_rules);
 CREATE INDEX idx_parameters5 ON parameters (critical_impact);
 CREATE INDEX idx_parameters6 ON parameters (threat);
 
+CREATE TABLE blacklist_rules (
+    id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
+    profile_id  INTEGER UNSIGNED NOT NULL,
+    path        text NOT NULL,
+    caller      text NOT NULL,
+    threshold   integer NOT NULL,
+    date        DATETIME,
+    status      smallint NOT NULL,
+    CONSTRAINT fk_blacklist_rules1 FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_blacklist_rules1 ON blacklist_rules (profile_id);
+CREATE INDEX idx_blacklist_rules2 ON blacklist_rules (path(20));
+CREATE INDEX idx_blacklist_rules3 ON blacklist_rules (caller(20));
+CREATE INDEX idx_blacklist_rules4 ON blacklist_rules (threshold);
+CREATE INDEX idx_blacklist_rules5 ON blacklist_rules (date);
+CREATE INDEX idx_blacklist_rules6 ON blacklist_rules (status);
+
 CREATE TABLE blacklist_parameters (
     filter_id    INTEGER UNSIGNED NOT NULL,
     parameter_id INTEGER UNSIGNED NOT NULL,

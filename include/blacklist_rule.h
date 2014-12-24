@@ -16,35 +16,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WHITELIST_H
-#define WHITELIST_H
+#ifndef BLACKLIST_RULE_H
+#define BLACKLIST_RULE_H
 
+#include <string>
 #include <vector>
-
-#include "request.h"
+#include <boost/shared_ptr.hpp>
 
 namespace swd {
 	/**
-	 * @brief Handles the whitelist examination of a request.
+	 * @brief Models a blacklist rule.
 	 */
-	class whitelist {
+	class blacklist_rule {
 		public:
 			/**
-			 * @brief Construct the whitelist.
+			 * @brief Construct a blacklist rule.
 			 *
-			 * @param request The pointer to the request object
+			 * @param id The id of the rule
+			 * @param threshold The threshold of the rule
 			 */
-			whitelist(swd::request_ptr request);
+			blacklist_rule(int id, int threshold);
 
 			/**
-			 * @brief Scan all parameters in the request and add connections to broken
-			 *  rules.
+			 * @brief Get the id the rule.
+			 *
+			 * @return The id of the rule
 			 */
-			void scan();
+			int get_id();
+
+			/**
+			 * @brief Get the threshold the rule.
+			 *
+			 * @return The threshold of the rule
+			 */
+			int get_threshold();
 
 		private:
-			swd::request_ptr request_;
+			int id_;
+			int threshold_;
 	};
+
+	/**
+	 * @brief Blacklist rule pointer.
+	 */
+	typedef boost::shared_ptr<swd::blacklist_rule> blacklist_rule_ptr;
+
+	/**
+	 * @brief List of blacklist rule pointers.
+	 */
+	typedef std::vector<swd::blacklist_rule_ptr> blacklist_rules;
 }
 
-#endif /* WHITELIST_H */
+#endif /* BLACKLIST_RULE_H */

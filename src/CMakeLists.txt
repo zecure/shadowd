@@ -3,7 +3,7 @@ link_directories(${SHADOWD_BINARY_DIR}/src)
 
 add_executable(shadowd analyzer.cpp blacklist_filter.cpp config.cpp daemon.cpp
 	log.cpp profile.cpp reply_handler.cpp request_handler.cpp server.cpp
-	storage.cpp whitelist_filter.cpp blacklist.cpp connection.cpp
+	storage.cpp whitelist_filter.cpp blacklist.cpp blacklist_rule.cpp connection.cpp
 	database.cpp parameter.cpp reply.cpp request.cpp request_parser.cpp
 	shadowd.cpp whitelist.cpp whitelist_rule.cpp)
 

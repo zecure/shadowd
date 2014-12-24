@@ -16,35 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WHITELIST_H
-#define WHITELIST_H
+#include "blacklist_rule.h"
 
-#include <vector>
-
-#include "request.h"
-
-namespace swd {
-	/**
-	 * @brief Handles the whitelist examination of a request.
-	 */
-	class whitelist {
-		public:
-			/**
-			 * @brief Construct the whitelist.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			whitelist(swd::request_ptr request);
-
-			/**
-			 * @brief Scan all parameters in the request and add connections to broken
-			 *  rules.
-			 */
-			void scan();
-
-		private:
-			swd::request_ptr request_;
-	};
+swd::blacklist_rule::blacklist_rule(int id, int threshold) :
+ id_(id),
+ threshold_(threshold) {
 }
 
-#endif /* WHITELIST_H */
+int swd::blacklist_rule::get_id() {
+	return id_;
+}
+
+int swd::blacklist_rule::get_threshold() {
+	return threshold_;
+}

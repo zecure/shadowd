@@ -74,6 +74,24 @@ CREATE INDEX ON parameters (total_rules);
 CREATE INDEX ON parameters (critical_impact);
 CREATE INDEX ON parameters (threat);
 
+CREATE TABLE blacklist_rules (
+	id			SERIAL primary key,
+	profile_id	integer NOT NULL,
+	path		text NOT NULL,
+	caller		text NOT NULL,
+	threshold	integer NOT NULL,
+	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
+	status		smallint NOT NULL,
+	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ON blacklist_rules (profile_id);
+CREATE INDEX ON blacklist_rules (path);
+CREATE INDEX ON blacklist_rules (caller);
+CREATE INDEX ON blacklist_rules (threshold);
+CREATE INDEX ON blacklist_rules (date);
+CREATE INDEX ON blacklist_rules (status);
+
 CREATE TABLE blacklist_parameters (
 	filter_id		int NOT NULL,
 	parameter_id	int NOT NULL,

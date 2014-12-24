@@ -16,14 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RULE_H
-#define RULE_H
+#ifndef WHITELIST_RULE_H
+#define WHITELIST_RULE_H
 
 #include <string>
-#include <vector>
 #include <boost/shared_ptr.hpp>
-#include <boost/regex.hpp>
-#include <boost/algorithm/string/replace.hpp>
 
 #include "whitelist_filter.h"
 
@@ -41,13 +38,12 @@ namespace swd {
 			 * @brief Construct a whitelist rule.
 			 *
 			 * @param id The id of the rule
-			 * @param path The path of the rule
 			 * @param filter The whitelist filter of the rule
 			 * @param min_length The minimum length of the rule
 			 * @param max_length The maximum length of the rule
 			 */
-			whitelist_rule(int id, std::string path, swd::whitelist_filter_ptr filter,
-			 int min_length, int max_length);
+			whitelist_rule(int id, swd::whitelist_filter_ptr filter, int min_length,
+			 int max_length);
 
 			/**
 			 * @brief Get the id the rule.
@@ -55,14 +51,6 @@ namespace swd {
 			 * @return The id of the rule
 			 */
 			int get_id();
-
-			/**
-			 * @brief Test for path if the rule should handle the parameter.
-			 *
-			 * @param path The string that should be tested
-			 * @return The status of the responsibility test
-			 */
-			bool is_responsible(std::string path);
 
 			/**
 			 * @brief Test for value if the filter matches and if the length is
@@ -74,9 +62,7 @@ namespace swd {
 			bool is_adhered_to(std::string value);
 
 		private:
-			void escape_regex(std::string &regex);
 			int id_;
-			boost::regex path_;
 			swd::whitelist_filter_ptr filter_;
 			int min_length_;
 			int max_length_;
@@ -93,4 +79,4 @@ namespace swd {
 	typedef std::vector<swd::whitelist_rule_ptr> whitelist_rules;
 }
 
-#endif /* RULE_H */
+#endif /* WHITELIST_RULE_H */

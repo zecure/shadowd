@@ -127,6 +127,51 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 	return profile;
 }
 
+swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
+ std::string caller, std::string path) {
+	swd::log::i()->send(swd::notice, "Get blacklist rules");
+
+	ensure_connection();
+
+	char *caller_esc = strdup(caller.c_str());
+	dbi_conn_quote_string(conn_, &caller_esc);
+
+	char *path_esc = strdup(path.c_str());
+	dbi_conn_quote_string(conn_, &path_esc);
+
+	pthread_mutex_lock(&dbi_conn_query_lock);
+	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, r.threshold "
+	 "FROM blacklist_rules AS r WHERE r.profile_id = %i AND %s LIKE "
+	 "REPLACE(REPLACE(REPLACE(r.caller, '_', '\\_'), '%', '\\%'), '*', '%') AND %s LIKE "
+	 "REPLACE(REPLACE(REPLACE(r.path, '_', '\\_'), '%', '\\%'), '*', '%') AND r.status = %i",
+	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
+	pthread_mutex_unlock(&dbi_conn_query_lock);
+
+	free(caller_esc);
+	free(path_esc);
+
+	if (!res) {
+		throw swd::exceptions::database_exception("Can't execute blacklist_rules query");
+	}
+
+	swd::blacklist_rules rules;
+
+	while (dbi_result_next_row(res)) {
+		swd::blacklist_rule_ptr rule(
+			new swd::blacklist_rule(
+				dbi_result_get_uint(res, "id"),
+				dbi_result_get_uint(res, "threshold")
+			)
+		);
+
+		rules.push_back(rule);
+	}
+
+	dbi_result_free(res);
+
+	return rules;
+}
+
 swd::blacklist_filters swd::database::get_blacklist_filters() {
 	swd::log::i()->send(swd::notice, "Get blacklist filters");
 
@@ -160,13 +205,16 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
 }
 
 swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
- std::string caller) {
+ std::string caller, std::string path) {
 	swd::log::i()->send(swd::notice, "Get whitelist rules");
 
 	ensure_connection();
 
 	char *caller_esc = strdup(caller.c_str());
 	dbi_conn_quote_string(conn_, &caller_esc);
+
+	char *path_esc = strdup(path.c_str());
+	dbi_conn_quote_string(conn_, &path_esc);
 
 	/**
 	 * Remove LIKE single character wildcard, because it could result easily in security
@@ -177,11 +225,13 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, f.id as filter_id, "
 	 "f.rule, f.impact, r.min_length, r.max_length FROM whitelist_rules AS r, "
 	 "whitelist_filters AS f WHERE r.filter_id = f.id AND r.profile_id = %i AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.caller, '_', '\\_'), '%', '\\%'), '*', '%') AND "
-	 "r.status = %i", profile, caller_esc, STATUS_ACTIVATED);
+	 "REPLACE(REPLACE(REPLACE(r.caller, '_', '\\_'), '%', '\\%'), '*', '%') AND %s LIKE "
+	 "REPLACE(REPLACE(REPLACE(r.path, '_', '\\_'), '%', '\\%'), '*', '%') AND r.status = %i",
+	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
 	pthread_mutex_unlock(&dbi_conn_query_lock);
 
 	free(caller_esc);
+	free(path_esc);
 
 	if (!res) {
 		throw swd::exceptions::database_exception("Can't execute whitelist_rules query");
@@ -200,7 +250,6 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 		swd::whitelist_rule_ptr rule(
 			new swd::whitelist_rule(
 				dbi_result_get_uint(res, "id"),
-				dbi_result_get_string(res, "path"),
 				filter,
 				dbi_result_get_uint(res, "min_length"),
 				dbi_result_get_uint(res, "max_length")

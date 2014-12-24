@@ -22,7 +22,7 @@ swd::parameter::parameter(std::string value) :
  value_(value),
  threat_(false),
  critical_impact_(false),
- rules_counter_(0) {
+ total_rules_(0) {
 }
 
 std::string swd::parameter::get_value() {
@@ -72,10 +72,10 @@ bool swd::parameter::has_critical_impact() {
 	return critical_impact_;
 }
 
-void swd::parameter::increment_rules_counter() {
-	rules_counter_++;
+void swd::parameter::set_total_rules(int total_rules) {
+	total_rules_ = total_rules;
 }
 
 int swd::parameter::get_total_rules() {
-	return rules_counter_;
+	return total_rules_;
 }

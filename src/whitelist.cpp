@@ -19,16 +19,13 @@
 #include <boost/lexical_cast.hpp>
 
 #include "whitelist.h"
+#include "whitelist_filter.h"
+#include "whitelist_rule.h"
 #include "database.h"
 #include "log.h"
 
 swd::whitelist::whitelist(swd::request_ptr request)
  : request_(request) {
-	/* Import the rules from the database. */
-	rules_ = swd::database::i()->get_whitelist_rules(
-		request_->get_profile()->get_id(),
-		request_->get_caller()
-	);
 }
 
 void swd::whitelist::scan() {
@@ -40,26 +37,31 @@ void swd::whitelist::scan() {
 		/* Save the iterators in variables for the sake of readability. */
 		swd::parameter_ptr parameter((*it_parameter).second);
 
+		/* Import the rules from the database. */
+		swd::whitelist_rules rules = swd::database::i()->get_whitelist_rules(
+			request_->get_profile()->get_id(),
+			request_->get_caller(),
+			(*it_parameter).first
+		);
+
+		/**
+		 * The parameter needs at least one rule to pass the check. Otherwise
+		 * it wouldn't be a whitelist.
+		 */
+		parameter->set_total_rules(rules.size());
+
 		/* Iterate over all rules. */
-		for (swd::whitelist_rules::iterator it_rule = rules_.begin();
-		 it_rule != rules_.end(); it_rule++) {
+		for (swd::whitelist_rules::iterator it_rule = rules.begin();
+		 it_rule != rules.end(); it_rule++) {
 			swd::whitelist_rule_ptr rule(*it_rule);
 
-			if (rule->is_responsible((*it_parameter).first)) {
-				/**
-				 * The parameter needs at least one rule to pass the check. Otherwise
-				 * it wouldn't be a whitelist.
-				 */
-				parameter->increment_rules_counter();
-
-				try {
-					/* Add pointers to all rules that are not adhered to by this parameter. */
-					if (!rule->is_adhered_to(parameter->get_value())) {
-						parameter->add_whitelist_rule(rule);
-					}
-				} catch (...) {
-					swd::log::i()->send(swd::uncritical_error, "Unexpected whitelist problem");
+			try {
+				/* Add pointers to all rules that are not adhered to by this parameter. */
+				if (!rule->is_adhered_to(parameter->get_value())) {
+					parameter->add_whitelist_rule(rule);
 				}
+			} catch (...) {
+				swd::log::i()->send(swd::uncritical_error, "Unexpected whitelist problem");
 			}
 		}
 	}
