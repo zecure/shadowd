@@ -29,15 +29,15 @@ swd::analyzer::analyzer(swd::request_ptr request) :
 void swd::analyzer::start() {
 	if (request_->get_profile()->is_blacklist_enabled()) {
 		/**
-		 * First we initialize the blacklist. This way the rules are only read once per
+		 * First we initialize the blacklist. This way the filters are only read once per
 		 * request and we have a neat cache for the regex objects.
 		 */
 		swd::blacklist blacklist(request_);
 
 		/**
-		 * The blacklist checks the PHPIDS rules against all parameters and generates an
-		 * impact based on the result for every single parameter. The impacts are saved
-		 * directly in the request object.
+		 * The blacklist checks the PHPIDS filters against all parameters and calculates
+		 * the total impact for every single parameter. The impacts are saved directly in
+		 * the request object.
 		 */
 		blacklist.scan();
 	}
@@ -47,9 +47,10 @@ void swd::analyzer::start() {
 
 		/**
 		 * The whitelist checks for all parameters if there exists a rule and if it
-		 * is adhered to. Every parameter that does not gets tagged in the request
-		 * object. At the moment three things get checked: the existence of a rule,
-		 * the length of the input and the character set.
+		 * is adhered to. Every parameter that does not adhere to the conditions gets
+		 * tagged in the request object.
+		 * At the moment three things get checked: the existence of a rule, the length
+		 * of the input and the character set.
 		 */
 		whitelist.scan();
 	}

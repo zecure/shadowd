@@ -45,7 +45,7 @@ namespace swd {
 			int get_id();
 
 			/**
-			 * @brief Get the threshold the rule.
+			 * @brief Get the threshold of the rule.
 			 *
 			 * @return The threshold of the rule
 			 */
