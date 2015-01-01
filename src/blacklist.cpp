@@ -50,6 +50,9 @@ void swd::blacklist::scan() {
 				}
 			} catch (...) {
 				swd::log::i()->send(swd::uncritical_error, "Unexpected blacklist problem");
+
+				/* Add the filter anyway to avoid a potential blacklist bypass. */
+				parameter->add_blacklist_filter(filter);
 			}
 		}
 	}
