@@ -54,11 +54,8 @@ namespace swd {
  * @mainpage Disk and Execution Monitor
  *
  * This reference is intended for developers only. If you just want to use the
- * Shadow Daemon system go to the <a href="https://shadowd.zecure.org/docs/current/">
- * user documentation</a> instead.
- *
- * <img src="uml.svg" alt="shadowd uml diagram" style="width: 100%" />
- * <a href="uml.svg" style="float: right">Full size</a>
+ * Shadow Daemon system go to the <a href="https://shadowd.zecure.org/">user 
+ * documentation</a> instead.
  *
  * @author Hendrik Buchwald
  */
