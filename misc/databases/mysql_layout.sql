@@ -463,5 +463,5 @@ INSERT INTO whitelist_filters VALUES (2, '^-?(?:\\d+|\\d*(\\.|,)\\d+)$', 2, 'Num
 INSERT INTO whitelist_filters VALUES (3, '^[0-9a-f]*$', 5, 'Hexadecimal');
 INSERT INTO whitelist_filters VALUES (4, '^[0-9a-z]*$', 6, 'Alphanumeric');
 INSERT INTO whitelist_filters VALUES (5, '^[\\s0-9a-z+/]+={0,2}$', 10, 'Base64');
-INSERT INTO whitelist_filters VALUES (6, '^[\\w\\s.,:-+]*$', 30, 'Special Characters');
+INSERT INTO whitelist_filters VALUES (6, '^[\\w\\s.,:\\-+]*$', 30, 'Special Characters');
 INSERT INTO whitelist_filters VALUES (7, '.*', 100, 'Everything');
