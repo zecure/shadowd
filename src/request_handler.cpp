@@ -81,6 +81,11 @@ bool swd::request_handler::decode() {
 			return false;
 		}
 
+		/* If root is not an object the input is invalid. */
+		if (!root.isObject()) {
+			return false;
+		}
+
 		/* First we set the client ip. It shouldn't be possible that this is empty. */
 		Json::Value client_ip = root["client_ip"];
 
