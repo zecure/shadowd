@@ -17,7 +17,7 @@ Use cmake to configure and prepare the project. It is a good idea to create a se
 If cmake is successful it creates a makefile. Use it to compile and install the project:
 
     make
-    sudo make install
+    make install
 
 ## Database
 Install and configure a database server. At the moment shadowd officially supports PostgreSQL and MySQL. If you are done create a new user and database and import the correct layout, e.g.:
