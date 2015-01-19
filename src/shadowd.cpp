@@ -68,7 +68,9 @@ void swd::shadowd::init(int argc, char** argv) {
 			daemon_.change_root(swd::config::i()->get<std::string>("chroot"));
 		}
 
-		daemon_.write_pid(swd::config::i()->get<std::string>("pid"));
+		if (swd::config::i()->defined("pid")) {
+			daemon_.write_pid(swd::config::i()->get<std::string>("pid"));
+		}
 	}
 
 	/* Connect to the database. */
