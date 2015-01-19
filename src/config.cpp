@@ -110,12 +110,6 @@ void swd::config::validate() {
 		throw swd::exceptions::config_exception("threadpool must be greater than zero");
 	}
 
-	if (this->defined("daemonize")) {
-		if (!this->defined("pid")) {
-			throw swd::exceptions::config_exception("daemonize requires a pid file");
-		}
-	}
-
 	if (!this->defined("address") || !this->defined("port")) {
 		throw swd::exceptions::config_exception("address and port required");
 	}
