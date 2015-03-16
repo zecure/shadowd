@@ -6,6 +6,8 @@ install(FILES examples/shadowd.ini
 
 install(FILES databases/mysql_layout.sql
 	databases/pgsql_layout.sql
+	databases/updates/pgsql_layout_1.0.0-1.1.0.sql
+	databases/updates/mysql_layout_1.0.0-1.1.0.sql
 	DESTINATION share/shadowd)
 
 install(FILES man/shadowd.1
