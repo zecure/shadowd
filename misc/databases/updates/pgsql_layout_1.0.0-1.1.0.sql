@@ -26,3 +26,20 @@ INSERT INTO tags_filters VALUES (11, 107);
 INSERT INTO tags_filters VALUES (8, 108);
 INSERT INTO tags_filters VALUES (10, 109);
 INSERT INTO tags_filters VALUES (11, 110);
+
+DROP INDEX IF EXISTS requests_profile_id_idx;
+DROP INDEX IF EXISTS requests_caller_idx;
+DROP INDEX IF EXISTS requests_learning_idx;
+DROP INDEX IF EXISTS requests_client_ip_idx;
+DROP INDEX IF EXISTS requests_date_idx;
+
+DROP INDEX IF EXISTS parameters_request_id_idx;
+DROP INDEX IF EXISTS parameters_total_rules_idx;
+DROP INDEX IF EXISTS parameters_critical_impact_idx;
+DROP INDEX IF EXISTS parameters_threat_idx;
+
+DROP INDEX IF EXISTS blacklist_parameters_filter_id_idx;
+DROP INDEX IF EXISTS blacklist_parameters_parameter_id_idx;
+
+DROP INDEX IF EXISTS whitelist_parameters_rule_id_idx;
+DROP INDEX IF EXISTS whitelist_parameters_parameter_id_idx;

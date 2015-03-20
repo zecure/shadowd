@@ -52,12 +52,6 @@ CREATE TABLE requests (
     CONSTRAINT fk_requests FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_requests1 ON requests (profile_id);
-CREATE INDEX idx_requests2 ON requests (caller(20));
-CREATE INDEX idx_requests3 ON requests (learning);
-CREATE INDEX idx_requests4 ON requests (client_ip);
-CREATE INDEX idx_requests5 ON requests (date);
-
 CREATE TABLE parameters (
     id              INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
     request_id      INTEGER UNSIGNED NOT NULL,
@@ -68,11 +62,6 @@ CREATE TABLE parameters (
     threat          smallint NOT NULL,
     CONSTRAINT fk_parameters FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
-
-CREATE INDEX idx_parameters1 ON parameters (request_id);
-CREATE INDEX idx_parameters4 ON parameters (total_rules);
-CREATE INDEX idx_parameters5 ON parameters (critical_impact);
-CREATE INDEX idx_parameters6 ON parameters (threat);
 
 CREATE TABLE blacklist_rules (
     id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
@@ -99,9 +88,6 @@ CREATE TABLE blacklist_parameters (
     CONSTRAINT fk_blacklist_parameters2 FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
     PRIMARY KEY (filter_id, parameter_id)
 );
-
-CREATE INDEX idx_blacklist_parameters1 ON blacklist_parameters (filter_id);
-CREATE INDEX idx_blacklist_parameters2 ON blacklist_parameters (parameter_id);
 
 CREATE TABLE whitelist_filters (
     id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
@@ -143,9 +129,6 @@ CREATE TABLE whitelist_parameters (
     CONSTRAINT fk_whitelist_parameters2 FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
     PRIMARY KEY (rule_id, parameter_id)
 );
-
-CREATE INDEX idx_whitelist_parameters1 ON whitelist_parameters (rule_id);
-CREATE INDEX idx_whitelist_parameters2 ON whitelist_parameters (parameter_id);
 
 -- Tables UI
 

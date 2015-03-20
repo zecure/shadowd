@@ -52,12 +52,6 @@ CREATE TABLE requests (
 	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
 
-CREATE INDEX ON requests (profile_id);
-CREATE INDEX ON requests (caller);
-CREATE INDEX ON requests (learning);
-CREATE INDEX ON requests (client_ip);
-CREATE INDEX ON requests (date);
-
 CREATE TABLE parameters (
 	id				SERIAL primary key,
 	request_id		int NOT NULL,
@@ -68,11 +62,6 @@ CREATE TABLE parameters (
 	threat			smallint NOT NULL,
 	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
-
-CREATE INDEX ON parameters (request_id);
-CREATE INDEX ON parameters (total_rules);
-CREATE INDEX ON parameters (critical_impact);
-CREATE INDEX ON parameters (threat);
 
 CREATE TABLE blacklist_rules (
 	id			SERIAL primary key,
@@ -99,9 +88,6 @@ CREATE TABLE blacklist_parameters (
 	FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
 	PRIMARY KEY (filter_id, parameter_id)
 );
-
-CREATE INDEX ON blacklist_parameters (filter_id);
-CREATE INDEX ON blacklist_parameters (parameter_id);
 
 CREATE TABLE whitelist_filters (
 	id			SERIAL primary key,
@@ -143,9 +129,6 @@ CREATE TABLE whitelist_parameters (
 	FOREIGN KEY (parameter_id) REFERENCES parameters (id) ON DELETE CASCADE,
 	PRIMARY KEY (rule_id, parameter_id)
 );
-
-CREATE INDEX ON whitelist_parameters (rule_id);
-CREATE INDEX ON whitelist_parameters (parameter_id);
 
 -- Tables UI
 

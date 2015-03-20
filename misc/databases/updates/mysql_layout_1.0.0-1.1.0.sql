@@ -26,3 +26,20 @@ INSERT INTO tags_filters VALUES (11, 107);
 INSERT INTO tags_filters VALUES (8, 108);
 INSERT INTO tags_filters VALUES (10, 109);
 INSERT INTO tags_filters VALUES (11, 110);
+
+DROP INDEX idx_requests1 ON requests;
+DROP INDEX idx_requests2 ON requests;
+DROP INDEX idx_requests3 ON requests;
+DROP INDEX idx_requests4 ON requests;
+DROP INDEX idx_requests5 ON requests;
+
+DROP INDEX idx_parameters1 ON parameters;
+DROP INDEX idx_parameters4 ON parameters;
+DROP INDEX idx_parameters5 ON parameters;
+DROP INDEX idx_parameters6 ON parameters;
+
+DROP INDEX idx_blacklist_parameters1 ON blacklist_parameters;
+DROP INDEX idx_blacklist_parameters2 ON blacklist_parameters;
+
+DROP INDEX idx_whitelist_parameters1 ON whitelist_parameters;
+DROP INDEX idx_whitelist_parameters2 ON whitelist_parameters;
