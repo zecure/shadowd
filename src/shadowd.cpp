@@ -36,6 +36,7 @@
 #include "config.h"
 #include "log.h"
 #include "database.h"
+#include "storage.h"
 
 void swd::shadowd::init(int argc, char** argv) {
 	/**
@@ -116,6 +117,9 @@ void swd::shadowd::init(int argc, char** argv) {
 }
 
 void swd::shadowd::start() {
+	/* Start the storage worker thread. */
+	swd::storage::i()->start();
+
 	/* This adds threads to the threadpool and keeps everything running. */
 	server_.start(swd::config::i()->get<int>("threads"));
 }

@@ -47,9 +47,9 @@ namespace swd {
 	 public swd::singleton<swd::storage> {
 		public:
 			/**
-			 * @brief Construct the storage and start insert thread.
+			 * @brief Start insert thread.
 			 */
-			storage();
+			void start();
 
 			/**
 			 * @brief Add request to insert queue.

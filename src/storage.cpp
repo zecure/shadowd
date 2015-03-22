@@ -36,8 +36,10 @@
 #include "database.h"
 #include "log.h"
 
-swd::storage::storage()
- : worker_thread_(boost::bind(&swd::storage::process_next, this)) {
+void swd::storage::start() {
+	worker_thread_ = boost::thread(
+		boost::bind(&swd::storage::process_next, this)
+	);
 }
 
 void swd::storage::add(swd::request_ptr request) {
