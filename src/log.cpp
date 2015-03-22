@@ -51,7 +51,7 @@ void swd::log::send(swd::log_level level, std::string message) {
 	/* Build an informative output line. */
 	std::stringstream line;
 
-	line << get_current_time() << "\t";
+	line << this->get_current_time() << "\t";
 
 	switch (level) {
 		case critical_error:

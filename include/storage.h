@@ -33,21 +33,58 @@
 #define STORAGE_H
 
 #include <vector>
+#include <queue>
+#include <boost/thread.hpp>
 
 #include "request.h"
+#include "singleton.h"
 
 namespace swd {
 	/**
 	 * @brief Manages the storage of a request.
 	 */
-	class storage {
+	class storage :
+	 public swd::singleton<swd::storage> {
 		public:
+			/**
+			 * @brief Construct the storage and start insert thread.
+			 */
+			storage();
+
+			/**
+			 * @brief Add request to insert queue.
+			 *
+			 * @param request The pointer to the request object
+			 */
+			void add(swd::request_ptr request);
+
+		private:
+			/**
+			 * @brief Process next request in queue in recursive manner.
+			 */
+			void process_next();
+
 			/**
 			 * @brief Save a complete request in the database.
 			 *
 			 * @param request The pointer to the request object
 			 */
 			void save(swd::request_ptr request);
+
+			/**
+			 * @brief Request queue for performance improvements.
+			 */
+			std::queue<swd::request_ptr> queue_;
+
+			/**
+			 * @brief Mutex for queue to avoid race conditions.
+			 */
+			boost::mutex queue_mutex_;
+
+			/**
+			 * @brief Thread that constantly checks queue for new entries.
+			 */
+			boost::thread worker_thread_;
 	};
 }
 

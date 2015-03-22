@@ -30,10 +30,42 @@
  */
 
 #include <iostream>
+#include <boost/date_time.hpp>
 
 #include "storage.h"
 #include "database.h"
 #include "log.h"
+
+swd::storage::storage()
+ : worker_thread_(boost::bind(&swd::storage::process_next, this)) {
+}
+
+void swd::storage::add(swd::request_ptr request) {
+	/* Mutex to avoid race conditions. */
+	boost::unique_lock<boost::mutex> scoped_lock(queue_mutex_);
+
+	/* Add request to end of queue. */
+	queue_.push(request);
+}
+
+void swd::storage::process_next() {
+	queue_mutex_.lock();
+
+	if (!queue_.empty()) {
+		/* Save oldest request and remove it from queue. */
+		this->save(queue_.front());
+		queue_.pop();
+	}
+
+	queue_mutex_.unlock();
+
+	/* Wait some time to prioritize database reading. */
+	boost::posix_time::milliseconds sleep_time(50);
+	boost::this_thread::sleep(sleep_time);
+
+	/* Process next entry in the queue. */
+	this->process_next();
+}
 
 void swd::storage::save(swd::request_ptr request) {
 	/**

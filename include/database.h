@@ -35,8 +35,8 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <dbi/dbi.h>
-#include <pthread.h>
 
 #include "profile.h"
 #include "whitelist_rule.h"
@@ -184,7 +184,7 @@ namespace swd {
 #if defined(HAVE_DBI_NEW)
 			dbi_inst instance_;
 #endif /* defined(HAVE_DBI_NEW) */
-			pthread_mutex_t dbi_conn_query_lock;
+			boost::mutex dbi_mutex_;
 	};
 }
 

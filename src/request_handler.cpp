@@ -150,8 +150,7 @@ std::vector<std::string> swd::request_handler::process() {
 	analyzer.start();
 
 	/* Save everything unusual about this request in the database. */
-	swd::storage storage;
-	storage.save(request_);
+	swd::storage::i()->add(request_);
 
 	/**
 	 * Return the paths of all threats for the reply. But only if learning mode is
