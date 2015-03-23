@@ -179,7 +179,17 @@ namespace swd {
 			 */
 			void add_whitelist_parameter_connector(int rule, int parameter);
 
+			/**
+			 * @brief Get the flooding status of the attacker.
+			 *
+			 * @param client_ip The ip of the attacker
+			 * @param profile_id The profile id of the request
+			 * @return The status of the flooding check
+			 */
+			bool is_flooding(std::string client_ip, int profile_id);
+
 		private:
+			std::string driver_;
 			dbi_conn conn_;
 #if defined(HAVE_DBI_NEW)
 			dbi_inst instance_;

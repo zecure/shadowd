@@ -216,6 +216,10 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		std::vector<std::string> threats;
 
 		try {
+			if (swd::database::i()->is_flooding(request_->get_client_ip(), request_->get_profile_id())) {
+				throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+			}
+
 			threats = request_handler.process();
 		} catch (swd::exceptions::database_exception& e) {
 			swd::log::i()->send(swd::uncritical_error, e.what());

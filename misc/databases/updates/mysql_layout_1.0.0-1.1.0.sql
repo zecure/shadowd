@@ -43,3 +43,6 @@ DROP INDEX idx_blacklist_parameters2 ON blacklist_parameters;
 
 DROP INDEX idx_whitelist_parameters1 ON whitelist_parameters;
 DROP INDEX idx_whitelist_parameters2 ON whitelist_parameters;
+
+ALTER TABLE profiles ADD flooding_time int NOT NULL DEFAULT '0';
+ALTER TABLE profiles ADD flooding_threshold int NOT NULL DEFAULT '5';

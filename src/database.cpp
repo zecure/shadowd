@@ -40,6 +40,8 @@
 
 void swd::database::connect(std::string driver, std::string host, std::string port,
  std::string username, std::string password, std::string name, std::string encoding) {
+	driver_ = driver;
+
 #if defined(HAVE_DBI_NEW)
 	dbi_initialize_r(NULL, &instance_);
 	conn_ = dbi_conn_new_r(driver.c_str(), instance_);
@@ -97,12 +99,10 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 	char *server_ip_esc = strdup(server_ip.c_str());
 	dbi_conn_quote_string(conn_, &server_ip_esc);
 
-	/**
-	 * Insert the ip and execute the query.
-	 */
+	/* Insert the ip and execute the query. */
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, learning_enabled, "
-	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE server_ip = "
-	 "%s AND id = %i", server_ip_esc, profile_id);
+	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE server_ip "
+	 "= %s AND id = %i", server_ip_esc, profile_id);
 
 	/* Don't forget to free server_ip_esc to avoid a memory leak. */
 	free(server_ip_esc);
@@ -366,4 +366,45 @@ void swd::database::add_whitelist_parameter_connector(int rule, int parameter) {
 	if (!res) {
 		throw swd::exceptions::database_exception("Can't execute whitelist_parameter query");
 	}
+}
+
+bool swd::database::is_flooding(std::string client_ip, int profile_id) {
+	ensure_connection();
+
+	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+
+	char *client_ip_esc = strdup(client_ip.c_str());
+	dbi_conn_quote_string(conn_, &client_ip_esc);
+
+	dbi_result res;
+
+	if (driver_ == "pgsql") {
+		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
+		 "AS request_count FROM requests WHERE requests.client_ip = %s AND "
+		 "requests.profile_id = %i AND requests.date > NOW() - ((SELECT "
+		 "profiles.flooding_time FROM profiles WHERE profiles.id = %i) || "
+		 "' minute')::INTERVAL) r WHERE r.request_count > (SELECT "
+		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i)",
+		 client_ip_esc, profile_id, profile_id, profile_id);
+	} else if (driver_ == "mysql") {
+		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
+		 "AS request_count FROM requests WHERE requests.client_ip = %s AND "
+		 "requests.profile_id = %i AND requests.date > NOW() - INTERVAL (SELECT "
+		 "profiles.flooding_time FROM profiles WHERE profiles.id = %i) MINUTE) "
+		 "r WHERE r.request_count > (SELECT profiles.flooding_threshold FROM "
+		 "profiles WHERE profiles.id = %i)", client_ip_esc, profile_id,
+		 profile_id, profile_id);
+	}
+
+	free(client_ip_esc);
+
+	if (!res) {
+		throw swd::exceptions::database_exception("Can't execute request count query");
+	}
+
+	bool status = (dbi_result_get_numrows(res) == 1);
+
+	dbi_result_free(res);
+
+	return status;
 }

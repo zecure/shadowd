@@ -37,7 +37,9 @@ CREATE TABLE profiles (
 	learning_enabled	smallint NOT NULL,
 	whitelist_enabled	smallint NOT NULL,
 	blacklist_enabled	smallint NOT NULL,
-	threshold			int NOT NULL
+	threshold			int NOT NULL,
+	flooding_time		int NOT NULL,
+	flooding_threshold	int NOT NULL
 );
 
 CREATE INDEX ON profiles (server_ip);

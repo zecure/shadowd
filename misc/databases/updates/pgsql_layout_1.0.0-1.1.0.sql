@@ -43,3 +43,6 @@ DROP INDEX IF EXISTS blacklist_parameters_parameter_id_idx;
 
 DROP INDEX IF EXISTS whitelist_parameters_rule_id_idx;
 DROP INDEX IF EXISTS whitelist_parameters_parameter_id_idx;
+
+ALTER TABLE profiles ADD COLUMN flooding_time int NOT NULL DEFAULT '0';
+ALTER TABLE profiles ADD COLUMN flooding_threshold int NOT NULL DEFAULT '5';
