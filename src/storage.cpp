@@ -70,14 +70,6 @@ void swd::storage::process_next() {
 }
 
 void swd::storage::save(swd::request_ptr request) {
-	/**
-	 * Nothing to do if there are no threats and learning is disabled. If there
-	 * is at least one threat the complete request gets recorded.
-	 */
-	if (!request->has_threats() && !request->get_profile()->is_learning_enabled()) {
-		return;
-	}
-
 	int request_id;
 
 	try {

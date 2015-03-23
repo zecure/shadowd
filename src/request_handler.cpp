@@ -149,8 +149,14 @@ std::vector<std::string> swd::request_handler::process() {
 	swd::analyzer analyzer(request_);
 	analyzer.start();
 
-	/* Save everything unusual about this request in the database. */
-	swd::storage::i()->add(request_);
+	/**
+	 * Nothing to do if there are no threats and learning is disabled. If there
+	 * is at least one threat or if learning is enabled the complete request gets
+	 * recorded permanently.
+	 */
+	if (request_->has_threats() || request_->get_profile()->is_learning_enabled()) {
+		swd::storage::i()->add(request_);
+	}
 
 	/**
 	 * Return the paths of all threats for the reply. But only if learning mode is
