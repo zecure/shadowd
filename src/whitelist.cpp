@@ -32,7 +32,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "whitelist.h"
-#include "whitelist_filter.h"
 #include "whitelist_rule.h"
 #include "database.h"
 #include "log.h"
