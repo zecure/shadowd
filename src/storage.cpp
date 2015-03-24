@@ -51,22 +51,21 @@ void swd::storage::add(swd::request_ptr request) {
 }
 
 void swd::storage::process_next() {
-	queue_mutex_.lock();
+	while (1) {
+		queue_mutex_.lock();
 
-	if (!queue_.empty()) {
-		/* Save oldest request and remove it from queue. */
-		this->save(queue_.front());
-		queue_.pop();
+		if (!queue_.empty()) {
+			/* Save oldest request and remove it from queue. */
+			this->save(queue_.front());
+			queue_.pop();
+		}
+
+		queue_mutex_.unlock();
+
+		/* Wait some time to prioritize database reading. */
+		boost::posix_time::milliseconds sleep_time(50);
+		boost::this_thread::sleep(sleep_time);
 	}
-
-	queue_mutex_.unlock();
-
-	/* Wait some time to prioritize database reading. */
-	boost::posix_time::milliseconds sleep_time(50);
-	boost::this_thread::sleep(sleep_time);
-
-	/* Process next entry in the queue. */
-	this->process_next();
 }
 
 void swd::storage::save(swd::request_ptr request) {
