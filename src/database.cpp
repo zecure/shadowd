@@ -380,20 +380,20 @@ bool swd::database::is_flooding(std::string client_ip, int profile_id) {
 
 	if (driver_ == "pgsql") {
 		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.client_ip = %s AND "
-		 "requests.profile_id = %i AND requests.date > NOW() - ((SELECT "
-		 "profiles.flooding_time FROM profiles WHERE profiles.id = %i) || "
-		 "' minute')::INTERVAL) r WHERE r.request_count >= (SELECT "
+		 "AS request_count FROM requests WHERE requests.learning = 0 AND "
+		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
+		 "> NOW() - ((SELECT profiles.flooding_time FROM profiles WHERE profiles.id "
+		 "= %i) || ' minute')::INTERVAL) r WHERE r.request_count >= (SELECT "
 		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i)",
 		 client_ip_esc, profile_id, profile_id, profile_id);
 	} else if (driver_ == "mysql") {
 		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.client_ip = %s AND "
-		 "requests.profile_id = %i AND requests.date > NOW() - INTERVAL (SELECT "
-		 "profiles.flooding_time FROM profiles WHERE profiles.id = %i) MINUTE) "
-		 "r WHERE r.request_count >= (SELECT profiles.flooding_threshold FROM "
-		 "profiles WHERE profiles.id = %i)", client_ip_esc, profile_id,
-		 profile_id, profile_id);
+		 "AS request_count FROM requests WHERE requests.learning = 0 AND "
+		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
+		 "> NOW() - INTERVAL (SELECT profiles.flooding_time FROM profiles WHERE "
+		 "profiles.id = %i) MINUTE) r WHERE r.request_count >= (SELECT "
+		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i)",
+		 client_ip_esc, profile_id, profile_id, profile_id);
 	}
 
 	free(client_ip_esc);
