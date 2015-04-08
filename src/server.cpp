@@ -37,6 +37,7 @@
 #include <boost/thread/thread.hpp>
 
 #include "server.h"
+#include "storage.h"
 #include "config.h"
 #include "log.h"
 #include "shared.h"
@@ -174,5 +175,9 @@ void swd::server::handle_accept(const boost::system::error_code& e) {
 }
 
 void swd::server::handle_stop() {
+	/* Stop the threads of asio. */
 	io_service_.stop();
+
+	/* Also stop the storage thread. */
+	swd::storage::i()->stop();
 }

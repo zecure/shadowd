@@ -36,10 +36,18 @@
 #include "database.h"
 #include "log.h"
 
+swd::storage::storage() :
+ stop_(false) {
+}
+
 void swd::storage::start() {
 	worker_thread_ = boost::thread(
 		boost::bind(&swd::storage::process_next, this)
 	);
+}
+
+void swd::storage::stop() {
+	stop_ = true;
 }
 
 void swd::storage::add(swd::request_ptr request) {
@@ -51,7 +59,7 @@ void swd::storage::add(swd::request_ptr request) {
 }
 
 void swd::storage::process_next() {
-	while (1) {
+	while (!stop_) {
 		queue_mutex_.lock();
 
 		if (!queue_.empty()) {

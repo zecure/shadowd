@@ -47,9 +47,19 @@ namespace swd {
 	 public swd::singleton<swd::storage> {
 		public:
 			/**
+			 * @brief Initialize the storage object.
+			 */
+			storage();
+
+			/**
 			 * @brief Start insert thread.
 			 */
 			void start();
+
+			/**
+			 * @brief Gracefully stop process_next.
+			 */
+			void stop();
 
 			/**
 			 * @brief Add request to insert queue.
@@ -85,6 +95,11 @@ namespace swd {
 			 * @brief Thread that constantly checks queue for new entries.
 			 */
 			boost::thread worker_thread_;
+
+			/**
+			 * @brief Switch to exit process_next loop.
+			 */
+			bool stop_;
 	};
 }
 
