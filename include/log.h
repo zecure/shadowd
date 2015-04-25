@@ -33,6 +33,7 @@
 #define LOG_H
 
 #include <string>
+#include <boost/thread.hpp>
 
 #include "singleton.h"
 #include "shared.h"
@@ -70,8 +71,20 @@ namespace swd {
 			void send(swd::log_level level, std::string message);
 
 		private:
+			/**
+			 * @brief Get the current date and time as string.
+			 */
 			std::string get_current_time();
+
+			/**
+			 * @brief The log file. If empty stderr is used instead.
+			 */
 			std::string file_;
+
+			/**
+			 * @brief Mutex for output.
+			 */
+			boost::mutex mutex_;
 	};
 }
 

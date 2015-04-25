@@ -101,7 +101,9 @@ namespace swd {
 			 */
 			bool stop_;
 
-			/* @brief Notify consumer threads on new requests in the queue. */
+			/**
+			 * @brief Notify consumer threads on new requests in the queue.
+			 */
 			boost::condition_variable cond_;
 	};
 }
