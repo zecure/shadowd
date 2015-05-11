@@ -105,11 +105,6 @@ namespace swd {
 			 * @brief Notify consumer threads on new requests in the queue.
 			 */
 			boost::condition_variable cond_;
-
-			/**
-			 * @brief Mutex required for condition variable.
-			 */
-			boost::mutex consumer_mutex_;
 	};
 }
 
