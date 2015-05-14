@@ -61,21 +61,35 @@ void swd::storage::add(swd::request_ptr request) {
 }
 
 void swd::storage::process_next() {
-	boost::unique_lock<boost::mutex> scoped_lock(queue_mutex_);
+	boost::unique_lock<boost::mutex> consumer_lock(consumer_mutex_);
 
 	while (!stop_) {
-		/* Wait for new request in the queue. */
-		cond_.wait(scoped_lock);
+		/* Wait for a new request in the queue. */
+		while (1) {
+			/* Do not wait if there are still elements in the queue. */
+			{
+				boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
 
-		/* Save all queued requests. */
-		while (!queue_.empty()) {
-			/* Remove oldest request from queue. */
-			swd::request_ptr request = queue_.front();
-			queue_.pop();
+				if (!queue_.empty()) {
+					break;
+				}
+			}
 
-			/* Save request in the database. */
-			this->save(request);
+			cond_.wait(consumer_lock);
 		}
+
+		/* Move oldest element of queue to request. */
+		swd::request_ptr request;
+
+		{
+			boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
+
+			request = queue_.front();
+			queue_.pop();
+		}
+
+		/* Saving is the time-consuming part, do outside of mutex. */
+		this->save(request);
 	}
 }
 
