@@ -49,7 +49,7 @@
 namespace swd {
 	namespace exceptions {
 		/**
-		 * @brief Critical exception in on of the core components.
+		 * @brief Critical exception in one of the core components.
 		 */
 		struct core_exception : public std::exception {
 			/**
