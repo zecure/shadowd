@@ -14,9 +14,6 @@ CREATE TABLE blacklist_filters (
     description text
 );
 
-CREATE INDEX idx_blacklistfilters1 ON blacklist_filters (rule);
-CREATE INDEX idx_blacklistfilters2 ON blacklist_filters (impact);
-
 CREATE TABLE tags_filters (
     tag_id        INTEGER UNSIGNED NOT NULL,
     filter_id     INTEGER UNSIGNED NOT NULL,
@@ -97,9 +94,6 @@ CREATE TABLE whitelist_filters (
     impact      integer NOT NULL,
     description text
 );
-
-CREATE INDEX idx_whitelist_filters1 ON whitelist_filters (rule);
-CREATE INDEX idx_whitelist_filters2 ON whitelist_filters (impact);
 
 CREATE TABLE whitelist_rules (
     id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,

@@ -14,9 +14,6 @@ CREATE TABLE blacklist_filters (
 	description	text
 );
 
-CREATE INDEX ON blacklist_filters (rule);
-CREATE INDEX ON blacklist_filters (impact);
-
 CREATE TABLE tags_filters (
 	tag_id		integer NOT NULL,
 	filter_id	integer NOT NULL,
@@ -97,9 +94,6 @@ CREATE TABLE whitelist_filters (
 	impact		integer NOT NULL,
 	description	text
 );
-
-CREATE INDEX ON whitelist_filters (rule);
-CREATE INDEX ON whitelist_filters (impact);
 
 CREATE TABLE whitelist_rules (
 	id			SERIAL primary key,
