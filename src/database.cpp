@@ -101,8 +101,8 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 
 	/* Insert the ip and execute the query. */
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, learning_enabled, "
-	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE server_ip "
-	 "= %s AND id = %i", server_ip_esc, profile_id);
+	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE (server_ip "
+	 "= %s OR server_ip = '*') AND id = %i", server_ip_esc, profile_id);
 
 	/* Don't forget to free server_ip_esc to avoid a memory leak. */
 	free(server_ip_esc);
