@@ -101,8 +101,8 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 
 	/* Insert the ip and execute the query. */
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, learning_enabled, "
-	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE (server_ip "
-	 "= %s OR server_ip = '*') AND id = %i", server_ip_esc, profile_id);
+	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE %s LIKE "
+	 "prepare_wildcard(server_ip) AND id = %i", server_ip_esc, profile_id);
 
 	/* Don't forget to free server_ip_esc to avoid a memory leak. */
 	free(server_ip_esc);
@@ -152,8 +152,7 @@ swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
 
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, r.threshold "
 	 "FROM blacklist_rules AS r WHERE r.profile_id = %i AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.caller, '_', '\\_'), '%', '\\%'), '*', '%') AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.path, '_', '\\_'), '%', '\\%'), '*', '%') AND r.status = %i",
+	 "prepare_wildcard(r.caller) AND %s LIKE prepare_wildcard(r.path) AND r.status = %i",
 	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
 
 	free(caller_esc);
@@ -235,8 +234,7 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, f.id as filter_id, "
 	 "f.rule, f.impact, r.min_length, r.max_length FROM whitelist_rules AS r, "
 	 "whitelist_filters AS f WHERE r.filter_id = f.id AND r.profile_id = %i AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.caller, '_', '\\_'), '%', '\\%'), '*', '%') AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.path, '_', '\\_'), '%', '\\%'), '*', '%') AND r.status = %i",
+	 "prepare_wildcard(r.caller) AND %s LIKE prepare_wildcard(r.path) AND r.status = %i",
 	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
 
 	free(caller_esc);
