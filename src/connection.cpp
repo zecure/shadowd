@@ -225,6 +225,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			int max_params = swd::config::i()->get<int>("max-parameters");
 
 			if ((max_params > -1) && (parameters.size() > max_params)) {
+				swd::log::i()->send(swd::notice, "Too many parameters");
 				throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 			}
 
@@ -237,16 +238,19 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 					swd::parameter_ptr parameter((*it_parameter).second);
 
 					if ((max_length_name > -1) && (((*it_parameter).first).length() > max_length_name)) {
+						swd::log::i()->send(swd::notice, "Too long parameter name");
 						throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 					}
 
 					if ((max_length_value > -1) && (parameter->get_length() > max_length_value)) {
+						swd::log::i()->send(swd::notice, "Too long parameter value");
 						throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 					}
 				}
 			}
 
 			if (swd::database::i()->is_flooding(request_->get_client_ip(), request_->get_profile_id())) {
+				swd::log::i()->send(swd::notice, "Too many requests");
 				throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 			}
 
