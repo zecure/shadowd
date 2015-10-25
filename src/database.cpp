@@ -32,7 +32,6 @@
 #include <sstream>
 #include <stdio.h>
 #include <string.h>
-#include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "database.h"
