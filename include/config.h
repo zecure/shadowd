@@ -96,6 +96,7 @@ namespace swd {
 			po::options_description od_generic_;
 			po::options_description od_server_;
 			po::options_description od_daemon_;
+			po::options_description od_security_;
 			po::options_description od_database_;
 			po::variables_map vm_;
 	};

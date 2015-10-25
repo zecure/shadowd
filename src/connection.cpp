@@ -36,6 +36,7 @@
 #include "request_handler.h"
 #include "reply_handler.h"
 #include "database.h"
+#include "config.h"
 #include "log.h"
 
 swd::connection::connection(boost::asio::io_service& io_service,
@@ -216,10 +217,40 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		std::vector<std::string> threats;
 
 		try {
+			swd::parameters& parameters = request_->get_parameters();
+
+			/**
+			 * Check security limitations first.
+			 */
+			int max_params = swd::config::i()->get<int>("max-parameters");
+
+			if ((max_params > -1) && (parameters.size() > max_params)) {
+				throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+			}
+
+			int max_length_name = swd::config::i()->get<int>("max-length-name");
+			int max_length_value = swd::config::i()->get<int>("max-length-value");
+
+			if ((max_length_name > -1) || (max_length_value > -1)) {
+				for (swd::parameters::iterator it_parameter = parameters.begin();
+				 it_parameter != parameters.end(); it_parameter++) {
+					swd::parameter_ptr parameter((*it_parameter).second);
+
+					if ((max_length_name > -1) && (((*it_parameter).first).length() > max_length_name)) {
+						throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+					}
+
+					if ((max_length_value > -1) && (parameter->get_length() > max_length_value)) {
+						throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+					}
+				}
+			}
+
 			if (swd::database::i()->is_flooding(request_->get_client_ip(), request_->get_profile_id())) {
 				throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 			}
 
+			/* Time to analyze the request. */
 			threats = request_handler.process();
 		} catch (swd::exceptions::database_exception& e) {
 			swd::log::i()->send(swd::uncritical_error, e.what());

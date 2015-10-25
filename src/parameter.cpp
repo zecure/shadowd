@@ -42,6 +42,10 @@ std::string swd::parameter::get_value() {
 	return value_;
 }
 
+int swd::parameter::get_length() {
+	return value_.length();
+}
+
 void swd::parameter::add_blacklist_filter(swd::blacklist_filter_ptr filter) {
 	filters_.push_back(filter);
 }

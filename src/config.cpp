@@ -39,6 +39,7 @@ swd::config::config() :
  od_generic_("Generic options"),
  od_server_("Server options"),
  od_daemon_("Daemon options"),
+ od_security_("Security options"),
  od_database_("Database options") {
 	od_generic_.add_options()
 		("help,h", "produce help message")
@@ -63,6 +64,11 @@ swd::config::config() :
 		("group,G", po::value<std::string>(), "group to run daemon as")
 		("chroot,R", po::value<std::string>(), "change root directory");
 
+	od_security_.add_options()
+		("max-parameters", po::value<int>()->default_value(64), "max number of parameters per request")
+		("max-length-name", po::value<int>()->default_value(64), "max length of parameter names")
+		("max-length-value", po::value<int>()->default_value(-1), "max length of parameter values");
+
 	od_database_.add_options()
 		("db-driver", po::value<std::string>()->default_value("pgsql"))
 		("db-host", po::value<std::string>()->default_value("127.0.0.1"))
@@ -75,7 +81,7 @@ swd::config::config() :
 
 void swd::config::parse_command_line(int argc, char** argv) {
 	po::options_description combination;
-	combination.add(od_generic_).add(od_server_).add(od_daemon_);
+	combination.add(od_generic_).add(od_server_).add(od_daemon_).add(od_security_);
 
 	try {
 		po::store(po::command_line_parser(argc, argv).options(combination).run(), vm_);
@@ -104,7 +110,7 @@ void swd::config::parse_config_file(std::string file) {
 	}
 
 	po::options_description combination;
-	combination.add(od_server_).add(od_daemon_).add(od_database_);
+	combination.add(od_server_).add(od_daemon_).add(od_security_).add(od_database_);
 
 	try {
 		po::store(po::parse_config_file(ifs, combination, true), vm_);

@@ -59,6 +59,13 @@ namespace swd {
 			std::string get_value();
 
 			/**
+			 * @brief Get the length of the value.
+			 *
+			 * @return The length of the value
+			 */
+			int get_length();
+
+			/**
 			 * @brief Add a (matching) blacklist filter to this parameter.
 			 *
 			 * @param filter The pointer to the blacklist filter object
