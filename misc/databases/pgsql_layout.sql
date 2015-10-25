@@ -45,6 +45,7 @@ CREATE TABLE requests (
 	id			SERIAL primary key,
 	profile_id	int NOT NULL,
 	caller		text NOT NULL,
+	resource	text NOT NULL,
 	learning	smallint NOT NULL,
 	client_ip	text NOT NULL,
 	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),

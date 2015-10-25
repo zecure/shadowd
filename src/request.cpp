@@ -88,6 +88,14 @@ std::string swd::request::get_caller() {
 	return caller_;
 }
 
+void swd::request::set_resource(std::string resource) {
+	resource_ = resource;
+}
+
+std::string swd::request::get_resource() {
+	return resource_;
+}
+
 bool swd::request::has_threats() {
 	/* Iterate over all parameters and check for threats. */
 	for (swd::parameters::iterator it_parameter = parameters_.begin();

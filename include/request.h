@@ -162,6 +162,20 @@ namespace swd {
 			std::string get_caller();
 
 			/**
+			 * @brief Set the resource of this request.
+			 *
+			 * @param resource The resource
+			 */
+			void set_resource(std::string resource);
+
+			/**
+			 * @brief Get the resource of this request.
+			 *
+			 * @return The resource
+			 */
+			std::string get_resource();
+
+			/**
 			 * @brief Check if any parameter of this request is classified by the
 			 *  analyzer as a threat.
 			 *
@@ -180,6 +194,7 @@ namespace swd {
 			std::string profile_id_;
 			std::string client_ip_;
 			std::string caller_;
+			std::string resource_;
 	};
 
 	/**

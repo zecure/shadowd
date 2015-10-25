@@ -141,12 +141,13 @@ namespace swd {
 			 *
 			 * @param profile The profile id of the request
 			 * @param caller The caller (php file) that initiated the connection
+			 * @param resource The resource identifier
 			 * @param learning The status of the learning mode
 			 * @param client_ip The ip of the attacker
 			 * @return The id of the new row
 			 */
-			int save_request(int profile, std::string caller, int learning,
-			 std::string client_ip);
+			int save_request(int profile, std::string caller, std::string resource,
+			 int learning, std::string client_ip);
 
 			/**
 			 * @brief Save information about a parameter.

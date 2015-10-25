@@ -117,6 +117,15 @@ bool swd::request_handler::decode() {
 
 		request_->set_caller(caller.asString());
 
+		/* For backwards compatibility it is acceptable that the resource is empty. */
+		Json::Value resource = root["resource"];
+
+		if (!resource) {
+			resource = "";
+		}
+
+		request_->set_resource(resource.asString());
+
 		/* Even if there is no user input there should be at least an empty array. */
 		Json::Value input = root["input"];
 

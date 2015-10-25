@@ -45,6 +45,7 @@ CREATE TABLE requests (
     id            INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
     profile_id    INTEGER UNSIGNED NOT NULL,
     caller        text NOT NULL,
+    resource      text NOT NULL,
     learning      smallint NOT NULL,
     client_ip     varchar(200) NOT NULL,
     date          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

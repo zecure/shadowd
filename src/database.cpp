@@ -273,11 +273,11 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 	return rules;
 }
 
-int swd::database::save_request(int profile, std::string caller, int learning,
- std::string client_ip) {
+int swd::database::save_request(int profile, std::string caller, std::string resource,
+ int learning, std::string client_ip) {
 	swd::log::i()->send(swd::notice, "Save request -> profile: "
-	 + boost::lexical_cast<std::string>(profile) + "; caller: " + caller
-	 + "; learning: " + boost::lexical_cast<std::string>(learning)
+	 + boost::lexical_cast<std::string>(profile) + "; caller: " + caller + "; resource: "
+	 + resource + "; learning: " + boost::lexical_cast<std::string>(learning)
 	 + "; client_ip: " + client_ip);
 
 	ensure_connection();
@@ -287,21 +287,21 @@ int swd::database::save_request(int profile, std::string caller, int learning,
 	char *caller_esc = strdup(caller.c_str());
 	dbi_conn_quote_string(conn_, &caller_esc);
 
+	char *resource_esc = strdup(resource.c_str());
+	dbi_conn_quote_string(conn_, &resource_esc);
+
 	char *client_ip_esc = strdup(client_ip.c_str());
 	dbi_conn_quote_string(conn_, &client_ip_esc);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO requests (profile_id, "
-	 "caller, learning, client_ip) VALUES (%i, %s, %i, %s)", profile, caller_esc,
-	 learning, client_ip_esc);
+	 "caller, learning, client_ip) VALUES (%i, %s, %s, %i, %s)", profile, caller_esc,
+	 resource_esc, learning, client_ip_esc);
 
 	free(caller_esc);
+	free(resource_esc);
 	free(client_ip_esc);
 
 	if (!res) {
-		/**
-		 * It is important to unlock the mutex before returning. Otherwise we get
-		 * a dead lock and the daemon doesn't work anymore.
-		 */
 		throw swd::exceptions::database_exception("Can't execute request query");
 	}
 
