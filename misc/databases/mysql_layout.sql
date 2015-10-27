@@ -252,7 +252,7 @@ INSERT INTO blacklist_filters VALUES (100, '(?:&#?(\\w+);)', 3, 'Detects HTML es
 INSERT INTO blacklist_filters VALUES (101, '(?:[^\\w]on(\\w+)(\\s*)=)', 4, 'Detects possible event handlers');
 INSERT INTO blacklist_filters VALUES (102, '(?:\\(\\)(\\s*)\\{(.*);(\\s*)\\}(\\s*);)', 6, 'Detects possible Shellshock injection attempts');
 INSERT INTO blacklist_filters VALUES (103, '(?:<(?:a|applet|base|body|button|embed|form|frame|frameset|html|iframe|img|input|link|map|meta|object|option|script|select|style|svg|textarea)\\W)', 4, 'Detects tags that are the most common direct HTML injection points');
-INSERT INTO blacklist_filters VALUES (104, '(?:\\|(\\s*)$)', 5, 'Detects possible command injection in Perl');
+INSERT INTO blacklist_filters VALUES (104, '(?:(^(\\s*)\\||\\|(\\s*)$))', 5, 'Detects possible command injection in Perl');
 INSERT INTO blacklist_filters VALUES (105, '(?:(?<![\\w.-])(?:bash|cc|cmd|curl|ftp|g\\+\\+|gcc|nasm|nc|netcat|perl|php|ping|python|ruby|sh|telnet|wget)(?![a-z]))', 4, 'Detects possible system commands');
 INSERT INTO blacklist_filters VALUES (106, '(?:<\\?(?!xml\\s))', 4, 'Detects possible PHP open tag');
 INSERT INTO blacklist_filters VALUES (107, '(?:\\b(?:call_user_func|create_function|eval|exec|f(?:get|open|read|write)|file_(?:get|put)_contents|move_uploaded_file|passthru|popen|proc_open|readfile|shell_exec|system)\\b)', 5, 'Detects possible PHP code');
