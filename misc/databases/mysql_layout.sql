@@ -2,7 +2,7 @@
 
 DELIMITER //
 
-CREATE FUNCTION prepare_wildcard (input text) RETURNS text DETERMINISTIC
+CREATE FUNCTION prepare_wildcard(input text) RETURNS text DETERMINISTIC
 BEGIN
     DECLARE escape_us   text;
     DECLARE escape_pc   text;
