@@ -291,8 +291,8 @@ int swd::database::save_request(int profile, std::string caller, std::string res
 	dbi_conn_quote_string(conn_, &client_ip_esc);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO requests (profile_id, "
-	 "caller, learning, client_ip) VALUES (%i, %s, %s, %i, %s)", profile, caller_esc,
-	 resource_esc, learning, client_ip_esc);
+	 "caller, resource, learning, client_ip) VALUES (%i, %s, %s, %i, %s)", profile,
+	 caller_esc, resource_esc, learning, client_ip_esc);
 
 	free(caller_esc);
 	free(resource_esc);
