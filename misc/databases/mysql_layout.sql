@@ -167,6 +167,7 @@ CREATE TABLE settings (
     page_limit      integer NOT NULL,
     sort_order      smallint NOT NULL,
     theme           text NOT NULL,
+    locale          text NOT NULL,
     open_filter     boolean,
     user_id         INTEGER UNSIGNED NOT NULL,
     CONSTRAINT fk_settings FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE

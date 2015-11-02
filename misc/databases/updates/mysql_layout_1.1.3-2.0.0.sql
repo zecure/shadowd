@@ -20,6 +20,7 @@ END; //
 DELIMITER ;
 
 ALTER TABLE requests ADD resource text NOT NULL DEFAULT '';
+ALTER TABLE settings ADD locale text NOT NULL DEFAULT '';
 
 UPDATE blacklist_filters SET rule = '(?:(?<!\\w)(?:\\.(?:ht(?:access|passwd|group))|(?:/etc/([./]*)(?:passwd|shadow|master\\.passwd))|(?:apache|httpd|lighttpd)\\.conf)\\b)', impact = 4, description = 'Finds sensible file names (Unix)' WHERE id = 12;
 UPDATE blacklist_filters SET rule = '(?:(^(\\s*)\\||\\|(\\s*)$))' WHERE id = 104;
