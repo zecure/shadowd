@@ -22,6 +22,7 @@ ALTER TABLE settings ADD COLUMN locale text NOT NULL DEFAULT '';
 UPDATE blacklist_filters SET rule = '(?:(?<!\w)(?:\.(?:ht(?:access|passwd|group))|(?:/etc/([./]*)(?:passwd|shadow|master\.passwd))|(?:apache|httpd|lighttpd)\.conf)\\b)', impact = 4, description = 'Finds sensible file names (Unix)' WHERE id = 12;
 UPDATE blacklist_filters SET rule = '(?:(^(\s*)\||\|(\s*)$))' WHERE id = 104;
 UPDATE blacklist_filters SET rule = '(?:(?<!\w)(boot\.ini|global\.asa)\b)', impact = 4, description = 'Finds sensible file names (Win)' WHERE id = 109;
+UPDATE whitelist_filters SET description = 'Numeric (extended)' WHERE id = 2;
 
 DELETE FROM tags_filters;
 DELETE FROM tags;

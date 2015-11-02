@@ -379,7 +379,7 @@ INSERT INTO tags_filters VALUES (5, 109);
 INSERT INTO tags_filters VALUES (11, 110);
 
 INSERT INTO whitelist_filters VALUES (1, '^[0-9]*$', 1, 'Numeric');
-INSERT INTO whitelist_filters VALUES (2, '^-?(?:\\d+|\\d*(\\.|,)\\d+)$', 2, 'Numeric (Extended)');
+INSERT INTO whitelist_filters VALUES (2, '^-?(?:\\d+|\\d*(\\.|,)\\d+)$', 2, 'Numeric (extended)');
 INSERT INTO whitelist_filters VALUES (3, '^[0-9a-f]*$', 5, 'Hexadecimal');
 INSERT INTO whitelist_filters VALUES (4, '^[0-9a-z]*$', 6, 'Alphanumeric');
 INSERT INTO whitelist_filters VALUES (5, '^[\\s0-9a-z+/]+={0,2}$', 10, 'Base64');
