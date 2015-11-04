@@ -16,10 +16,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+ALTER TABLE profiles DROP COLUMN learning_enabled;
+ALTER TABLE profiles ADD COLUMN integrity_enabled smallint NOT NULL DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN flooding_enabled smallint NOT NULL DEFAULT 1;
+ALTER TABLE profiles ADD COLUMN mode int NOT NULL DEFAULT 1;
+ALTER TABLE profiles RENAME threshold TO blacklist_threshold;
+ALTER TABLE profiles RENAME flooding_time TO flooding_timeframe;
 ALTER TABLE parameters RENAME COLUMN total_rules TO total_whitelist_rules;
 ALTER TABLE requests ADD COLUMN total_integrity_rules INT NOT NULL DEFAULT 0;
 ALTER TABLE requests ADD COLUMN resource text NOT NULL DEFAULT '';
 ALTER TABLE settings ADD COLUMN locale text NOT NULL DEFAULT '';
+ALTER TABLE requests DROP COLUMN learning;
+ALTER TABLE requests ADD COLUMN mode INT NOT NULL DEFAULT 0;
 
 UPDATE blacklist_filters SET rule = '(?:(?<!\w)(?:\.(?:ht(?:access|passwd|group))|(?:/etc/([./]*)(?:passwd|shadow|master\.passwd))|(?:apache|httpd|lighttpd)\.conf)\\b)', impact = 4, description = 'Finds sensible file names (Unix)' WHERE id = 12;
 UPDATE blacklist_filters SET rule = '(?:(^(\s*)\||\|(\s*)$))' WHERE id = 104;
@@ -179,3 +187,5 @@ CREATE TABLE integrity_requests (
 	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE,
 	PRIMARY KEY (rule_id, request_id)
 );
+
+UPDATE profiles SET flooding_timeframe = flooding_timeframe * 60;

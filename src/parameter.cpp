@@ -35,7 +35,7 @@ swd::parameter::parameter(std::string value) :
  value_(value),
  threat_(false),
  critical_impact_(false),
- total_rules_(0) {
+ total_whitelist_rules_(0) {
 }
 
 std::string swd::parameter::get_value() {
@@ -89,10 +89,10 @@ bool swd::parameter::has_critical_impact() {
 	return critical_impact_;
 }
 
-void swd::parameter::set_total_rules(int total_rules) {
-	total_rules_ = total_rules;
+void swd::parameter::set_total_whitelist_rules(int total_whitelist_rules) {
+	total_whitelist_rules_ = total_whitelist_rules;
 }
 
-int swd::parameter::get_total_rules() {
-	return total_rules_;
+int swd::parameter::get_total_whitelist_rules() {
+	return total_whitelist_rules_;
 }

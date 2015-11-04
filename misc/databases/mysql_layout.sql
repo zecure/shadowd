@@ -54,11 +54,13 @@ CREATE TABLE profiles (
     server_ip           varchar(200) NOT NULL,
     name                varchar(200) NOT NULL,
     hmac_key            varchar(200) NOT NULL,
-    learning_enabled    smallint NOT NULL,
+    mode                int NOT NULL,
     whitelist_enabled   smallint NOT NULL,
     blacklist_enabled   smallint NOT NULL,
-    threshold           int NOT NULL,
-    flooding_time       int NOT NULL,
+    integrity_enabled   smallint NOT NULL,
+    flooding_enabled    smallint NOT NULL,
+    blacklist_threshold int NOT NULL,
+    flooding_timeframe  int NOT NULL,
     flooding_threshold  int NOT NULL
 );
 
@@ -69,7 +71,7 @@ CREATE TABLE requests (
     profile_id            INTEGER UNSIGNED NOT NULL,
     caller                text NOT NULL,
     resource              text NOT NULL,
-    learning              smallint NOT NULL,
+    mode                  int NOT NULL,
     client_ip             varchar(200) NOT NULL,
     total_integrity_rules int NOT NULL,
     date                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

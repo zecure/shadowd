@@ -60,7 +60,7 @@ void swd::whitelist::scan() {
 		 * The parameter needs at least one rule to pass the check. Otherwise
 		 * it wouldn't be a whitelist.
 		 */
-		parameter->set_total_rules(rules.size());
+		parameter->set_total_whitelist_rules(rules.size());
 
 		/* Iterate over all rules. */
 		for (swd::whitelist_rules::iterator it_rule = rules.begin();

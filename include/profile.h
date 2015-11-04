@@ -46,15 +46,17 @@ namespace swd {
 			 *
 			 * @param server_ip The ip of the http server/shadowd client
 			 * @param id The id of the profile
-			 * @param learning_enabled The status of the learning mode
-			 * @param whitelist_enabled The status of the whitelist
-			 * @param blacklist_enabled The status of the blacklist
+			 * @param mode The status of the system
+			 * @param whitelist_enabled The status of the whitelist analyzer
+			 * @param blacklist_enabled The status of the blacklist analyzer
+			 * @param integrity_enabled The status of the integrity analyzer
+			 * @param flooding_enabled The status of the flooding analyzer
 			 * @param key The key for the hmac check
-			 * @param threshold The threshold for blacklist impacts
+			 * @param blacklist_threshold The global threshold for blacklist
 			 */
-			profile(std::string server_ip, int id, bool learning_enabled,
-			 bool whitelist_enabled, bool blacklist_enabled, std::string key,
-			 int threshold);
+			profile(std::string server_ip, int id, int mode, bool whitelist_enabled,
+			 bool blacklist_enabled, bool integrity_enabled, bool flooding_enabled,
+			 std::string key, int blacklist_threshold);
 
 			/**
 			 * @brief Get the ip of the http server/shadowd client.
@@ -71,25 +73,39 @@ namespace swd {
 			int get_id();
 
 			/**
-			 * @brief Get the status of learning for the profile.
+			 * @brief Get the status of the system.
 			 *
-			 * @return The learning status
+			 * @return The status of the system
 			 */
-			bool is_learning_enabled();
+			int get_mode();
 
 			/**
-			 * @brief Get the status of the whitelist for the profile.
+			 * @brief Get the status of the whitelist check for the profile.
 			 *
-			 * @return The whitelist status
+			 * @return The whitelist check status
 			 */
 			bool is_whitelist_enabled();
 
 			/**
-			 * @brief Get the status of the blacklist for the profile.
+			 * @brief Get the status of the blacklist check for the profile.
 			 *
-			 * @return The blacklist status
+			 * @return The blacklist check status
 			 */
 			bool is_blacklist_enabled();
+
+			/**
+			 * @brief Get the status of the integrity check for the profile.
+			 *
+			 * @return The integrity check status
+			 */
+			bool is_integrity_enabled();
+
+			/**
+			 * @brief Get the status of the flooding check for the profile.
+			 *
+			 * @return The flooding check status
+			 */
+			bool is_flooding_enabled();
 
 			/**
 			 * @brief Get the key/password for the profile.
@@ -104,7 +120,7 @@ namespace swd {
 			std::string get_key();
 
 			/**
-			 * @brief Get the threshold for the profile.
+			 * @brief Get the global blacklist threshold for the profile.
 			 *
 			 * The threshold is used by the analyzer to check if the blacklist
 			 * impact is so high that the parameter should be classified as an
@@ -112,16 +128,18 @@ namespace swd {
 			 *
 			 * @return The blacklist threshold
 			 */
-			int get_threshold();
+			int get_blacklist_threshold();
 
 		private:
 			std::string server_ip_;
 			int id_;
-			bool learning_enabled_;
+			int mode_;
 			bool whitelist_enabled_;
 			bool blacklist_enabled_;
+			bool integrity_enabled_;
+			bool flooding_enabled_;
 			std::string key_;
-			int threshold_;
+			int blacklist_threshold_;
 
 	};
 

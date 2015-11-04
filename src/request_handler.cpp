@@ -163,18 +163,18 @@ std::vector<std::string> swd::request_handler::process() {
 	 * is at least one threat or if learning is enabled the complete request gets
 	 * recorded permanently.
 	 */
-	if (request_->has_threats() || request_->get_profile()->is_learning_enabled()) {
+	if (request_->has_threats() || (request_->get_profile()->get_mode() == MODE_LEARNING)) {
 		swd::storage::i()->add(request_);
 	}
 
 	/**
-	 * Return the paths of all threats for the reply. But only if learning mode is
-	 * not enabled, because this values are used to defuse a request and this
+	 * Return the paths of all threats for the reply. But only if the active mode
+	 * is enabled, because this values are used to defuse a request and this
 	 * could result in unusable sites.
 	 */
 	std::vector<std::string> threats;
 
-	if (!request_->get_profile()->is_learning_enabled()) {
+	if (request_->get_profile()->get_mode() == MODE_ACTIVE) {
 		swd::parameters& parameters = request_->get_parameters();
 
 		for (swd::parameters::iterator it_parameter = parameters.begin();

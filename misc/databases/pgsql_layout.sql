@@ -51,11 +51,13 @@ CREATE TABLE profiles (
 	server_ip			text NOT NULL,
 	name				text NOT NULL,
 	hmac_key			text NOT NULL,
-	learning_enabled	smallint NOT NULL,
+	mode				int NOT NULL,
 	whitelist_enabled	smallint NOT NULL,
 	blacklist_enabled	smallint NOT NULL,
-	threshold			int NOT NULL,
-	flooding_time		int NOT NULL,
+	integrity_enabled	smallint NOT NULL,
+	flooding_enabled	smallint NOT NULL,
+	blacklist_threshold	int NOT NULL,
+	flooding_timeframe	int NOT NULL,
 	flooding_threshold	int NOT NULL
 );
 
@@ -66,9 +68,9 @@ CREATE TABLE requests (
 	profile_id				int NOT NULL,
 	caller					text NOT NULL,
 	resource				text NOT NULL,
-	learning				smallint NOT NULL,
+	mode					int NOT NULL,
 	client_ip				text NOT NULL,
-	total_integrity_rules	INT NOT NULL,
+	total_integrity_rules	int NOT NULL,
 	date					timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
 	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );

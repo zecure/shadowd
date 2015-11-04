@@ -134,14 +134,14 @@ namespace swd {
 			 * Parameters with not whitelist rule are also classified as an
 			 * attack, so we have to keep track of the responsible rules.
 			 */
-			void set_total_rules(int total_rules);
+			void set_total_whitelist_rules(int total_whitelist_rules);
 
 			/**
 			 * @brief Get the total number of responsible whitelist rules.
 			 *
 			 * @return The total number of checked whitelist rules
 			 */
-			int get_total_rules();
+			int get_total_whitelist_rules();
 
 		private:
 			std::string value_;
@@ -149,7 +149,7 @@ namespace swd {
 			swd::whitelist_rules rules_;
 			bool threat_;
 			bool critical_impact_;
-			int total_rules_;
+			int total_whitelist_rules_;
 	};
 
 	/**

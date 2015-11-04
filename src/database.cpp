@@ -99,9 +99,10 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 	dbi_conn_quote_string(conn_, &server_ip_esc);
 
 	/* Insert the ip and execute the query. */
-	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, learning_enabled, "
-	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE %s LIKE "
-	 "prepare_wildcard(server_ip) AND id = %i", server_ip_esc, profile_id);
+	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, mode, "
+	 "whitelist_enabled, blacklist_enabled, integrity_enabled, flooding_enabled, "
+	 "blacklist_threshold FROM profiles WHERE %s LIKE prepare_wildcard(server_ip) "
+	 "AND id = %i", server_ip_esc, profile_id);
 
 	/* Don't forget to free server_ip_esc to avoid a memory leak. */
 	free(server_ip_esc);
@@ -122,11 +123,13 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 		new swd::profile(
 			server_ip,
 			dbi_result_get_uint(res, "id"),
-			(dbi_result_get_uint(res, "learning_enabled") == 1),
+			dbi_result_get_uint(res, "mode"),
 			(dbi_result_get_uint(res, "whitelist_enabled") == 1),
 			(dbi_result_get_uint(res, "blacklist_enabled") == 1),
+			(dbi_result_get_uint(res, "integrity_enabled") == 1),
+			(dbi_result_get_uint(res, "flooding_enabled") == 1),
 			dbi_result_get_string(res, "hmac_key"),
-			dbi_result_get_uint(res, "threshold")
+			dbi_result_get_uint(res, "blacklist_threshold")
 		)
 	);
 
@@ -271,10 +274,10 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 }
 
 int swd::database::save_request(int profile, std::string caller, std::string resource,
- int learning, std::string client_ip) {
+ int mode, std::string client_ip) {
 	swd::log::i()->send(swd::notice, "Save request -> profile: "
 	 + boost::lexical_cast<std::string>(profile) + "; caller: " + caller + "; resource: "
-	 + resource + "; learning: " + boost::lexical_cast<std::string>(learning)
+	 + resource + "; mode: " + boost::lexical_cast<std::string>(mode)
 	 + "; client_ip: " + client_ip);
 
 	ensure_connection();
@@ -291,8 +294,8 @@ int swd::database::save_request(int profile, std::string caller, std::string res
 	dbi_conn_quote_string(conn_, &client_ip_esc);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO requests (profile_id, "
-	 "caller, resource, learning, client_ip) VALUES (%i, %s, %s, %i, %s)", profile,
-	 caller_esc, resource_esc, learning, client_ip_esc);
+	 "caller, resource, mode, client_ip) VALUES (%i, %s, %s, %i, %s)", profile,
+	 caller_esc, resource_esc, mode, client_ip_esc);
 
 	free(caller_esc);
 	free(resource_esc);
@@ -377,21 +380,19 @@ bool swd::database::is_flooding(std::string client_ip, int profile_id) {
 
 	if (driver_ == "pgsql") {
 		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.learning = 0 AND "
+		 "AS request_count FROM requests WHERE requests.mode != 3 AND "
 		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
-		 "> NOW() - ((SELECT profiles.flooding_time FROM profiles WHERE profiles.id "
-		 "= %i) || ' minute')::INTERVAL) r WHERE r.request_count >= (SELECT "
-		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i AND "
-		 "profiles.flooding_threshold > 0)",
+		 "> NOW() - ((SELECT profiles.flooding_timeframe FROM profiles WHERE profiles.id "
+		 "= %i) || ' second')::INTERVAL) r WHERE r.request_count >= (SELECT "
+		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i)",
 		 client_ip_esc, profile_id, profile_id, profile_id);
 	} else if (driver_ == "mysql") {
 		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.learning = 0 AND "
+		 "AS request_count FROM requests WHERE requests.mode != 3 AND "
 		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
-		 "> NOW() - INTERVAL (SELECT profiles.flooding_time FROM profiles WHERE "
-		 "profiles.id = %i) MINUTE) r WHERE r.request_count >= (SELECT "
-		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i AND "
-		 "profiles.flooding_threshold > 0)",
+		 "> NOW() - INTERVAL (SELECT profiles.flooding_timeframe FROM profiles WHERE "
+		 "profiles.id = %i) SECOND) r WHERE r.request_count >= (SELECT "
+		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i)",
 		 client_ip_esc, profile_id, profile_id, profile_id);
 	}
 

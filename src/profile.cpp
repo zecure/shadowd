@@ -31,23 +31,26 @@
 
 #include "profile.h"
 
-swd::profile::profile(std::string server_ip, int id, bool learning_enabled,
- bool whitelist_enabled, bool blacklist_enabled, std::string key, int threshold) :
+swd::profile::profile(std::string server_ip, int id, int mode, bool whitelist_enabled,
+ bool blacklist_enabled, bool integrity_enabled, bool flooding_enabled, std::string key,
+ int blacklist_threshold) :
  server_ip_(server_ip),
  id_(id),
- learning_enabled_(learning_enabled),
+ mode_(mode),
  whitelist_enabled_(whitelist_enabled),
  blacklist_enabled_(blacklist_enabled),
+ integrity_enabled_(integrity_enabled),
+ flooding_enabled_(flooding_enabled),
  key_(key),
- threshold_(threshold) {
+ blacklist_threshold_(blacklist_threshold) {
 }
 
 int swd::profile::get_id() {
 	return id_;
 }
 
-bool swd::profile::is_learning_enabled() {
-	return learning_enabled_;
+int swd::profile::get_mode() {
+	return mode_;
 }
 
 bool swd::profile::is_whitelist_enabled() {
@@ -58,12 +61,20 @@ bool swd::profile::is_blacklist_enabled() {
 	return blacklist_enabled_;
 }
 
+bool swd::profile::is_integrity_enabled() {
+	return integrity_enabled_;
+}
+
+bool swd::profile::is_flooding_enabled() {
+	return flooding_enabled_;
+}
+
 std::string swd::profile::get_key() {
 	return key_;
 }
 
-int swd::profile::get_threshold() {
-	return threshold_;
+int swd::profile::get_blacklist_threshold() {
+	return blacklist_threshold_;
 }
 
 std::string swd::profile::get_server_ip() {

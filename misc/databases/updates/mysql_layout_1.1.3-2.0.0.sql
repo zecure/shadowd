@@ -19,10 +19,22 @@ END; //
 
 DELIMITER ;
 
+
+
+
+
+ALTER TABLE profiles DROP COLUMN learning_enabled;
+ALTER TABLE profiles ADD integrity_enabled smallint NOT NULL DEFAULT 0;
+ALTER TABLE profiles ADD flooding_enabled smallint NOT NULL DEFAULT 1;
+ALTER TABLE profiles ADD mode int NOT NULL DEFAULT 1;
+ALTER TABLE profiles CHANGE threshold blacklist_threshold INT;
+ALTER TABLE profiles CHANGE flooding_time flooding_timeframe INT;
 ALTER TABLE parameters CHANGE total_rules total_whitelist_rules INT;
 ALTER TABLE requests ADD total_integrity_rules INT NOT NULL DEFAULT 0;
 ALTER TABLE requests ADD resource text NOT NULL DEFAULT '';
 ALTER TABLE settings ADD locale text NOT NULL DEFAULT '';
+ALTER TABLE requests DROP COLUMN learning;
+ALTER TABLE requests ADD mode INT NOT NULL DEFAULT 0;
 
 UPDATE blacklist_filters SET rule = '(?:(?<!\\w)(?:\\.(?:ht(?:access|passwd|group))|(?:/etc/([./]*)(?:passwd|shadow|master\\.passwd))|(?:apache|httpd|lighttpd)\\.conf)\\b)', impact = 4, description = 'Finds sensible file names (Unix)' WHERE id = 12;
 UPDATE blacklist_filters SET rule = '(?:(^(\\s*)\\||\\|(\\s*)$))' WHERE id = 104;
@@ -182,3 +194,5 @@ CREATE TABLE integrity_requests (
     CONSTRAINT fk_integrity_requests2 FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE,
     PRIMARY KEY (rule_id, request_id)
 );
+
+UPDATE profiles SET flooding_timeframe = flooding_timeframe * 60;

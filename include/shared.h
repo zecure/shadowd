@@ -46,6 +46,10 @@
 #define STATUS_DEACTIVATED 2
 #define STATUS_PENDING 2
 
+#define MODE_ACTIVE 1
+#define MODE_PASSIVE 2
+#define MODE_LEARNING 3
+
 namespace swd {
 	namespace exceptions {
 		/**

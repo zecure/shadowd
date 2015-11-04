@@ -249,9 +249,11 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 				}
 			}
 
-			if (swd::database::i()->is_flooding(request_->get_client_ip(), request_->get_profile_id())) {
-				swd::log::i()->send(swd::notice, "Too many requests");
-				throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+			if (request_->get_profile()->is_flooding_enabled()) {
+				if (swd::database::i()->is_flooding(request_->get_client_ip(), request_->get_profile_id())) {
+					swd::log::i()->send(swd::notice, "Too many requests");
+					throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+				}
 			}
 
 			/* Time to analyze the request. */

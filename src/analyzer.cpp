@@ -77,7 +77,7 @@ void swd::analyzer::start() {
 		swd::parameter_ptr parameter((*it_parameter).second);
 
 		if (request_->get_profile()->is_blacklist_enabled()) {
-			int threshold = request_->get_profile()->get_threshold();
+			int threshold = request_->get_profile()->get_blacklist_threshold();
 
 			swd::blacklist_rules rules = swd::database::i()->get_blacklist_rules(
 				request_->get_profile()->get_id(),
@@ -110,7 +110,7 @@ void swd::analyzer::start() {
 
 		if (request_->get_profile()->is_whitelist_enabled()) {
 			/* Check if there is no responsible whitelist rule. */
-			if (parameter->get_total_rules() == 0) {
+			if (parameter->get_total_whitelist_rules() == 0) {
 				parameter->is_threat(true);
 			}
 
