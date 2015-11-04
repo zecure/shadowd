@@ -164,3 +164,15 @@ CREATE INDEX idx_integrity_rules3 ON whitelist_rules (algorithm(20));
 CREATE INDEX idx_integrity_rules4 ON whitelist_rules (hash(20));
 CREATE INDEX idx_integrity_rules5 ON whitelist_rules (date);
 CREATE INDEX idx_integrity_rules6 ON whitelist_rules (status);
+
+CREATE TABLE integrity_hashes (
+    id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
+    request_id  INTEGER UNSIGNED NOT NULL,
+    algorithm   text NOT NULL,
+    hash        text NOT NULL,
+    CONSTRAINT fk_integrity_hashes1 FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_integrity_rules1 ON whitelist_rules (request_id);
+CREATE INDEX idx_integrity_rules3 ON whitelist_rules (algorithm(20));
+CREATE INDEX idx_integrity_rules4 ON whitelist_rules (hash(20));
