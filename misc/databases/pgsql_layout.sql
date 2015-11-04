@@ -62,24 +62,25 @@ CREATE TABLE profiles (
 CREATE INDEX ON profiles (server_ip);
 
 CREATE TABLE requests (
-	id			SERIAL primary key,
-	profile_id	int NOT NULL,
-	caller		text NOT NULL,
-	resource	text NOT NULL,
-	learning	smallint NOT NULL,
-	client_ip	text NOT NULL,
-	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
+	id						SERIAL primary key,
+	profile_id				int NOT NULL,
+	caller					text NOT NULL,
+	resource				text NOT NULL,
+	learning				smallint NOT NULL,
+	client_ip				text NOT NULL,
+	total_integrity_rules	INT NOT NULL,
+	date					timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
 	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
 
 CREATE TABLE parameters (
-	id				SERIAL primary key,
-	request_id		int NOT NULL,
-	path			text NOT NULL,
-	value			text NOT NULL,
-	total_rules		int NOT NULL,
-	critical_impact	smallint NOT NULL,
-	threat			smallint NOT NULL,
+	id						SERIAL primary key,
+	request_id				int NOT NULL,
+	path					text NOT NULL,
+	value					text NOT NULL,
+	total_whitelist_rules	int NOT NULL,
+	critical_impact			smallint NOT NULL,
+	threat					smallint NOT NULL,
 	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
@@ -165,7 +166,7 @@ CREATE INDEX ON integrity_rules (digest);
 CREATE INDEX ON integrity_rules (date);
 CREATE INDEX ON integrity_rules (status);
 
-CREATE TABLE integrity_hashes (
+CREATE TABLE hashes (
 	id			SERIAL primary key,
 	request_id	integer NOT NULL,
 	algorithm	text NOT NULL,
@@ -173,9 +174,13 @@ CREATE TABLE integrity_hashes (
 	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
-CREATE INDEX ON integrity_hashes (request_id);
-CREATE INDEX ON integrity_hashes (algorithm);
-CREATE INDEX ON integrity_hashes (digest);
+CREATE TABLE integrity_requests (
+	rule_id		int NOT NULL,
+	request_id	int NOT NULL,
+	FOREIGN KEY (rule_id) REFERENCES integrity_rules (id) ON DELETE CASCADE,
+	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE,
+	PRIMARY KEY (rule_id, request_id)
+);
 
 -- Tables UI
 

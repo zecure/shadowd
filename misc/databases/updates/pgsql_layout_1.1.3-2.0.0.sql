@@ -16,6 +16,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+ALTER TABLE parameters RENAME COLUMN total_rules TO total_whitelist_rules;
+ALTER TABLE requests ADD COLUMN total_integrity_rules INT NOT NULL DEFAULT 0;
 ALTER TABLE requests ADD COLUMN resource text NOT NULL DEFAULT '';
 ALTER TABLE settings ADD COLUMN locale text NOT NULL DEFAULT '';
 
@@ -162,7 +164,7 @@ CREATE INDEX ON integrity_rules (digest);
 CREATE INDEX ON integrity_rules (date);
 CREATE INDEX ON integrity_rules (status);
 
-CREATE TABLE integrity_hashes (
+CREATE TABLE hashes (
 	id			SERIAL primary key,
 	request_id	integer NOT NULL,
 	algorithm	text NOT NULL,
@@ -170,6 +172,10 @@ CREATE TABLE integrity_hashes (
 	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
-CREATE INDEX ON integrity_hashes (request_id);
-CREATE INDEX ON integrity_hashes (algorithm);
-CREATE INDEX ON integrity_hashes (digest);
+CREATE TABLE integrity_requests (
+	rule_id		int NOT NULL,
+	request_id	int NOT NULL,
+	FOREIGN KEY (rule_id) REFERENCES integrity_rules (id) ON DELETE CASCADE,
+	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE,
+	PRIMARY KEY (rule_id, request_id)
+);

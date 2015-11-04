@@ -19,6 +19,8 @@ END; //
 
 DELIMITER ;
 
+ALTER TABLE parameters CHANGE total_rules total_whitelist_rules INT;
+ALTER TABLE requests ADD total_integrity_rules INT NOT NULL DEFAULT 0;
 ALTER TABLE requests ADD resource text NOT NULL DEFAULT '';
 ALTER TABLE settings ADD locale text NOT NULL DEFAULT '';
 
@@ -165,14 +167,18 @@ CREATE INDEX idx_integrity_rules4 ON integrity_rules (digest(20));
 CREATE INDEX idx_integrity_rules5 ON integrity_rules (date);
 CREATE INDEX idx_integrity_rules6 ON integrity_rules (status);
 
-CREATE TABLE integrity_hashes (
+CREATE TABLE hashes (
     id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
     request_id  INTEGER UNSIGNED NOT NULL,
     algorithm   text NOT NULL,
     digest      text NOT NULL,
-    CONSTRAINT fk_integrity_hashes1 FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
+    CONSTRAINT fk_hashes1 FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_integrity_rules1 ON integrity_hashes (request_id);
-CREATE INDEX idx_integrity_rules3 ON integrity_hashes (algorithm(20));
-CREATE INDEX idx_integrity_rules4 ON integrity_hashes (digest(20));
+CREATE TABLE integrity_requests (
+    rule_id        INTEGER UNSIGNED NOT NULL,
+    request_id     INTEGER UNSIGNED NOT NULL,
+    CONSTRAINT fk_integrity_requests1 FOREIGN KEY (rule_id) REFERENCES integrity_rules (id) ON DELETE CASCADE,
+    CONSTRAINT fk_integrity_requests2 FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE,
+    PRIMARY KEY (rule_id, request_id)
+);
