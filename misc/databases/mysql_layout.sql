@@ -155,7 +155,7 @@ CREATE TABLE integrity_rules (
     profile_id  INTEGER UNSIGNED NOT NULL,
     caller      text NOT NULL,
     algorithm   text NOT NULL,
-    hash        text NOT NULL,
+    digest        text NOT NULL,
     date        DATETIME,
     status      smallint NOT NULL,
     CONSTRAINT fk_integrity_rules1 FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
@@ -164,7 +164,7 @@ CREATE TABLE integrity_rules (
 CREATE INDEX idx_integrity_rules1 ON integrity_rules (profile_id);
 CREATE INDEX idx_integrity_rules2 ON integrity_rules (caller(20));
 CREATE INDEX idx_integrity_rules3 ON integrity_rules (algorithm(20));
-CREATE INDEX idx_integrity_rules4 ON integrity_rules (hash(20));
+CREATE INDEX idx_integrity_rules4 ON integrity_rules (digest(20));
 CREATE INDEX idx_integrity_rules5 ON integrity_rules (date);
 CREATE INDEX idx_integrity_rules6 ON integrity_rules (status);
 
@@ -172,13 +172,13 @@ CREATE TABLE integrity_hashes (
     id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
     request_id  INTEGER UNSIGNED NOT NULL,
     algorithm   text NOT NULL,
-    hash        text NOT NULL,
+    digest        text NOT NULL,
     CONSTRAINT fk_integrity_hashes1 FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_integrity_rules1 ON integrity_hashes (request_id);
 CREATE INDEX idx_integrity_rules3 ON integrity_hashes (algorithm(20));
-CREATE INDEX idx_integrity_rules4 ON integrity_hashes (hash(20));
+CREATE INDEX idx_integrity_rules4 ON integrity_hashes (digest(20));
 
 -- Tables UI
 

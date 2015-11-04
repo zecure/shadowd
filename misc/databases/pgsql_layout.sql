@@ -152,7 +152,7 @@ CREATE TABLE integrity_rules (
 	profile_id	integer NOT NULL,
 	caller		text NOT NULL,
 	algorithm	text NOT NULL,
-	hash		text NOT NULL,
+	digest		text NOT NULL,
 	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
 	status		smallint NOT NULL,
 	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
@@ -161,7 +161,7 @@ CREATE TABLE integrity_rules (
 CREATE INDEX ON integrity_rules (profile_id);
 CREATE INDEX ON integrity_rules (caller);
 CREATE INDEX ON integrity_rules (algorithm);
-CREATE INDEX ON integrity_rules (hash);
+CREATE INDEX ON integrity_rules (digest);
 CREATE INDEX ON integrity_rules (date);
 CREATE INDEX ON integrity_rules (status);
 
@@ -169,13 +169,13 @@ CREATE TABLE integrity_hashes (
 	id			SERIAL primary key,
 	request_id	integer NOT NULL,
 	algorithm	text NOT NULL,
-	hash		text NOT NULL,
+	digest		text NOT NULL,
 	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
 CREATE INDEX ON integrity_hashes (request_id);
 CREATE INDEX ON integrity_hashes (algorithm);
-CREATE INDEX ON integrity_hashes (hash);
+CREATE INDEX ON integrity_hashes (digest);
 
 -- Tables UI
 
