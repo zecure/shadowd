@@ -150,6 +150,24 @@ CREATE TABLE whitelist_parameters (
     PRIMARY KEY (rule_id, parameter_id)
 );
 
+CREATE TABLE integrity_rules (
+    id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
+    profile_id  INTEGER UNSIGNED NOT NULL,
+    caller      text NOT NULL,
+    algorithm   text NOT NULL,
+    hash        text NOT NULL,
+    date        DATETIME,
+    status      smallint NOT NULL,
+    CONSTRAINT fk_integrity_rules1 FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_integrity_rules1 ON whitelist_rules (profile_id);
+CREATE INDEX idx_integrity_rules2 ON whitelist_rules (caller(20));
+CREATE INDEX idx_integrity_rules3 ON whitelist_rules (algorithm(20));
+CREATE INDEX idx_integrity_rules4 ON whitelist_rules (hash(20));
+CREATE INDEX idx_integrity_rules5 ON whitelist_rules (date);
+CREATE INDEX idx_integrity_rules6 ON whitelist_rules (status);
+
 -- Tables UI
 
 CREATE TABLE users (

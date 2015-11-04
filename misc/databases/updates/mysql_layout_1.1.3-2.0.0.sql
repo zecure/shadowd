@@ -146,3 +146,21 @@ INSERT INTO tags_filters VALUES (2, 109);
 INSERT INTO tags_filters VALUES (4, 109);
 INSERT INTO tags_filters VALUES (5, 109);
 INSERT INTO tags_filters VALUES (11, 110);
+
+CREATE TABLE integrity_rules (
+    id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT primary key,
+    profile_id  INTEGER UNSIGNED NOT NULL,
+    caller      text NOT NULL,
+    algorithm   text NOT NULL,
+    hash        text NOT NULL,
+    date        DATETIME,
+    status      smallint NOT NULL,
+    CONSTRAINT fk_integrity_rules1 FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_integrity_rules1 ON whitelist_rules (profile_id);
+CREATE INDEX idx_integrity_rules2 ON whitelist_rules (caller(20));
+CREATE INDEX idx_integrity_rules3 ON whitelist_rules (algorithm(20));
+CREATE INDEX idx_integrity_rules4 ON whitelist_rules (hash(20));
+CREATE INDEX idx_integrity_rules5 ON whitelist_rules (date);
+CREATE INDEX idx_integrity_rules6 ON whitelist_rules (status);

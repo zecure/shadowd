@@ -143,3 +143,21 @@ INSERT INTO tags_filters VALUES (2, 109);
 INSERT INTO tags_filters VALUES (4, 109);
 INSERT INTO tags_filters VALUES (5, 109);
 INSERT INTO tags_filters VALUES (11, 110);
+
+CREATE TABLE integrity_rules (
+	id			SERIAL primary key,
+	profile_id	integer NOT NULL,
+	caller		text NOT NULL,
+	algorithm	text NOT NULL,
+	hash		text NOT NULL,
+	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
+	status		smallint NOT NULL,
+	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ON integrity_rules (profile_id);
+CREATE INDEX ON integrity_rules (caller);
+CREATE INDEX ON integrity_rules (algorithm);
+CREATE INDEX ON integrity_rules (hash);
+CREATE INDEX ON integrity_rules (date);
+CREATE INDEX ON integrity_rules (status);
