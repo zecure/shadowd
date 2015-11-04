@@ -155,14 +155,14 @@ namespace swd {
 			 * @param request The id of the corresponding request
 			 * @param path The path (i.e. key) of the parameter
 			 * @param value The value of the parameter
-			 * @param total_rules The total number of whitelist rules that are
-			 *  responsible for this parameter
+			 * @param total_whitelist_rules The total number of whitelist rules
+			 *  that are responsible for this parameter
 			 * @param critical_impact The status of the blacklist test
 			 * @param threat The status of the analyzer
 			 * @return The id of the new row
 			 */
 			int save_parameter(int request, std::string path, std::string value,
-			 int total_rules, int critical_impact, int threat);
+			 int total_whitelist_rules, int critical_impact, int threat);
 
 			/**
 			 * @brief Add a many to many connector for a matching blacklist filter.

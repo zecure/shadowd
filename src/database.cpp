@@ -310,7 +310,7 @@ int swd::database::save_request(int profile, std::string caller, std::string res
 }
 
 int swd::database::save_parameter(int request, std::string path, std::string value,
- int total_rules, int critical_impact, int threat) {
+ int total_whitelist_rules, int critical_impact, int threat) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
@@ -322,8 +322,8 @@ int swd::database::save_parameter(int request, std::string path, std::string val
 	dbi_conn_quote_string(conn_, &value_esc);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO parameters (request_id, "
-	 "path, value, total_rules, critical_impact, threat) VALUES (%i, %s, %s, %i, %i, %i)",
-	 request, path_esc, value_esc, total_rules, critical_impact, threat);
+	 "path, value, total_whitelist_rules, critical_impact, threat) VALUES (%i, %s, %s, %i, %i, %i)",
+	 request, path_esc, value_esc, total_whitelist_rules, critical_impact, threat);
 
 	free(path_esc);
 	free(value_esc);
