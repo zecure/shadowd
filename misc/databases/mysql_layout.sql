@@ -297,6 +297,7 @@ INSERT INTO blacklist_filters VALUES (107, '(?:\\b(?:call_user_func|create_funct
 INSERT INTO blacklist_filters VALUES (108, '(?:[\\n\\r]\\s*\\b(?:to|b?cc)\\b\\s*:.*?\\@)', 5, 'Detects email injections');
 INSERT INTO blacklist_filters VALUES (109, '(?:(?<!\\w)(boot\\.ini|global\\.asa)\\b)', 4, 'Finds sensible file names (Win)');
 INSERT INTO blacklist_filters VALUES (110, '(?:<!--\\W*?#\\W*?(cmd|echo|exec|include|printenv)\\b)', 6, 'Detects Server-Site Include injections');
+INSERT INTO blacklist_filters VALUES (111, '(?:\\{\\s*\\w+\\s*:\\s*[+-]?\\s*\\d+\\s*:.*\\})', 8, 'Detects serialized PHP objects');
 
 INSERT INTO tags VALUES (1, 'xss');
 INSERT INTO tags VALUES (2, 'win');
@@ -414,6 +415,7 @@ INSERT INTO tags_filters VALUES (2, 109);
 INSERT INTO tags_filters VALUES (4, 109);
 INSERT INTO tags_filters VALUES (5, 109);
 INSERT INTO tags_filters VALUES (11, 110);
+INSERT INTO tags_filters VALUES (13, 111);
 
 INSERT INTO whitelist_filters VALUES (1, '^[0-9]*$', 1, 'Numeric');
 INSERT INTO whitelist_filters VALUES (2, '^-?(?:\\d+|\\d*(\\.|,)\\d+)$', 2, 'Numeric (extended)');

@@ -29,6 +29,7 @@ ALTER TABLE settings ADD COLUMN locale text NOT NULL DEFAULT '';
 ALTER TABLE requests DROP COLUMN learning;
 ALTER TABLE requests ADD COLUMN mode INT NOT NULL DEFAULT 0;
 
+INSERT INTO blacklist_filters VALUES (111, '(?:\{\s*\w+\s*:\s*[+-]?\s*\d+\s*:.*\})', 8, 'Detects serialized PHP objects');
 UPDATE blacklist_filters SET rule = '(?:(?<!\w)(?:\.(?:ht(?:access|passwd|group))|(?:/etc/([./]*)(?:passwd|shadow|master\.passwd))|(?:apache|httpd|lighttpd)\.conf)\\b)', impact = 4, description = 'Finds sensible file names (Unix)' WHERE id = 12;
 UPDATE blacklist_filters SET rule = '(?:(^(\s*)\||\|(\s*)$))' WHERE id = 104;
 UPDATE blacklist_filters SET rule = '(?:(?<!\w)(boot\.ini|global\.asa)\b)', impact = 4, description = 'Finds sensible file names (Win)' WHERE id = 109;
@@ -153,6 +154,7 @@ INSERT INTO tags_filters VALUES (2, 109);
 INSERT INTO tags_filters VALUES (4, 109);
 INSERT INTO tags_filters VALUES (5, 109);
 INSERT INTO tags_filters VALUES (11, 110);
+INSERT INTO tags_filters VALUES (13, 111);
 
 CREATE TABLE integrity_rules (
 	id			SERIAL primary key,
