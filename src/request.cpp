@@ -122,6 +122,11 @@ swd::hashes& swd::request::get_hashes() {
 }
 
 swd::hash_ptr swd::request::get_hash(std::string algorithm) {
+	/* Necessary, otherwise element is created. */
+	if (hashes_.find(algorithm) == hashes_.end()) {
+		return swd::hash_ptr();
+	}
+
 	return hashes_[algorithm];
 }
 
