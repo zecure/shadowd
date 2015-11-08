@@ -29,68 +29,35 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef WHITELIST_RULE_H
-#define WHITELIST_RULE_H
+#ifndef INTEGRITY_H
+#define INTEGRITY_H
 
 #include <vector>
-#include <string>
-#include <boost/shared_ptr.hpp>
 
-#include "whitelist_filter.h"
+#include "request.h"
 
 namespace swd {
 	/**
-	 * @brief Models a whitelist rule.
-	 *
-	 * If is_responsible() is true it is required that is_adhered_to() is also
-	 * true, otherwise the input parameter is classified as an attack.
-	 * Parameters are directly connected with broken rules.
+	 * @brief Handles the integrity examination of a request.
 	 */
-	class whitelist_rule {
+	class integrity {
 		public:
 			/**
-			 * @brief Construct a whitelist rule.
+			 * @brief Construct the integrity check.
 			 *
-			 * @param id The id of the rule
-			 * @param filter The whitelist filter of the rule
-			 * @param min_length The minimum length of the rule
-			 * @param max_length The maximum length of the rule
+			 * @param request The pointer to the request object
 			 */
-			whitelist_rule(int id, swd::whitelist_filter_ptr filter, int min_length,
-			 int max_length);
+			integrity(swd::request_ptr request);
 
 			/**
-			 * @brief Get the id the rule.
-			 *
-			 * @return The id of the rule
+			 * @brief Scan all parameters in the request and add connections to broken
+			 *  rules.
 			 */
-			int get_id();
-
-			/**
-			 * @brief Test for value if the filter matches and if the length is
-			 *  acceptable.
-			 *
-			 * @param value The string that should be tested
-			 * @return The status of the regular expression and length test
-			 */
-			bool is_adhered_to(std::string value);
+			void scan();
 
 		private:
-			int id_;
-			swd::whitelist_filter_ptr filter_;
-			int min_length_;
-			int max_length_;
+			swd::request_ptr request_;
 	};
-
-	/**
-	 * @brief Whitelist rule pointer.
-	 */
-	typedef boost::shared_ptr<swd::whitelist_rule> whitelist_rule_ptr;
-
-	/**
-	 * @brief List of whitelist rule pointers.
-	 */
-	typedef std::vector<swd::whitelist_rule_ptr> whitelist_rules;
 }
 
-#endif /* WHITELIST_RULE_H */
+#endif /* INTEGRITY_H */

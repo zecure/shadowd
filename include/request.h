@@ -39,6 +39,8 @@
 
 #include "profile.h"
 #include "parameter.h"
+#include "hash.h"
+#include "integrity_rule.h"
 
 namespace swd {
 	/**
@@ -70,10 +72,10 @@ namespace swd {
 			/**
 			 * @brief Add a parameter object to the request.
 			 *
-			 * @param key The path/key of the parameter
+			 * @param path The path of the parameter
 			 * @param value The value of the parameter
 			 */
-			void add_parameter(std::string key, std::string value);
+			void add_parameter(std::string path, std::string value);
 
 			/**
 			 * @brief Get all saved parameters.
@@ -176,25 +178,95 @@ namespace swd {
 			std::string get_resource();
 
 			/**
-			 * @brief Check if any parameter of this request is classified by the
-			 *  analyzer as a threat.
+			 * @brief Add a (broken) integrity rule to this request.
 			 *
-			 * This is needed by the storage to check if the request should be stored
-			 * on the hard disk or not.
+			 * @param rule The pointer to the integrity rule object
+			 */
+			void add_integrity_rule(swd::integrity_rule_ptr rule);
+
+			/**
+			 * @brief Get all (broken) integrity rules.
 			 *
-			 * @return If it is classified as threat
+			 * @return The list of saved integrity rules
+			 */
+			const swd::integrity_rules& get_integrity_rules();
+
+			/**
+			 * @brief Set the number of integrity rules.
+			 *
+			 * Parameters with not integrity rule are also classified as an
+			 * attack, so we have to keep track of the responsible rules.
+			 */
+			void set_total_integrity_rules(int total_integrity_rules);
+
+			/**
+			 * @brief Get the total number of responsible integrity rules.
+			 *
+			 * @return The total number of checked integrity rules
+			 */
+			int get_total_integrity_rules();
+
+			/**
+			 * @brief Add a hash to the request.
+			 *
+			 * @param algorithm The algorithm that is used to calculate the hash
+			 * @param digest The output of the hash algorithm on the message
+			 */
+			void add_hash(std::string algorithm, std::string digest);
+
+			/**
+			 * @brief Get all saved hashes.
+			 *
+			 * @return The hashes of the request
+			 */
+			swd::hashes& get_hashes();
+
+			/**
+			 * @brief Get the hash of a specific algorithm.
+			 *
+			 * @param algorithm The algorithm that is used to calculate the hash
+			 * @return The hash of the algorithm
+			 */
+			swd::hash_ptr get_hash(std::string algorithm);
+
+			/**
+			 * @brief Define if this request itself is a threat or not.
+			 *
+			 * @param threat Threat status of this request
+			 */
+			void is_threat(bool global_threat);
+
+			/**
+			 * @brief Check if the request itself is a threat.
+			 *
+			 * If the request itself is a threat it has to be completely blocked.
+			 *
+			 * @return If the request is classified as threat
+			 */
+			bool is_threat();
+
+			/**
+			 * @brief Check if this request has parameters with threats.
+			 *
+			 * If only a sub part of the request is a threat it can be filtered out.
+			 *
+			 * @return If the request has threats
 			 */
 			bool has_threats();
 
 		private:
 			swd::profile_ptr profile_;
 			swd::parameters parameters_;
+			swd::hashes hashes_;
 			std::string content_;
 			std::string signature_;
 			std::string profile_id_;
 			std::string client_ip_;
 			std::string caller_;
 			std::string resource_;
+			bool threat_;
+			swd::integrity_rules integrity_rules_;
+			int total_integrity_rules_;
 	};
 
 	/**

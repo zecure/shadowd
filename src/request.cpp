@@ -39,9 +39,9 @@ swd::profile_ptr swd::request::get_profile() {
 	return profile_;
 }
 
-void swd::request::add_parameter(std::string key, std::string value) {
-	swd::parameter_ptr parameter(new swd::parameter(value));
-	parameters_[key] = parameter;
+void swd::request::add_parameter(std::string path, std::string value) {
+	swd::parameter_ptr parameter(new swd::parameter(path, value));
+	parameters_[path] = parameter;
 }
 
 swd::parameters& swd::request::get_parameters() {
@@ -94,6 +94,43 @@ void swd::request::set_resource(std::string resource) {
 
 std::string swd::request::get_resource() {
 	return resource_;
+}
+
+void swd::request::add_integrity_rule(swd::integrity_rule_ptr rule) {
+	integrity_rules_.push_back(rule);
+}
+
+const swd::integrity_rules& swd::request::get_integrity_rules() {
+	return integrity_rules_;
+}
+
+void swd::request::set_total_integrity_rules(int total_integrity_rules) {
+	total_integrity_rules_ = total_integrity_rules;
+}
+
+int swd::request::get_total_integrity_rules() {
+	return total_integrity_rules_;
+}
+
+void swd::request::add_hash(std::string algorithm, std::string digest) {
+	swd::hash_ptr hash(new swd::hash(algorithm, digest));
+	hashes_[algorithm] = hash;
+}
+
+swd::hashes& swd::request::get_hashes() {
+	return hashes_;
+}
+
+swd::hash_ptr swd::request::get_hash(std::string algorithm) {
+	return hashes_[algorithm];
+}
+
+void swd::request::is_threat(bool threat) {
+	threat_ = threat;
+}
+
+bool swd::request::is_threat() {
+	return threat_;
 }
 
 bool swd::request::has_threats() {

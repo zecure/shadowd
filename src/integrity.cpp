@@ -29,56 +29,43 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef REQUEST_HANDLER_H
-#define REQUEST_HANDLER_H
+#include "integrity.h"
+#include "integrity_rule.h"
+#include "hash.h"
+#include "database.h"
+#include "log.h"
 
-#include <string>
-#include <vector>
-
-#include "request.h"
-
-namespace swd {
-	/**
-	 * @brief Handles a request object.
-	 */
-	class request_handler {
-		public:
-			/**
-			 * @brief Construct a request handler.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			request_handler(swd::request_ptr request);
-
-			/**
-			 * @brief Check if the signature of the request is valid.
-			 *
-			 * @return Status of hmac check
-			 */
-			bool valid_signature();
-
-			/**
-			 * @brief Decode the json string.
-			 *
-			 * @return Status of decoding
-			 */
-			bool decode();
-
-			/**
-			 * @brief Start the real processing of the request.
-			 */
-			void process();
-
-			/**
-			 * @brief Get the threats of the processing.
-			 *
-			 * @return A list of all paths that should be protected
-			 */
-			std::vector<std::string> get_threats();
-
-		private:
-			swd::request_ptr request_;
-	};
+swd::integrity::integrity(swd::request_ptr request)
+ : request_(request) {
 }
 
-#endif /* REQUEST_HANDLER_H */
+void swd::integrity::scan() {
+	/* Import the rules from the database. */
+	swd::integrity_rules rules = swd::database::i()->get_integrity_rules(
+		request_->get_profile()->get_id(),
+		request_->get_caller()
+	);
+
+	/**
+	 * The request needs at least one rule to pass the check. Otherwise
+	 * it wouldn't be a whitelist.
+	 */
+	request_->set_total_integrity_rules(rules.size());
+
+	/* Iterate over all rules. */
+	for (swd::integrity_rules::iterator it_rule = rules.begin();
+	 it_rule != rules.end(); it_rule++) {
+		swd::integrity_rule_ptr rule(*it_rule);
+
+		try {
+			swd::hash_ptr hash = request_->get_hash(rule->get_algorithm());
+
+			/* Add pointers to all rules that do not match. */
+			if (!hash || (rule->get_digest() != hash->get_digest())) {
+				request_->add_integrity_rule(rule);
+			}
+		} catch (...) {
+			swd::log::i()->send(swd::uncritical_error, "Unexpected integrity problem");
+		}
+	}
+}

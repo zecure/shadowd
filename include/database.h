@@ -43,6 +43,7 @@
 #include "whitelist_filter.h"
 #include "blacklist_rule.h"
 #include "blacklist_filter.h"
+#include "integrity_rule.h"
 #include "singleton.h"
 #include "shared.h"
 
@@ -137,6 +138,14 @@ namespace swd {
 			 std::string path);
 
 			/**
+			 * @brief Get integrity rules by the profile and caller.
+			 *
+			 * @param profile The profile id of the request
+			 * @param caller The caller (resource) that initiated the connection
+			 */
+			swd::integrity_rules get_integrity_rules(int profile, std::string caller);
+
+			/**
 			 * @brief Save information about a request.
 			 *
 			 * @param profile The profile id of the request
@@ -144,10 +153,11 @@ namespace swd {
 			 * @param resource The resource identifier
 			 * @param mode The status of the system
 			 * @param client_ip The ip of the attacker
+			 * @param total_integrity_rules The number of broken integrity rules
 			 * @return The id of the new row
 			 */
 			int save_request(int profile, std::string caller, std::string resource,
-			 int mode, std::string client_ip);
+			 int mode, std::string client_ip, int total_integrity_rules);
 
 			/**
 			 * @brief Save information about a parameter.
@@ -165,6 +175,15 @@ namespace swd {
 			 int total_whitelist_rules, int critical_impact, int threat);
 
 			/**
+			 * @brief Save information about a hash.
+			 *
+			 * @param request The id of the corresponding request
+			 * @param algorithm The algorithm that is used to calculate the hash
+			 * @param digest The output of the hash algorithm on the message
+			 */
+			int save_hash(int request, std::string algorithm, std::string digest);
+
+			/**
 			 * @brief Add a many to many connector for a matching blacklist filter.
 			 *
 			 * @param filter The id of the blacklist filter
@@ -179,6 +198,14 @@ namespace swd {
 			 * @param parameter The id of the parameter
 			 */
 			void add_whitelist_parameter_connector(int rule, int parameter);
+
+			/**
+			 * @brief Add a many to many connector for a broken integrity rule.
+			 *
+			 * @param rule The id of the integrity rule
+			 * @param request The id of the request
+			 */
+			void add_integrity_request_connector(int rule, int request);
 
 			/**
 			 * @brief Get the flooding status of the attacker.

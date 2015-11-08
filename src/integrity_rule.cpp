@@ -29,56 +29,22 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef REQUEST_HANDLER_H
-#define REQUEST_HANDLER_H
+#include "integrity_rule.h"
 
-#include <string>
-#include <vector>
-
-#include "request.h"
-
-namespace swd {
-	/**
-	 * @brief Handles a request object.
-	 */
-	class request_handler {
-		public:
-			/**
-			 * @brief Construct a request handler.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			request_handler(swd::request_ptr request);
-
-			/**
-			 * @brief Check if the signature of the request is valid.
-			 *
-			 * @return Status of hmac check
-			 */
-			bool valid_signature();
-
-			/**
-			 * @brief Decode the json string.
-			 *
-			 * @return Status of decoding
-			 */
-			bool decode();
-
-			/**
-			 * @brief Start the real processing of the request.
-			 */
-			void process();
-
-			/**
-			 * @brief Get the threats of the processing.
-			 *
-			 * @return A list of all paths that should be protected
-			 */
-			std::vector<std::string> get_threats();
-
-		private:
-			swd::request_ptr request_;
-	};
+swd::integrity_rule::integrity_rule(int id, std::string algorithm, std::string digest) :
+ id_(id),
+ algorithm_(algorithm),
+ digest_(digest) {
 }
 
-#endif /* REQUEST_HANDLER_H */
+int swd::integrity_rule::get_id() {
+	return id_;
+}
+
+std::string swd::integrity_rule::get_algorithm() {
+	return algorithm_;
+}
+
+std::string swd::integrity_rule::get_digest() {
+	return digest_;
+}

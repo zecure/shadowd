@@ -29,68 +29,55 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef WHITELIST_RULE_H
-#define WHITELIST_RULE_H
+#ifndef HASH_H
+#define HASH_H
 
-#include <vector>
+#include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "whitelist_filter.h"
-
 namespace swd {
 	/**
-	 * @brief Models a whitelist rule.
-	 *
-	 * If is_responsible() is true it is required that is_adhered_to() is also
-	 * true, otherwise the input parameter is classified as an attack.
-	 * Parameters are directly connected with broken rules.
+	 * @brief Models a hash.
 	 */
-	class whitelist_rule {
+	class hash {
 		public:
 			/**
-			 * @brief Construct a whitelist rule.
+			 * @brief Construct a hash.
 			 *
-			 * @param id The id of the rule
-			 * @param filter The whitelist filter of the rule
-			 * @param min_length The minimum length of the rule
-			 * @param max_length The maximum length of the rule
+			 * @param algorithm The algorithm of the hash
+			 * @param digest The digest of the hash
 			 */
-			whitelist_rule(int id, swd::whitelist_filter_ptr filter, int min_length,
-			 int max_length);
+			hash(std::string algorithm, std::string digest);
 
 			/**
-			 * @brief Get the id the rule.
+			 * @brief Get the algorithm of the hash.
 			 *
-			 * @return The id of the rule
+			 * @return The algorithm of the hash
 			 */
-			int get_id();
+			std::string get_algorithm();
 
 			/**
-			 * @brief Test for value if the filter matches and if the length is
-			 *  acceptable.
+			 * @brief Get the digest of the hash.
 			 *
-			 * @param value The string that should be tested
-			 * @return The status of the regular expression and length test
+			 * @return The digest of the hash
 			 */
-			bool is_adhered_to(std::string value);
+			std::string get_digest();
 
 		private:
-			int id_;
-			swd::whitelist_filter_ptr filter_;
-			int min_length_;
-			int max_length_;
+			std::string algorithm_;
+			std::string digest_;
 	};
 
 	/**
-	 * @brief Whitelist rule pointer.
+	 * @brief Hash pointer.
 	 */
-	typedef boost::shared_ptr<swd::whitelist_rule> whitelist_rule_ptr;
+	typedef boost::shared_ptr<swd::hash> hash_ptr;
 
 	/**
-	 * @brief List of whitelist rule pointers.
+	 * @brief Map of hashes pointers. The key is the algorithm.
 	 */
-	typedef std::vector<swd::whitelist_rule_ptr> whitelist_rules;
+	typedef std::map<std::string, swd::hash_ptr> hashes;
 }
 
-#endif /* WHITELIST_RULE_H */
+#endif /* HASH_H */

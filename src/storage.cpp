@@ -103,7 +103,8 @@ void swd::storage::save(swd::request_ptr request) {
 			request->get_caller(),
 			request->get_resource(),
 			request->get_profile()->get_mode(),
-			request->get_client_ip()
+			request->get_client_ip(),
+			(request->get_profile()->is_integrity_enabled() ? request->get_total_integrity_rules() : -1)
 		);
 	} catch (swd::exceptions::database_exception& e) {
 		swd::log::i()->send(swd::uncritical_error, e.what());
@@ -113,6 +114,42 @@ void swd::storage::save(swd::request_ptr request) {
 		 * completely block access to the site either.
 		 */
 		return;
+	}
+
+	/* Save all hashes of the request. */
+	swd::hashes& hashes = request->get_hashes();
+
+	for (swd::hashes::iterator it_hash = hashes.begin(); it_hash != hashes.end(); it_hash++) {
+		swd::hash_ptr hash((*it_hash).second);
+
+		try {
+			swd::database::i()->save_hash(
+				request_id,
+				hash->get_algorithm(),
+				hash->get_digest()
+			);
+		} catch (swd::exceptions::database_exception& e) {
+			swd::log::i()->send(swd::uncritical_error, e.what());
+			continue;
+		}
+	}
+
+	/* Connect the broken integrity rules with the request. */
+	swd::integrity_rules integrity_rules = request->get_integrity_rules();
+
+	for (swd::integrity_rules::iterator it_integrity_rule = integrity_rules.begin();
+	 it_integrity_rule != integrity_rules.end(); it_integrity_rule++) {
+		swd::integrity_rule_ptr integrity_rule(*it_integrity_rule);
+
+		try {
+			swd::database::i()->add_integrity_request_connector(
+				integrity_rule->get_id(),
+				request_id
+			);
+		} catch (swd::exceptions::database_exception& e) {
+			swd::log::i()->send(swd::uncritical_error, e.what());
+			continue;
+		}
 	}
 
 	/* Now iterate over all parameters. */
@@ -157,10 +194,10 @@ void swd::storage::save(swd::request_ptr request) {
 		}
 
 		/* Connect the broken whitelist rules with the parameter. */
-		swd::whitelist_rules rules = parameter->get_whitelist_rules();
+		swd::whitelist_rules whitelist_rules = parameter->get_whitelist_rules();
 
-		for (swd::whitelist_rules::iterator it_whitelist_rule = rules.begin();
-		 it_whitelist_rule != rules.end(); it_whitelist_rule++) {
+		for (swd::whitelist_rules::iterator it_whitelist_rule = whitelist_rules.begin();
+		 it_whitelist_rule != whitelist_rules.end(); it_whitelist_rule++) {
 			swd::whitelist_rule_ptr whitelist_rule(*it_whitelist_rule);
 
 			try {

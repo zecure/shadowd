@@ -5,7 +5,8 @@ add_executable(shadowd analyzer.cpp blacklist_filter.cpp config.cpp daemon.cpp
 	log.cpp profile.cpp reply_handler.cpp request_handler.cpp server.cpp
 	storage.cpp whitelist_filter.cpp blacklist.cpp blacklist_rule.cpp connection.cpp
 	database.cpp parameter.cpp reply.cpp request.cpp request_parser.cpp
-	shadowd.cpp whitelist.cpp whitelist_rule.cpp)
+	shadowd.cpp whitelist.cpp whitelist_rule.cpp integrity.cpp integrity_rule.cpp
+	hash.cpp)
 
 target_link_libraries(shadowd
 	pthread

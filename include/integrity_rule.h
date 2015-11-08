@@ -29,35 +29,27 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef WHITELIST_RULE_H
-#define WHITELIST_RULE_H
+#ifndef INTEGRITY_RULE_H
+#define INTEGRITY_RULE_H
 
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "whitelist_filter.h"
-
 namespace swd {
 	/**
-	 * @brief Models a whitelist rule.
-	 *
-	 * If is_responsible() is true it is required that is_adhered_to() is also
-	 * true, otherwise the input parameter is classified as an attack.
-	 * Parameters are directly connected with broken rules.
+	 * @brief Models an integrity rule.
 	 */
-	class whitelist_rule {
+	class integrity_rule {
 		public:
 			/**
-			 * @brief Construct a whitelist rule.
+			 * @brief Construct aan integrity rule.
 			 *
 			 * @param id The id of the rule
-			 * @param filter The whitelist filter of the rule
-			 * @param min_length The minimum length of the rule
-			 * @param max_length The maximum length of the rule
+			 * @param algorithm The hash algorithm of the rule
+			 * @param digest The hash digest of the rule
 			 */
-			whitelist_rule(int id, swd::whitelist_filter_ptr filter, int min_length,
-			 int max_length);
+			integrity_rule(int id, std::string algorithm, std::string digest);
 
 			/**
 			 * @brief Get the id the rule.
@@ -67,30 +59,34 @@ namespace swd {
 			int get_id();
 
 			/**
-			 * @brief Test for value if the filter matches and if the length is
-			 *  acceptable.
+			 * @brief Get the hash algorithm of the rule
 			 *
-			 * @param value The string that should be tested
-			 * @return The status of the regular expression and length test
+			 * @return The hash algorithm of the rule
 			 */
-			bool is_adhered_to(std::string value);
+			std::string get_algorithm();
+
+			/**
+			 * @brief Get the hash digest of the rule
+			 *
+			 * @return The hash digest of the rule
+			 */
+			std::string get_digest();
 
 		private:
 			int id_;
-			swd::whitelist_filter_ptr filter_;
-			int min_length_;
-			int max_length_;
+			std::string algorithm_;
+			std::string digest_;
 	};
 
 	/**
-	 * @brief Whitelist rule pointer.
+	 * @brief Integrity rule pointer.
 	 */
-	typedef boost::shared_ptr<swd::whitelist_rule> whitelist_rule_ptr;
+	typedef boost::shared_ptr<swd::integrity_rule> integrity_rule_ptr;
 
 	/**
-	 * @brief List of whitelist rule pointers.
+	 * @brief List of integrity rule pointers.
 	 */
-	typedef std::vector<swd::whitelist_rule_ptr> whitelist_rules;
+	typedef std::vector<swd::integrity_rule_ptr> integrity_rules;
 }
 
-#endif /* WHITELIST_RULE_H */
+#endif /* INTEGRITY_RULE_H */

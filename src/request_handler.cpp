@@ -145,6 +145,25 @@ bool swd::request_handler::decode() {
 				swd::log::i()->send(swd::uncritical_error, e.what());
 			}
 		}
+
+		/* Iterate over the hashes and add them to the request. */
+		Json::Value hashes = root["hashes"];
+
+		if (!hashes) {
+			return false;
+		}
+
+		for (Json::ValueIterator it_hash = hashes.begin();
+		 it_hash != hashes.end(); it_hash++) {
+			try {
+				request_->add_hash(
+					it_hash.key().asString(),
+					(*it_hash).asString()
+				);
+			} catch (std::runtime_error& e) {
+				swd::log::i()->send(swd::uncritical_error, e.what());
+			}
+		}
 	} catch (...) {
 		swd::log::i()->send(swd::uncritical_error, "Uncaught json decode exception");
 		return false;
@@ -153,7 +172,7 @@ bool swd::request_handler::decode() {
 	return true;
 }
 
-std::vector<std::string> swd::request_handler::process() {
+void swd::request_handler::process() {
 	/* Analyze the request with the black- and whitelist. */
 	swd::analyzer analyzer(request_);
 	analyzer.start();
@@ -163,28 +182,24 @@ std::vector<std::string> swd::request_handler::process() {
 	 * is at least one threat or if learning is enabled the complete request gets
 	 * recorded permanently.
 	 */
-	if (request_->has_threats() || (request_->get_profile()->get_mode() == MODE_LEARNING)) {
+	if (request_->is_threat() || request_->has_threats() ||
+	 (request_->get_profile()->get_mode() == MODE_LEARNING)) {
 		swd::storage::i()->add(request_);
 	}
+}
 
-	/**
-	 * Return the paths of all threats for the reply. But only if the active mode
-	 * is enabled, because this values are used to defuse a request and this
-	 * could result in unusable sites.
-	 */
+std::vector<std::string> swd::request_handler::get_threats() {
 	std::vector<std::string> threats;
 
-	if (request_->get_profile()->get_mode() == MODE_ACTIVE) {
-		swd::parameters& parameters = request_->get_parameters();
+	swd::parameters& parameters = request_->get_parameters();
 
-		for (swd::parameters::iterator it_parameter = parameters.begin();
-		 it_parameter != parameters.end(); it_parameter++) {
-			/* Save the iterators in variables for the sake of readability. */
-			swd::parameter_ptr parameter((*it_parameter).second);
+	for (swd::parameters::iterator it_parameter = parameters.begin();
+	 it_parameter != parameters.end(); it_parameter++) {
+		/* Save the iterators in variables for the sake of readability. */
+		swd::parameter_ptr parameter((*it_parameter).second);
 
-			if (parameter->is_threat()) {
-				threats.push_back((*it_parameter).first);
-			}
+		if (parameter->is_threat()) {
+			threats.push_back((*it_parameter).first);
 		}
 	}
 

@@ -257,7 +257,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			}
 
 			/* Time to analyze the request. */
-			threats = request_handler.process();
+			request_handler.process();
 		} catch (swd::exceptions::database_exception& e) {
 			swd::log::i()->send(swd::uncritical_error, e.what());
 
@@ -268,8 +268,10 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 		}
 
-		if (!threats.empty()) {
-			reply_->set_threats(threats);
+		if (request_->is_threat()) {
+			reply_->set_status(STATUS_BAD_REQUEST);
+		} else if (request_->has_threats()) {
+			reply_->set_threats(request_handler.get_threats());
 			reply_->set_status(STATUS_ATTACK);
 		} else {
 			reply_->set_status(STATUS_OK);

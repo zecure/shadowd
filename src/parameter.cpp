@@ -31,11 +31,16 @@
 
 #include "parameter.h"
 
-swd::parameter::parameter(std::string value) :
+swd::parameter::parameter(std::string path, std::string value) :
+ path_(path),
  value_(value),
  threat_(false),
  critical_impact_(false),
  total_whitelist_rules_(0) {
+}
+
+std::string swd::parameter::get_path() {
+	return path_;
 }
 
 std::string swd::parameter::get_value() {
@@ -47,26 +52,26 @@ int swd::parameter::get_length() {
 }
 
 void swd::parameter::add_blacklist_filter(swd::blacklist_filter_ptr filter) {
-	filters_.push_back(filter);
+	blacklist_filters_.push_back(filter);
 }
 
 const swd::blacklist_filters& swd::parameter::get_blacklist_filters() {
-	return filters_;
+	return blacklist_filters_;
 }
 
 void swd::parameter::add_whitelist_rule(swd::whitelist_rule_ptr rule) {
-	rules_.push_back(rule);
+	whitelist_rules_.push_back(rule);
 }
 
 const swd::whitelist_rules& swd::parameter::get_whitelist_rules() {
-	return rules_;
+	return whitelist_rules_;
 }
 
 int swd::parameter::get_impact() {
 	int impact = 0;
 
-	for (swd::blacklist_filters::iterator it_filter = filters_.begin();
-	 it_filter != filters_.end(); it_filter++) {
+	for (swd::blacklist_filters::iterator it_filter = blacklist_filters_.begin();
+	 it_filter != blacklist_filters_.end(); it_filter++) {
 		impact += (*it_filter)->get_impact();
 	}
 

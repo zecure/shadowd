@@ -32,6 +32,7 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 
+#include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
 
@@ -47,9 +48,17 @@ namespace swd {
 			/**
 			 * @brief Construct a parameter.
 			 *
+			 * @param path The path of the parameter
 			 * @param value The raw value of the parameter
 			 */
-			parameter(std::string value);
+			parameter(std::string path, std::string value);
+
+			/**
+			 * @brief Get the path of the parameter.
+			 *
+			 * @return The path of the parameter
+			 */
+			std::string get_path();
 
 			/**
 			 * @brief Get the value of the parameter.
@@ -144,9 +153,10 @@ namespace swd {
 			int get_total_whitelist_rules();
 
 		private:
+			std::string path_;
 			std::string value_;
-			swd::blacklist_filters filters_;
-			swd::whitelist_rules rules_;
+			swd::blacklist_filters blacklist_filters_;
+			swd::whitelist_rules whitelist_rules_;
 			bool threat_;
 			bool critical_impact_;
 			int total_whitelist_rules_;

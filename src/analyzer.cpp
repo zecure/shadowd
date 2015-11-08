@@ -32,7 +32,10 @@
 #include "analyzer.h"
 #include "blacklist.h"
 #include "whitelist.h"
+#include "integrity.h"
 #include "blacklist_rule.h"
+#include "whitelist_rule.h"
+#include "integrity_rule.h"
 #include "database.h"
 
 swd::analyzer::analyzer(swd::request_ptr request) :
@@ -66,6 +69,23 @@ void swd::analyzer::start() {
 		 * of the input and the character set.
 		 */
 		whitelist.scan();
+	}
+
+	if (request_->get_profile()->is_integrity_enabled()) {
+		swd::integrity integrity(request_);
+
+		/* Compare the hashes from the database with the hashes in the request. */
+		integrity.scan();
+
+		/* Check if there is no responsible integrity rule. */
+		if (request_->get_total_integrity_rules() == 0) {
+			request_->is_threat(true);
+		}
+
+		/* Check if there are integrity rules that are not adhered to. */
+		if (request_->get_integrity_rules().size() > 0) {
+			request_->is_threat(true);
+		}
 	}
 
 	/* Combine the results and determine which parameters are threats. */
