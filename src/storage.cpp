@@ -122,8 +122,10 @@ void swd::storage::save(swd::request_ptr request) {
 	 it_parameter != parameters.end(); it_parameter++) {
 		swd::parameter_ptr parameter((*it_parameter).second);
 
+		int parameter_id;
+
 		try {
-			int parameter_id = swd::database::i()->save_parameter(
+			parameter_id = swd::database::i()->save_parameter(
 				request_id,
 				(*it_parameter).first,
 				parameter->get_value(),
@@ -131,35 +133,45 @@ void swd::storage::save(swd::request_ptr request) {
 				(parameter->has_critical_impact() ? 1 : 0 ),
 				(parameter->is_threat() ? 1 : 0 )
 			);
+		} catch (swd::exceptions::database_exception& e) {
+			swd::log::i()->send(swd::uncritical_error, e.what());
+			continue;
+		}
 
-			/* Connect the matching blacklist filters with the parameter. */
-			swd::blacklist_filters blacklist_filters = parameter->get_blacklist_filters();
+		/* Connect the matching blacklist filters with the parameter. */
+		swd::blacklist_filters blacklist_filters = parameter->get_blacklist_filters();
 
-			for (swd::blacklist_filters::iterator it_blacklist_filter = blacklist_filters.begin();
-			 it_blacklist_filter != blacklist_filters.end(); it_blacklist_filter++) {
-				swd::blacklist_filter_ptr blacklist_filter(*it_blacklist_filter);
+		for (swd::blacklist_filters::iterator it_blacklist_filter = blacklist_filters.begin();
+		 it_blacklist_filter != blacklist_filters.end(); it_blacklist_filter++) {
+			swd::blacklist_filter_ptr blacklist_filter(*it_blacklist_filter);
 
+			try {
 				swd::database::i()->add_blacklist_parameter_connector(
 					blacklist_filter->get_id(),
 					parameter_id
 				);
+			} catch (swd::exceptions::database_exception& e) {
+				swd::log::i()->send(swd::uncritical_error, e.what());
+				continue;
 			}
+		}
 
-			/* Connect the broken whitelist rules with the parameter. */
-			swd::whitelist_rules rules = parameter->get_whitelist_rules();
+		/* Connect the broken whitelist rules with the parameter. */
+		swd::whitelist_rules rules = parameter->get_whitelist_rules();
 
-			for (swd::whitelist_rules::iterator it_whitelist_rule = rules.begin();
-			 it_whitelist_rule != rules.end(); it_whitelist_rule++) {
-				swd::whitelist_rule_ptr whitelist_rule(*it_whitelist_rule);
+		for (swd::whitelist_rules::iterator it_whitelist_rule = rules.begin();
+		 it_whitelist_rule != rules.end(); it_whitelist_rule++) {
+			swd::whitelist_rule_ptr whitelist_rule(*it_whitelist_rule);
 
+			try {
 				swd::database::i()->add_whitelist_parameter_connector(
 					whitelist_rule->get_id(),
 					parameter_id
 				);
+			} catch (swd::exceptions::database_exception& e) {
+				swd::log::i()->send(swd::uncritical_error, e.what());
+				continue;
 			}
-		} catch (swd::exceptions::database_exception& e) {
-			swd::log::i()->send(swd::uncritical_error, e.what());
-			continue;
 		}
 	}
 }
