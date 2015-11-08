@@ -281,7 +281,13 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			reply_->set_status(STATUS_OK);
 		}
 	} catch(swd::exceptions::connection_exception& e) {
-		reply_->set_status(e.code());
+		if (!request_->get_profile()) {
+			reply_->set_status(STATUS_BAD_REQUEST);
+		} else if (request_->get_profile()->get_mode() == MODE_ACTIVE) {
+			reply_->set_status(e.code());
+		} else {
+			reply_->set_status(STATUS_OK);
+		}
 	}
 
 	/* Encode the reply. */
