@@ -1,3 +1,5 @@
+![Logo](http://shadowd.zecure.org/img/logo.png)
+
 **Shadow Daemon** is a collection of tools to **detect**, **protocol** and **prevent** **attacks** on *web applications*. Technically speaking, Shadow Daemon is a **web application firewall** that intercepts requests and filters out malicious parameters. It is a modular system that separates web application, analysis and interface to increase security, flexibility and expandability.
 
 This component is the background server that handles the analysis and storage of requests.
