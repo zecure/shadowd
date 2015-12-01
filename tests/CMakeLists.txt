@@ -1,0 +1,41 @@
+include_directories(${SHADOWD_SOURCE_DIR}/include)
+link_directories(${SHADOWD_BINARY_DIR}/src)
+
+add_executable(tests
+	shadowd_tests.cpp
+	request_parser_test.cpp
+	${SHADOWD_SOURCE_DIR}/src/analyzer.cpp
+	${SHADOWD_SOURCE_DIR}/src/blacklist_filter.cpp
+	${SHADOWD_SOURCE_DIR}/src/config.cpp
+	${SHADOWD_SOURCE_DIR}/src/daemon.cpp
+	${SHADOWD_SOURCE_DIR}/src/log.cpp
+	${SHADOWD_SOURCE_DIR}/src/profile.cpp
+	${SHADOWD_SOURCE_DIR}/src/reply_handler.cpp
+	${SHADOWD_SOURCE_DIR}/src/request_handler.cpp
+	${SHADOWD_SOURCE_DIR}/src/server.cpp
+	${SHADOWD_SOURCE_DIR}/src/storage.cpp
+	${SHADOWD_SOURCE_DIR}/src/whitelist_filter.cpp
+	${SHADOWD_SOURCE_DIR}/src/blacklist.cpp
+	${SHADOWD_SOURCE_DIR}/src/blacklist_rule.cpp
+	${SHADOWD_SOURCE_DIR}/src/connection.cpp
+	${SHADOWD_SOURCE_DIR}/src/database.cpp
+	${SHADOWD_SOURCE_DIR}/src/parameter.cpp
+	${SHADOWD_SOURCE_DIR}/src/reply.cpp
+	${SHADOWD_SOURCE_DIR}/src/request.cpp
+	${SHADOWD_SOURCE_DIR}/src/request_parser.cpp
+	${SHADOWD_SOURCE_DIR}/src/whitelist.cpp
+	${SHADOWD_SOURCE_DIR}/src/whitelist_rule.cpp
+	${SHADOWD_SOURCE_DIR}/src/integrity.cpp
+	${SHADOWD_SOURCE_DIR}/src/integrity_rule.cpp
+	${SHADOWD_SOURCE_DIR}/src/hash.cpp
+)
+
+target_link_libraries(tests
+	pthread
+	dbi
+	cryptopp
+	jsoncpp
+	${OPENSSL_LIBRARIES}
+	${Boost_LIBRARIES}
+)
+
