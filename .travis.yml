@@ -3,8 +3,6 @@ language: cpp
 compiler:
   - gcc
 
-sudo: false
-
 addons:
   apt:
     packages:
@@ -28,3 +26,7 @@ script: make && make test
 
 os:
   - linux
+
+sudo: required
+
+dist: trusty
