@@ -29,9 +29,6 @@
  * files in the program, then also delete it here.
  */
 
-#include <stdlib.h>
-#include <boost/lexical_cast.hpp>
-
 #include "blacklist.h"
 #include "database.h"
 #include "log.h"
@@ -58,7 +55,7 @@ void swd::blacklist::scan() {
 			/* If there is catastrophic backtracking boost throws an exception. */
 			try {
 				/* Add pointers to all filters that match to the parameter. */
-				if (filter->match(parameter->get_value())) {
+				if (filter->matches(parameter->get_value())) {
 					parameter->add_blacklist_filter(filter);
 				}
 			} catch (...) {

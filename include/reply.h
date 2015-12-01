@@ -32,8 +32,8 @@
 #ifndef REPLY_H
 #define REPLY_H
 
-#include <string>
 #include <vector>
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 

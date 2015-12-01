@@ -33,7 +33,7 @@
 #define LOG_H
 
 #include <string>
-#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "singleton.h"
 #include "shared.h"

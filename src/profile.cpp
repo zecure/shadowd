@@ -31,52 +31,74 @@
 
 #include "profile.h"
 
-swd::profile::profile(std::string server_ip, int id, int mode, bool whitelist_enabled,
- bool blacklist_enabled, bool integrity_enabled, bool flooding_enabled, std::string key,
- int blacklist_threshold) :
- server_ip_(server_ip),
- id_(id),
- mode_(mode),
- whitelist_enabled_(whitelist_enabled),
- blacklist_enabled_(blacklist_enabled),
- integrity_enabled_(integrity_enabled),
- flooding_enabled_(flooding_enabled),
- key_(key),
- blacklist_threshold_(blacklist_threshold) {
+void swd::profile::set_server_ip(std::string server_ip) {
+	server_ip_ = server_ip;
+}
+
+std::string swd::profile::get_server_ip() {
+	return server_ip_;
+}
+
+void swd::profile::set_id(int id) {
+	id_ = id;
 }
 
 int swd::profile::get_id() {
 	return id_;
 }
 
+void swd::profile::set_mode(int mode) {
+	mode_ = mode;
+}
+
 int swd::profile::get_mode() {
 	return mode_;
+}
+
+void swd::profile::set_whitelist_enabled(bool whitelist_enabled) {
+	whitelist_enabled_ = whitelist_enabled;
 }
 
 bool swd::profile::is_whitelist_enabled() {
 	return whitelist_enabled_;
 }
 
+void swd::profile::set_blacklist_enabled(bool blacklist_enabled) {
+	blacklist_enabled_ = blacklist_enabled;
+}
+
 bool swd::profile::is_blacklist_enabled() {
 	return blacklist_enabled_;
+}
+
+void swd::profile::set_integrity_enabled(bool integrity_enabled) {
+	integrity_enabled_ = integrity_enabled;
 }
 
 bool swd::profile::is_integrity_enabled() {
 	return integrity_enabled_;
 }
 
+void swd::profile::set_flooding_enabled(bool flooding_enabled) {
+	flooding_enabled_ = flooding_enabled;
+}
+
 bool swd::profile::is_flooding_enabled() {
 	return flooding_enabled_;
+}
+
+void swd::profile::set_key(std::string key) {
+	key_ = key;
 }
 
 std::string swd::profile::get_key() {
 	return key_;
 }
 
-int swd::profile::get_blacklist_threshold() {
-	return blacklist_threshold_;
+void swd::profile::set_blacklist_threshold(int blacklist_threshold) {
+	blacklist_threshold_ = blacklist_threshold;
 }
 
-std::string swd::profile::get_server_ip() {
-	return server_ip_;
+int swd::profile::get_blacklist_threshold() {
+	return blacklist_threshold_;
 }

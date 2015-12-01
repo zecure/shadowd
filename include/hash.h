@@ -43,12 +43,11 @@ namespace swd {
 	class hash {
 		public:
 			/**
-			 * @brief Construct a hash.
+			 * @brief Set the algorithm of the hash.
 			 *
 			 * @param algorithm The algorithm of the hash
-			 * @param digest The digest of the hash
 			 */
-			hash(std::string algorithm, std::string digest);
+			void set_algorithm(std::string algorithm);
 
 			/**
 			 * @brief Get the algorithm of the hash.
@@ -56,6 +55,13 @@ namespace swd {
 			 * @return The algorithm of the hash
 			 */
 			std::string get_algorithm();
+
+			/**
+			 * @brief Set the digest of the hash.
+			 *
+			 * @param digest The digest of the hash
+			 */
+			void set_digest(std::string digest);
 
 			/**
 			 * @brief Get the digest of the hash.

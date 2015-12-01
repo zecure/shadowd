@@ -31,13 +31,16 @@
 
 #include "hash.h"
 
-swd::hash::hash(std::string algorithm, std::string digest) :
- algorithm_(algorithm),
- digest_(digest) {
+void swd::hash::set_algorithm(std::string algorithm) {
+	algorithm_ = algorithm;
 }
 
 std::string swd::hash::get_algorithm() {
 	return algorithm_;
+}
+
+void swd::hash::set_digest(std::string digest) {
+	digest_ = digest;
 }
 
 std::string swd::hash::get_digest() {

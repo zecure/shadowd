@@ -32,8 +32,6 @@
 #ifndef INTEGRITY_H
 #define INTEGRITY_H
 
-#include <vector>
-
 #include "request.h"
 
 namespace swd {

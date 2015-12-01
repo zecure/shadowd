@@ -31,16 +31,16 @@
 
 #include "parameter.h"
 
-swd::parameter::parameter(std::string path, std::string value) :
- path_(path),
- value_(value),
- threat_(false),
- critical_impact_(false),
- total_whitelist_rules_(0) {
+void swd::parameter::set_path(std::string path) {
+	path_ = path;
 }
 
 std::string swd::parameter::get_path() {
 	return path_;
+}
+
+void swd::parameter::set_value(std::string value) {
+	value_ = value;
 }
 
 std::string swd::parameter::get_value() {

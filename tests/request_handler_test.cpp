@@ -29,38 +29,42 @@
  * files in the program, then also delete it here.
  */
 
-#include <vector>
-#include <string>
-#include <jsoncpp/json/json.h>
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
 
-#include "reply_handler.h"
-#include "log.h"
+#include "request_handler.h"
+#include "request.h"
+#include "profile.h"
 
-swd::reply_handler::reply_handler(swd::reply_ptr reply) :
- reply_(reply) {
+BOOST_AUTO_TEST_SUITE(request_handler_test)
+
+BOOST_AUTO_TEST_CASE(valid_signature) {
+	swd::request_ptr request(new swd::request);
+	swd::request_handler request_handler(request);
+	swd::profile_ptr profile(new swd::profile());
+
+	profile->set_key("foo");
+	request->set_profile(profile);
+	request->set_signature("f9320baf0249169e73850cd6156ded0106e2bb6ad8cab01b7bbbebe6d1065317");
+	request->set_content("bar");
+
+	BOOST_CHECK(request_handler.valid_signature() == true);
 }
 
-bool swd::reply_handler::encode() {
-	try {
-		Json::Value root;
-		Json::FastWriter writer;
+BOOST_AUTO_TEST_CASE(invalid_signature) {
+	swd::request_ptr request(new swd::request);
+	swd::request_handler request_handler(request);
+	swd::profile_ptr profile(new swd::profile());
 
-		root["status"] = reply_->get_status();
-		std::vector<std::string> threats = reply_->get_threats();
+	profile->set_key("qux");
+	request->set_profile(profile);
+	request->set_content("bar");
 
-		Json::Value output(Json::arrayValue);
-		for (std::vector<std::string>::iterator it = threats.begin(); it != threats.end(); ++it) {
-			output.append(*it);
-		}
+	request->set_signature("");
+	BOOST_CHECK(request_handler.valid_signature() == false);
 
-		root["threats"] = output;
-
-		reply_->set_content(writer.write(root));
-
-	} catch (...) {
-		swd::log::i()->send(swd::uncritical_error, "Uncaught json encode exception");
-		return false;
-	}
-
-	return true;
+	request->set_signature("f9320baf0249169e73850cd6156ded0106e2bb6ad8cab01b7bbbebe6d1065317");
+	BOOST_CHECK(request_handler.valid_signature() == false);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

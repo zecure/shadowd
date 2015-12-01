@@ -42,21 +42,11 @@ namespace swd {
 	class profile {
 		public:
 			/**
-			 * @brief Construct a profile.
+			 * @brief Set the ip of the http server/shadowd client.
 			 *
 			 * @param server_ip The ip of the http server/shadowd client
-			 * @param id The id of the profile
-			 * @param mode The status of the system
-			 * @param whitelist_enabled The status of the whitelist analyzer
-			 * @param blacklist_enabled The status of the blacklist analyzer
-			 * @param integrity_enabled The status of the integrity analyzer
-			 * @param flooding_enabled The status of the flooding analyzer
-			 * @param key The key for the hmac check
-			 * @param blacklist_threshold The global threshold for blacklist
 			 */
-			profile(std::string server_ip, int id, int mode, bool whitelist_enabled,
-			 bool blacklist_enabled, bool integrity_enabled, bool flooding_enabled,
-			 std::string key, int blacklist_threshold);
+			void set_server_ip(std::string server_ip);
 
 			/**
 			 * @brief Get the ip of the http server/shadowd client.
@@ -66,11 +56,25 @@ namespace swd {
 			std::string get_server_ip();
 
 			/**
+			 * @brief Set the id the profile.
+			 *
+			 * @param id The id of the profile
+			 */
+			void set_id(int id);
+
+			/**
 			 * @brief Get the id the profile.
 			 *
 			 * @return The id of the profile
 			 */
 			int get_id();
+
+			/**
+			 * @brief Set the status of the system.
+			 *
+			 * @param mode The status of the system
+			 */
+			void set_mode(int mode);
 
 			/**
 			 * @brief Get the status of the system.
@@ -80,11 +84,25 @@ namespace swd {
 			int get_mode();
 
 			/**
+			 * @brief Set the status of the whitelist check for the profile.
+			 *
+			 * @param whitelist_enabled The status of the whitelist analyzer
+			 */
+			void set_whitelist_enabled(bool whitelist_enabled);
+
+			/**
 			 * @brief Get the status of the whitelist check for the profile.
 			 *
 			 * @return The whitelist check status
 			 */
 			bool is_whitelist_enabled();
+
+			/**
+			 * @brief Set the status of the blacklist check for the profile.
+			 *
+			 * @param blacklist_enabled The status of the blacklist analyzer
+			 */
+			void set_blacklist_enabled(bool blacklist_enabled);
 
 			/**
 			 * @brief Get the status of the blacklist check for the profile.
@@ -94,6 +112,13 @@ namespace swd {
 			bool is_blacklist_enabled();
 
 			/**
+			 * @brief Set the status of the integrity check for the profile.
+			 *
+			 * @param integrity_enabled The status of the integrity analyzer
+			 */
+			void set_integrity_enabled(bool integrity_enabled);
+
+			/**
 			 * @brief Get the status of the integrity check for the profile.
 			 *
 			 * @return The integrity check status
@@ -101,11 +126,25 @@ namespace swd {
 			bool is_integrity_enabled();
 
 			/**
+			 * @brief Set the status of the flooding check for the profile.
+			 *
+			 * @param flooding_enabled The status of the flooding analyzer
+			 */
+			void set_flooding_enabled(bool flooding_enabled);
+
+			/**
 			 * @brief Get the status of the flooding check for the profile.
 			 *
 			 * @return The flooding check status
 			 */
 			bool is_flooding_enabled();
+
+			/**
+			 * @brief Set the key/password for the profile.
+			 *
+			 * @param key The key for the hmac check
+			 */
+			void set_key(std::string key);
 
 			/**
 			 * @brief Get the key/password for the profile.
@@ -118,6 +157,13 @@ namespace swd {
 			 * @return The hmac key the client has to use
 			 */
 			std::string get_key();
+
+			/**
+			 * @brief Set the global blacklist threshold for the profile.
+			 *
+			 * @param blacklist_threshold The global threshold for blacklist
+			 */
+			void set_blacklist_threshold(int blacklist_threshold);
 
 			/**
 			 * @brief Get the global blacklist threshold for the profile.

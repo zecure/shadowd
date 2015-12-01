@@ -33,8 +33,6 @@
 #define REQUEST_H
 
 #include <string>
-#include <vector>
-#include <map>
 #include <boost/shared_ptr.hpp>
 
 #include "profile.h"
@@ -97,6 +95,13 @@ namespace swd {
 			/**
 			 * @brief Get the complete json content.
 			 *
+			 * @param content The complete encoded content
+			 */
+			void set_content(std::string content);
+
+			/**
+			 * @brief Set the complete json content.
+			 *
 			 * @return The complete encoded content.
 			 */
 			std::string get_content();
@@ -110,6 +115,13 @@ namespace swd {
 			 * @param input The character that gets appended
 			 */
 			void append_signature(char input);
+
+			/**
+			 * @brief Set the complete signature.
+			 *
+			 * @param signature The complete signature
+			 */
+			void set_signature(std::string signature);
 
 			/**
 			 * @brief Get the complete signature.
@@ -127,6 +139,13 @@ namespace swd {
 			 * @param input The character digit that gets appended
 			 */
 			void append_profile_id(char input);
+
+			/**
+			 * @brief Set the complete profile id.
+			 *
+			 * @param profile_id The complete profile id
+			 */
+			void set_profile_id(int profile_id);
 
 			/**
 			 * @brief Get the complete profile id.

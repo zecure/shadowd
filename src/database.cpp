@@ -31,8 +31,6 @@
 
 #include <sstream>
 #include <stdio.h>
-#include <string.h>
-#include <boost/lexical_cast.hpp>
 
 #include "database.h"
 #include "log.h"
@@ -82,8 +80,11 @@ void swd::database::ensure_connection() {
 }
 
 swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_id) {
-	swd::log::i()->send(swd::notice, "Get profile -> server_ip: " + server_ip
-	 + "; profile_id: " + boost::lexical_cast<std::string>(profile_id));
+	std::stringstream log_message;
+	log_message << "Get profile -> server_ip: " << server_ip
+	 << "; profile_id: " << profile_id;
+
+	swd::log::i()->send(swd::notice, log_message.str());
 
 	/* Test the database connection status. Tries to reconnect if disconnected. */
 	ensure_connection();
@@ -119,19 +120,16 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 		throw swd::exceptions::database_exception("No profile?");
 	}
 
-	swd::profile_ptr profile(
-		new swd::profile(
-			server_ip,
-			dbi_result_get_uint(res, "id"),
-			dbi_result_get_uint(res, "mode"),
-			(dbi_result_get_uint(res, "whitelist_enabled") == 1),
-			(dbi_result_get_uint(res, "blacklist_enabled") == 1),
-			(dbi_result_get_uint(res, "integrity_enabled") == 1),
-			(dbi_result_get_uint(res, "flooding_enabled") == 1),
-			dbi_result_get_string(res, "hmac_key"),
-			dbi_result_get_uint(res, "blacklist_threshold")
-		)
-	);
+	swd::profile_ptr profile(new swd::profile());
+	profile->set_server_ip(server_ip),
+	profile->set_id(dbi_result_get_uint(res, "id"));
+	profile->set_mode(dbi_result_get_uint(res, "mode"));
+	profile->set_whitelist_enabled(dbi_result_get_uint(res, "whitelist_enabled") == 1);
+	profile->set_blacklist_enabled(dbi_result_get_uint(res, "blacklist_enabled") == 1);
+	profile->set_integrity_enabled(dbi_result_get_uint(res, "integrity_enabled") == 1);
+	profile->set_flooding_enabled(dbi_result_get_uint(res, "flooding_enabled") == 1);
+	profile->set_key(dbi_result_get_string(res, "hmac_key"));
+	profile->set_blacklist_threshold(dbi_result_get_uint(res, "blacklist_threshold"));
 
 	dbi_result_free(res);
 
@@ -167,12 +165,9 @@ swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
 	swd::blacklist_rules rules;
 
 	while (dbi_result_next_row(res)) {
-		swd::blacklist_rule_ptr rule(
-			new swd::blacklist_rule(
-				dbi_result_get_uint(res, "id"),
-				dbi_result_get_uint(res, "threshold")
-			)
-		);
+		swd::blacklist_rule_ptr rule(new swd::blacklist_rule());
+		rule->set_id(dbi_result_get_uint(res, "id"));
+		rule->set_threshold(dbi_result_get_uint(res, "threshold"));
 
 		rules.push_back(rule);
 	}
@@ -189,7 +184,7 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	dbi_result res = dbi_conn_query(conn_, "SELECT id, rule, impact FROM blacklist_filters");
+	dbi_result res = dbi_conn_query(conn_, "SELECT id, impact, rule FROM blacklist_filters");
 
 	if (!res) {
 		throw swd::exceptions::database_exception("Can't execute blacklist_filters query");
@@ -198,13 +193,10 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
 	swd::blacklist_filters filters;
 
 	while (dbi_result_next_row(res)) {
-		swd::blacklist_filter_ptr filter(
-			new swd::blacklist_filter(
-				dbi_result_get_uint(res, "id"),
-				dbi_result_get_string(res, "rule"),
-				dbi_result_get_uint(res, "impact")
-			)
-		);
+		swd::blacklist_filter_ptr filter(new swd::blacklist_filter());
+		filter->set_id(dbi_result_get_uint(res, "id"));
+		filter->set_impact(dbi_result_get_uint(res, "impact"));
+		filter->set_regex(dbi_result_get_string(res, "rule"));
 
 		filters.push_back(filter);
 	}
@@ -249,21 +241,15 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 	swd::whitelist_rules rules;
 
 	while (dbi_result_next_row(res)) {
-		swd::whitelist_filter_ptr filter(
-			new swd::whitelist_filter(
-				dbi_result_get_uint(res, "filter_id"),
-				dbi_result_get_string(res, "rule")
-			)
-		);
+		swd::whitelist_filter_ptr filter(new swd::whitelist_filter());
+		filter->set_id(dbi_result_get_uint(res, "filter_id"));
+		filter->set_regex(dbi_result_get_string(res, "rule"));
 
-		swd::whitelist_rule_ptr rule(
-			new swd::whitelist_rule(
-				dbi_result_get_uint(res, "id"),
-				filter,
-				dbi_result_get_uint(res, "min_length"),
-				dbi_result_get_uint(res, "max_length")
-			)
-		);
+		swd::whitelist_rule_ptr rule(new swd::whitelist_rule());
+		rule->set_id(dbi_result_get_uint(res, "id"));
+		rule->set_filter(filter);
+		rule->set_min_length(dbi_result_get_uint(res, "min_length"));
+		rule->set_max_length(dbi_result_get_uint(res, "max_length"));
 
 		rules.push_back(rule);
 	}
@@ -296,13 +282,10 @@ swd::integrity_rules swd::database::get_integrity_rules(int profile, std::string
 	swd::integrity_rules rules;
 
 	while (dbi_result_next_row(res)) {
-		swd::integrity_rule_ptr rule(
-			new swd::integrity_rule(
-				dbi_result_get_uint(res, "id"),
-				dbi_result_get_string(res, "algorithm"),
-				dbi_result_get_string(res, "digest")
-			)
-		);
+		swd::integrity_rule_ptr rule(new swd::integrity_rule());
+		rule->set_id(dbi_result_get_uint(res, "id"));
+		rule->set_algorithm(dbi_result_get_string(res, "algorithm"));
+		rule->set_digest(dbi_result_get_string(res, "digest"));
 
 		rules.push_back(rule);
 	}
@@ -312,12 +295,15 @@ swd::integrity_rules swd::database::get_integrity_rules(int profile, std::string
 	return rules;
 }
 
-int swd::database::save_request(int profile, std::string caller, std::string resource,
- int mode, std::string client_ip, int total_integrity_rules) {
-	swd::log::i()->send(swd::notice, "Save request -> profile: "
-	 + boost::lexical_cast<std::string>(profile) + "; caller: " + caller + "; resource: "
-	 + resource + "; mode: " + boost::lexical_cast<std::string>(mode)
-	 + "; client_ip: " + client_ip);
+int swd::database::save_request(int profile, std::string caller,
+ std::string resource, int mode, std::string client_ip,
+ int total_integrity_rules) {
+	std::stringstream log_message;
+	log_message << "Save request -> profile: " << profile
+	 << "; caller: " << caller << "; resource: " << resource
+	 << "; mode: " << mode << "; client_ip: " << client_ip;
+
+	swd::log::i()->send(swd::notice, log_message.str());
 
 	ensure_connection();
 

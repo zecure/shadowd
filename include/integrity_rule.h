@@ -43,13 +43,11 @@ namespace swd {
 	class integrity_rule {
 		public:
 			/**
-			 * @brief Construct aan integrity rule.
+			 * @brief Set the id the rule.
 			 *
 			 * @param id The id of the rule
-			 * @param algorithm The hash algorithm of the rule
-			 * @param digest The hash digest of the rule
 			 */
-			integrity_rule(int id, std::string algorithm, std::string digest);
+			void set_id(int id);
 
 			/**
 			 * @brief Get the id the rule.
@@ -59,11 +57,25 @@ namespace swd {
 			int get_id();
 
 			/**
+			 * @brief Set the hash algorithm of the rule
+			 *
+			 * @param algorithm The hash algorithm of the rule
+			 */
+			void set_algorithm(std::string algorithm);
+
+			/**
 			 * @brief Get the hash algorithm of the rule
 			 *
 			 * @return The hash algorithm of the rule
 			 */
 			std::string get_algorithm();
+
+			/**
+			 * @brief Set the hash digest of the rule
+			 *
+			 * @param digest The hash digest of the rule
+			 */
+			void set_digest(std::string digest);
 
 			/**
 			 * @brief Get the hash digest of the rule

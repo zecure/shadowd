@@ -31,13 +31,16 @@
 
 #include "blacklist_rule.h"
 
-swd::blacklist_rule::blacklist_rule(int id, int threshold) :
- id_(id),
- threshold_(threshold) {
+void swd::blacklist_rule::set_id(int id) {
+	id_ = id;
 }
 
 int swd::blacklist_rule::get_id() {
 	return id_;
+}
+
+void swd::blacklist_rule::set_threshold(int threshold) {
+	threshold_ = threshold;
 }
 
 int swd::blacklist_rule::get_threshold() {

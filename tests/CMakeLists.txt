@@ -3,6 +3,7 @@ link_directories(${SHADOWD_BINARY_DIR}/src)
 
 add_executable(tests
 	shadowd_tests.cpp
+	request_handler_test.cpp
 	request_parser_test.cpp
 	${SHADOWD_SOURCE_DIR}/src/analyzer.cpp
 	${SHADOWD_SOURCE_DIR}/src/blacklist_filter.cpp

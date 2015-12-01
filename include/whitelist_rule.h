@@ -49,22 +49,39 @@ namespace swd {
 	class whitelist_rule {
 		public:
 			/**
-			 * @brief Construct a whitelist rule.
+			 * @brief Set the id of the rule.
 			 *
 			 * @param id The id of the rule
-			 * @param filter The whitelist filter of the rule
-			 * @param min_length The minimum length of the rule
-			 * @param max_length The maximum length of the rule
 			 */
-			whitelist_rule(int id, swd::whitelist_filter_ptr filter, int min_length,
-			 int max_length);
+			void set_id(int id);
 
 			/**
-			 * @brief Get the id the rule.
+			 * @brief Get the id of the rule.
 			 *
 			 * @return The id of the rule
 			 */
 			int get_id();
+
+			/**
+			 * @brief Set the whitelist filter of the rule.
+			 *
+			 * @param filter The whitelist filter of the rule
+			 */
+			void set_filter(swd::whitelist_filter_ptr filter);
+
+			/**
+			 * @brief Set the minimum length of the rule.
+			 *
+			 * @param min_length The minimum length of the rule
+			 */
+			void set_min_length(int min_length);
+
+			/**
+			 * @brief Set the maximum length of the rule.
+			 *
+			 * @param max_length The maximum length of the rule
+			 */
+			void set_max_length(int max_length);
 
 			/**
 			 * @brief Test for value if the filter matches and if the length is

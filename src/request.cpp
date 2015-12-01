@@ -40,7 +40,10 @@ swd::profile_ptr swd::request::get_profile() {
 }
 
 void swd::request::add_parameter(std::string path, std::string value) {
-	swd::parameter_ptr parameter(new swd::parameter(path, value));
+	swd::parameter_ptr parameter(new swd::parameter());
+	parameter->set_path(path);
+	parameter->set_value(value);
+
 	parameters_[path] = parameter;
 }
 
@@ -52,6 +55,10 @@ void swd::request::append_content(char input) {
 	content_.push_back(input);
 }
 
+void swd::request::set_content(std::string content) {
+	content_ = content;
+}
+
 std::string swd::request::get_content() {
 	return content_;
 }
@@ -60,12 +67,20 @@ void swd::request::append_signature(char input) {
 	signature_.push_back(input);
 }
 
+void swd::request::set_signature(std::string signature) {
+	signature_ = signature;
+}
+
 std::string swd::request::get_signature() {
 	return signature_;
 }
 
 void swd::request::append_profile_id(char input) {
 	profile_id_.push_back(input);
+}
+
+void swd::request::set_profile_id(int profile_id) {
+	profile_id_ = profile_id;
 }
 
 int swd::request::get_profile_id() {
@@ -113,7 +128,10 @@ int swd::request::get_total_integrity_rules() {
 }
 
 void swd::request::add_hash(std::string algorithm, std::string digest) {
-	swd::hash_ptr hash(new swd::hash(algorithm, digest));
+	swd::hash_ptr hash(new swd::hash());
+	hash->set_algorithm(algorithm);
+	hash->set_digest(digest);
+
 	hashes_[algorithm] = hash;
 }
 

@@ -29,16 +29,7 @@
  * files in the program, then also delete it here.
  */
 
-#include <string>
-#include <boost/lexical_cast.hpp>
-
 #include "reply.h"
-
-std::vector<boost::asio::const_buffer> swd::reply::to_buffers() {
-	std::vector<boost::asio::const_buffer> buffers;
-	buffers.push_back(boost::asio::buffer(content_));
-	return buffers;
-}
 
 void swd::reply::set_status(int status) {
 	status_ = status;
@@ -58,4 +49,10 @@ std::vector<std::string> swd::reply::get_threats() {
 
 void swd::reply::set_content(std::string content) {
 	content_ = content;
+}
+
+std::vector<boost::asio::const_buffer> swd::reply::to_buffers() {
+	std::vector<boost::asio::const_buffer> buffers;
+	buffers.push_back(boost::asio::buffer(content_));
+	return buffers;
 }

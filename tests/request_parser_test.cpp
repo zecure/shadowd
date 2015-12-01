@@ -40,7 +40,7 @@
 BOOST_AUTO_TEST_SUITE(request_parser_test)
 
 BOOST_AUTO_TEST_CASE(valid_parse) {
-	swd::request_ptr req = swd::request_ptr(new swd::request());
+	swd::request_ptr request = swd::request_ptr(new swd::request());
 
 	/* Prepare the input and copy it into a boost char array. */
 	int profile_id = 13;
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(valid_parse) {
 	boost::tribool result;
 	boost::tie(result, boost::tuples::ignore) =
 		parser.parse(
-			req,
+			request,
 			buffer.data(),
 			buffer.data() + input.length()
 		);
@@ -69,13 +69,13 @@ BOOST_AUTO_TEST_CASE(valid_parse) {
 	BOOST_CHECK(result == true);
 
 	/* The parsed version should equal the initial values again. */
-	BOOST_CHECK(req->get_profile_id() == profile_id);
-	BOOST_CHECK(req->get_signature() == signature);
-	BOOST_CHECK(req->get_content() == content);
+	BOOST_CHECK(request->get_profile_id() == profile_id);
+	BOOST_CHECK(request->get_signature() == signature);
+	BOOST_CHECK(request->get_content() == content);
 }
 
 BOOST_AUTO_TEST_CASE(incomplete_parse) {
-	swd::request_ptr req = swd::request_ptr(new swd::request());
+	swd::request_ptr request = swd::request_ptr(new swd::request());
 
 	/* Prepare the input and copy it into a boost char array. */
 	std::string input = "1\na\na";
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(incomplete_parse) {
 	boost::tribool result;
 	boost::tie(result, boost::tuples::ignore) =
 		parser.parse(
-			req,
+			request,
 			buffer.data(),
 			buffer.data() + input.length()
 		);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(incomplete_parse) {
 }
 
 BOOST_AUTO_TEST_CASE(invalid_parse_id) {
-	swd::request_ptr req = swd::request_ptr(new swd::request());
+	swd::request_ptr request = swd::request_ptr(new swd::request());
 
 	/* Prepare the input and copy it into a boost char array. */
 	std::string input = "!\na\na\n";
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(invalid_parse_id) {
 	boost::tribool result;
 	boost::tie(result, boost::tuples::ignore) =
 		parser.parse(
-			req,
+			request,
 			buffer.data(),
 			buffer.data() + input.length()
 		);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(invalid_parse_id) {
 }
 
 BOOST_AUTO_TEST_CASE(invalid_parse_hmac) {
-	swd::request_ptr req = swd::request_ptr(new swd::request());
+	swd::request_ptr request = swd::request_ptr(new swd::request());
 
 	/* Prepare the input and copy it into a boost char array. */
 	std::string input = "1\n!\na\n";
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(invalid_parse_hmac) {
 	boost::tribool result;
 	boost::tie(result, boost::tuples::ignore) =
 		parser.parse(
-			req,
+			request,
 			buffer.data(),
 			buffer.data() + input.length()
 		);

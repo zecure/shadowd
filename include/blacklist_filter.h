@@ -35,25 +35,20 @@
 #include <vector>
 #include <string>
 #include <boost/regex.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace swd {
 	/**
 	 * @brief Models a blacklist filter.
-	 *
-	 * This class and its regular expressions are based on PHPIDS.
-	 * Parameters are directly connected with matching filters if the request
-	 * is classified as an attack or if learning mode is enabled.
 	 */
 	class blacklist_filter {
 		public:
 			/**
-			 * @brief Construct a blacklist filter.
+			 * @brief Set the id of the filter.
 			 *
-			 * @param id The database id of the filter
-			 * @param rule The regular expression of the filter
-			 * @param impact The dangerousness of the filter
+			 * @param id The id of the filter
 			 */
-			blacklist_filter(int id, std::string rule, int impact);
+			void set_id(int id);
 
 			/**
 			 * @brief Get the id of the filter.
@@ -63,6 +58,13 @@ namespace swd {
 			int get_id();
 
 			/**
+			 * @brief Set the impact of the filter.
+			 *
+			 * @param impact The impact of the filter
+			 */
+			void set_impact(int impact);
+
+			/**
 			 * @brief Get the impact of the filter.
 			 *
 			 * @return The impact of the filter
@@ -70,17 +72,24 @@ namespace swd {
 			int get_impact();
 
 			/**
-			 * @brief Test for input if the filter matches.
+			 * @brief Set the regular expression of the filter.
+			 *
+			 * @param regex The regular expression of the filter
+			 */
+			void set_regex(std::string regex);
+
+			/**
+			 * @brief Test for input if the regular expression matches.
 			 *
 			 * @param input The string that should be tested
-			 * @return The status of the regular expression test
+			 * @return The result of the test
 			 */
-			bool match(std::string input);
+			bool matches(std::string input);
 
 		private:
 			int id_;
 			int impact_;
-			boost::regex rule_;
+			boost::regex regex_;
 	};
 
 	/**

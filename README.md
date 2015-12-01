@@ -19,7 +19,7 @@ Use cmake to configure and prepare the project. It is a good idea to create a se
 ## Compilation
 If cmake is successful it creates a makefile. Use it to compile and install the project:
 
-    make
+    make shadowd
     make install
 
 ## Database

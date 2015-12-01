@@ -32,7 +32,6 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-#include <vector>
 #include <queue>
 #include <boost/thread.hpp>
 

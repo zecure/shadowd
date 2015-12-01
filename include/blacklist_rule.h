@@ -32,7 +32,6 @@
 #ifndef BLACKLIST_RULE_H
 #define BLACKLIST_RULE_H
 
-#include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
@@ -43,12 +42,11 @@ namespace swd {
 	class blacklist_rule {
 		public:
 			/**
-			 * @brief Construct a blacklist rule.
+			 * @brief Set the id the rule.
 			 *
 			 * @param id The id of the rule
-			 * @param threshold The threshold of the rule
 			 */
-			blacklist_rule(int id, int threshold);
+			void set_id(int id);
 
 			/**
 			 * @brief Get the id the rule.
@@ -56,6 +54,13 @@ namespace swd {
 			 * @return The id of the rule
 			 */
 			int get_id();
+
+			/**
+			 * @brief Get the threshold of the rule.
+			 *
+			 * @param threshold The threshold of the rule
+			 */
+			void set_threshold(int threshold);
 
 			/**
 			 * @brief Get the threshold of the rule.

@@ -46,12 +46,11 @@ namespace swd {
 	class parameter {
 		public:
 			/**
-			 * @brief Construct a parameter.
+			 * @brief Set the path of the parameter.
 			 *
 			 * @param path The path of the parameter
-			 * @param value The raw value of the parameter
 			 */
-			parameter(std::string path, std::string value);
+			void set_path(std::string path);
 
 			/**
 			 * @brief Get the path of the parameter.
@@ -59,6 +58,13 @@ namespace swd {
 			 * @return The path of the parameter
 			 */
 			std::string get_path();
+
+			/**
+			 * @brief Get the value of the parameter.
+			 *
+			 * @param value The raw value of the parameter
+			 */
+			void set_value(std::string value);
 
 			/**
 			 * @brief Get the value of the parameter.

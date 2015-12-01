@@ -32,8 +32,8 @@
 #ifndef REQUEST_HANDLER_H
 #define REQUEST_HANDLER_H
 
-#include <string>
 #include <vector>
+#include <string>
 
 #include "request.h"
 

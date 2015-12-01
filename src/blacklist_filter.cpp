@@ -31,20 +31,26 @@
 
 #include "blacklist_filter.h"
 
-swd::blacklist_filter::blacklist_filter(int id, std::string rule, int impact) :
- id_(id),
- impact_(impact) {
-	rule_.set_expression(rule, boost::regex::icase | boost::regex::mod_s);
+void swd::blacklist_filter::set_id(int id) {
+	id_ = id;
 }
 
 int swd::blacklist_filter::get_id() {
 	return id_;
 }
 
+void swd::blacklist_filter::set_impact(int impact) {
+	impact_ = impact;
+}
+
 int swd::blacklist_filter::get_impact() {
 	return impact_;
 }
 
-bool swd::blacklist_filter::match(std::string input) {
-	return regex_search(input, rule_);
+void swd::blacklist_filter::set_regex(std::string regex) {
+	regex_.set_expression(regex, boost::regex::icase | boost::regex::mod_s);
+}
+
+bool swd::blacklist_filter::matches(std::string input) {
+	return regex_search(input, regex_);
 }

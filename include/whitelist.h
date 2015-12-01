@@ -32,8 +32,6 @@
 #ifndef WHITELIST_H
 #define WHITELIST_H
 
-#include <vector>
-
 #include "request.h"
 
 namespace swd {

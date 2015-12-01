@@ -29,8 +29,6 @@
  * files in the program, then also delete it here.
  */
 
-#include <boost/lexical_cast.hpp>
-
 #include "whitelist.h"
 #include "whitelist_rule.h"
 #include "database.h"

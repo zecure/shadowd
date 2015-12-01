@@ -35,6 +35,7 @@
 #include <vector>
 #include <string>
 #include <boost/regex.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace swd {
 	/**
@@ -46,12 +47,11 @@ namespace swd {
 	class whitelist_filter {
 		public:
 			/**
-			 * @brief Construct a whitelist filter.
+			 * @brief Set the id the filter.
 			 *
 			 * @param id The database id of the filter
-			 * @param rule The regular expression of the filter
 			 */
-			whitelist_filter(int id, std::string rule);
+			void set_id(int id);
 
 			/**
 			 * @brief Get the id the filter.
@@ -61,16 +61,23 @@ namespace swd {
 			int get_id();
 
 			/**
+			 * @brief Set the regular expression of the filter.
+			 *
+			 * @param regex The regular expression of the filter
+			 */
+			void set_regex(std::string regex);
+
+			/**
 			 * @brief Test for input if the filter matches.
 			 *
 			 * @param input The string that should be tested
 			 * @return The status of the regular expression test
 			 */
-			bool match(std::string input);
+			bool matches(std::string input);
 
 		private:
 			int id_;
-			boost::regex rule_;
+			boost::regex regex_;
 	};
 
 	/**

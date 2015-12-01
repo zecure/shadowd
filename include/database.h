@@ -33,8 +33,6 @@
 #define DATABASE_H
 
 #include <string>
-#include <vector>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <dbi/dbi.h>
 

@@ -31,16 +31,24 @@
 
 #include "whitelist_rule.h"
 
-swd::whitelist_rule::whitelist_rule(int id, swd::whitelist_filter_ptr filter,
- int min_length, int max_length) :
- id_(id),
- filter_(filter),
- min_length_(min_length),
- max_length_(max_length) {
+void swd::whitelist_rule::set_id(int id) {
+	id_ = id;
 }
 
 int swd::whitelist_rule::get_id() {
 	return id_;
+}
+
+void swd::whitelist_rule::set_filter(swd::whitelist_filter_ptr filter) {
+	filter_ = filter;
+}
+
+void swd::whitelist_rule::set_min_length(int min_length) {
+	min_length_ = min_length;
+}
+
+void swd::whitelist_rule::set_max_length(int max_length) {
+	max_length_ = max_length;
 }
 
 bool swd::whitelist_rule::is_adhered_to(std::string value) {
@@ -54,5 +62,5 @@ bool swd::whitelist_rule::is_adhered_to(std::string value) {
 		return false;
 	}
 
-	return filter_->match(value);
+	return filter_->matches(value);
 }
