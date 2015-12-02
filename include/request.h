@@ -70,6 +70,13 @@ namespace swd {
 			/**
 			 * @brief Add a parameter object to the request.
 			 *
+			 * @param path The parameter
+			 */
+			void add_parameter(swd::parameter_ptr parameter);
+
+			/**
+			 * @brief Create and add a parameter object to the request.
+			 *
 			 * @param path The path of the parameter
 			 * @param value The value of the parameter
 			 */

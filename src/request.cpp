@@ -39,6 +39,10 @@ swd::profile_ptr swd::request::get_profile() {
 	return profile_;
 }
 
+void swd::request::add_parameter(swd::parameter_ptr parameter) {
+	parameters_[parameter->get_path()] = parameter;
+}
+
 void swd::request::add_parameter(std::string path, std::string value) {
 	swd::parameter_ptr parameter(new swd::parameter());
 	parameter->set_path(path);

@@ -41,10 +41,6 @@
 namespace swd {
 	/**
 	 * @brief Models a whitelist rule.
-	 *
-	 * If is_responsible() is true it is required that is_adhered_to() is also
-	 * true, otherwise the input parameter is classified as an attack.
-	 * Parameters are directly connected with broken rules.
 	 */
 	class whitelist_rule {
 		public:
