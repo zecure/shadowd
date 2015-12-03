@@ -120,14 +120,14 @@ namespace swd {
 			 *
 			 * @param threat Threat status of this parameter
 			 */
-			void is_threat(bool threat);
+			void set_threat(bool threat);
 
 			/**
 			 * @brief Check if the parameter is a threat.
 			 *
 			 * @return True if the parameter is a threat
 			 */
-			bool is_threat();
+			bool get_threat();
 
 			/**
 			 * @brief Define if this parameter has a critical blacklist impact or not.

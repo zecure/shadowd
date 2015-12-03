@@ -269,7 +269,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		}
 
 		if (request_->get_profile()->get_mode() == MODE_ACTIVE) {
-			if (request_->is_threat()) {
+			if (request_->get_threat()) {
 				reply_->set_status(STATUS_BAD_REQUEST);
 			} else if (request_->has_threats()) {
 				reply_->set_threats(request_handler.get_threats());

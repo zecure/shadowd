@@ -182,7 +182,7 @@ void swd::request_handler::process() {
 	 * is at least one threat or if learning is enabled the complete request gets
 	 * recorded permanently.
 	 */
-	if (request_->is_threat() || request_->has_threats() ||
+	if (request_->get_threat() || request_->has_threats() ||
 	 (request_->get_profile()->get_mode() == MODE_LEARNING)) {
 		swd::storage::i()->add(request_);
 	}
@@ -198,7 +198,7 @@ std::vector<std::string> swd::request_handler::get_threats() {
 		/* Save the iterators in variables for the sake of readability. */
 		swd::parameter_ptr parameter((*it_parameter).second);
 
-		if (parameter->is_threat()) {
+		if (parameter->get_threat()) {
 			threats.push_back((*it_parameter).first);
 		}
 	}

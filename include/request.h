@@ -260,7 +260,7 @@ namespace swd {
 			 *
 			 * @param threat Threat status of this request
 			 */
-			void is_threat(bool global_threat);
+			void set_threat(bool threat);
 
 			/**
 			 * @brief Check if the request itself is a threat.
@@ -269,7 +269,7 @@ namespace swd {
 			 *
 			 * @return If the request is classified as threat
 			 */
-			bool is_threat();
+			bool get_threat();
 
 			/**
 			 * @brief Check if this request has parameters with threats.

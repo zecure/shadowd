@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(get_threats) {
 	request->add_parameter(parameter_ok);
 	parameter_threat->set_path("faa");
 	parameter_threat->set_value("bor");
-	parameter_threat->is_threat(true);
+	parameter_threat->set_threat(true);
 	request->add_parameter(parameter_threat);
 
 	std::vector<std::string> threats = request_handler.get_threats();

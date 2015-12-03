@@ -78,11 +78,11 @@ int swd::parameter::get_impact() {
 	return impact;
 }
 
-void swd::parameter::is_threat(bool threat) {
+void swd::parameter::set_threat(bool threat) {
 	threat_ = threat;
 }
 
-bool swd::parameter::is_threat() {
+bool swd::parameter::get_threat() {
 	return threat_;
 }
 

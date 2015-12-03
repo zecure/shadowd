@@ -79,12 +79,12 @@ void swd::analyzer::start() {
 
 		/* Check if there is no responsible integrity rule. */
 		if (request_->get_total_integrity_rules() == 0) {
-			request_->is_threat(true);
+			request_->set_threat(true);
 		}
 
 		/* Check if there are integrity rules that are not adhered to. */
 		if (request_->get_integrity_rules().size() > 0) {
-			request_->is_threat(true);
+			request_->set_threat(true);
 		}
 	}
 
@@ -123,7 +123,7 @@ void swd::analyzer::start() {
 
 			/* Check if the impact is higher than the threshold. */
 			if ((threshold > -1) && (parameter->get_impact() > threshold)) {
-				parameter->is_threat(true);
+				parameter->set_threat(true);
 				parameter->has_critical_impact(true);
 			}
 		}
@@ -131,12 +131,12 @@ void swd::analyzer::start() {
 		if (request_->get_profile()->is_whitelist_enabled()) {
 			/* Check if there is no responsible whitelist rule. */
 			if (parameter->get_total_whitelist_rules() == 0) {
-				parameter->is_threat(true);
+				parameter->set_threat(true);
 			}
 
 			/* Check if there are whitelist rules that are not adhered to. */
 			if (parameter->get_whitelist_rules().size() > 0) {
-				parameter->is_threat(true);
+				parameter->set_threat(true);
 			}
 		}
 	}

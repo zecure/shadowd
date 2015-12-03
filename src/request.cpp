@@ -152,11 +152,11 @@ swd::hash_ptr swd::request::get_hash(std::string algorithm) {
 	return hashes_[algorithm];
 }
 
-void swd::request::is_threat(bool threat) {
+void swd::request::set_threat(bool threat) {
 	threat_ = threat;
 }
 
-bool swd::request::is_threat() {
+bool swd::request::get_threat() {
 	return threat_;
 }
 
@@ -167,7 +167,7 @@ bool swd::request::has_threats() {
 		swd::parameter_ptr parameter((*it_parameter).second);
 
 		/* We only need to know if there is at least one threat. */
-		if (parameter->is_threat()) {
+		if (parameter->get_threat()) {
 			return true;
 		}
 	}
