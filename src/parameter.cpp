@@ -31,6 +31,12 @@
 
 #include "parameter.h"
 
+swd::parameter::parameter() :
+ threat_(false),
+ critical_blacklist_impact_(false),
+ total_whitelist_rules_(0) {
+}
+
 void swd::parameter::set_path(std::string path) {
 	path_ = path;
 }
@@ -86,12 +92,12 @@ bool swd::parameter::get_threat() {
 	return threat_;
 }
 
-void swd::parameter::has_critical_impact(bool critical) {
-	critical_impact_ = critical;
+void swd::parameter::set_critical_blacklist_impact(bool critical) {
+	critical_blacklist_impact_ = critical;
 }
 
-bool swd::parameter::has_critical_impact() {
-	return critical_impact_;
+bool swd::parameter::get_critical_blacklist_impact() {
+	return critical_blacklist_impact_;
 }
 
 void swd::parameter::set_total_whitelist_rules(int total_whitelist_rules) {

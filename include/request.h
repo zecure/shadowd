@@ -54,6 +54,11 @@ namespace swd {
 	class request {
 		public:
 			/**
+			 * @brief Construct a request.
+			 */
+			request();
+
+			/**
 			 * @brief Set the pointer of the profile.
 			 *
 			 * @param profile The profile of the connection

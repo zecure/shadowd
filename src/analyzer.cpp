@@ -124,7 +124,7 @@ void swd::analyzer::start() {
 			/* Check if the impact is higher than the threshold. */
 			if ((threshold > -1) && (parameter->get_impact() > threshold)) {
 				parameter->set_threat(true);
-				parameter->has_critical_impact(true);
+				parameter->set_critical_blacklist_impact(true);
 			}
 		}
 

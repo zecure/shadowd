@@ -167,7 +167,7 @@ void swd::storage::save(swd::request_ptr request) {
 				(*it_parameter).first,
 				parameter->get_value(),
 				(request->get_profile()->is_whitelist_enabled() ? parameter->get_total_whitelist_rules() : -1),
-				(parameter->has_critical_impact() ? 1 : 0 ),
+				(parameter->get_critical_blacklist_impact() ? 1 : 0 ),
 				(parameter->get_threat() ? 1 : 0 )
 			);
 		} catch (swd::exceptions::database_exception& e) {

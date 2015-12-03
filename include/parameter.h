@@ -46,6 +46,11 @@ namespace swd {
 	class parameter {
 		public:
 			/**
+			 * @brief Construct a parameter.
+			 */
+			parameter();
+
+			/**
 			 * @brief Set the path of the parameter.
 			 *
 			 * @param path The path of the parameter
@@ -134,14 +139,14 @@ namespace swd {
 			 *
 			 * @param critical Critical impact status of this parameter
 			 */
-			void has_critical_impact(bool critical);
+			void set_critical_blacklist_impact(bool critical);
 
 			/**
 			 *@brief  Check if the parameter has a critical blacklist impact.
 			 *
 			 * @return True if the parameter has a critical blacklist impact
 			 */
-			bool has_critical_impact();
+			bool get_critical_blacklist_impact();
 
 			/**
 			 * @brief Set the number of whitelist rules.
@@ -164,7 +169,7 @@ namespace swd {
 			swd::blacklist_filters blacklist_filters_;
 			swd::whitelist_rules whitelist_rules_;
 			bool threat_;
-			bool critical_impact_;
+			bool critical_blacklist_impact_;
 			int total_whitelist_rules_;
 	};
 
