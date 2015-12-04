@@ -6,6 +6,8 @@ add_executable(tests
 	blacklist_filter_test.cpp
 	request_handler_test.cpp
 	request_parser_test.cpp
+	whitelist_filter_test.cpp
+	whitelist_rule_test.cpp
 	${SHADOWD_SOURCE_DIR}/src/analyzer.cpp
 	${SHADOWD_SOURCE_DIR}/src/blacklist_filter.cpp
 	${SHADOWD_SOURCE_DIR}/src/config.cpp

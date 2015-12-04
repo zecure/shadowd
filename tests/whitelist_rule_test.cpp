@@ -33,37 +33,45 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/array.hpp>
 
-#include "blacklist_filter.h"
+#include "whitelist_rule.h"
+#include "whitelist_filter.h"
 
-BOOST_AUTO_TEST_SUITE(blacklist_filter_test)
+BOOST_AUTO_TEST_SUITE(whitelist_rule_test)
 
-BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter = swd::blacklist_filter_ptr(new swd::blacklist_filter());
+BOOST_AUTO_TEST_CASE(adhered_whitelist_rule) {
+	swd::whitelist_rule_ptr rule = swd::whitelist_rule_ptr(new swd::whitelist_rule());
+	swd::whitelist_filter_ptr filter = swd::whitelist_filter_ptr(new swd::whitelist_filter());
 
 	filter->set_id(1);
-	filter->set_impact(5);
-
 	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foo") == true);
+	rule->set_id(1);
+	rule->set_filter(filter);
 
-	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("BOOFOOBAR") == true);
+	rule->set_min_length(-1);
+	rule->set_max_length(-1);
+	BOOST_CHECK(rule->is_adhered_to("foo") == true);
 
-	filter->set_regex("(?:(foo(.*)bar))");
-	BOOST_CHECK(filter->matches("foo\nbar") == true);
+	rule->set_min_length(3);
+	rule->set_max_length(3);
+	BOOST_CHECK(rule->is_adhered_to("foo") == true);
 }
 
-BOOST_AUTO_TEST_CASE(not_matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter = swd::blacklist_filter_ptr(new swd::blacklist_filter());
+BOOST_AUTO_TEST_CASE(not_adhered_whitelist_rule) {
+	swd::whitelist_rule_ptr rule = swd::whitelist_rule_ptr(new swd::whitelist_rule());
+	swd::whitelist_filter_ptr filter = swd::whitelist_filter_ptr(new swd::whitelist_filter());
 
 	filter->set_id(1);
-	filter->set_impact(5);
-
 	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foobar") == false);
+	rule->set_id(1);
+	rule->set_filter(filter);
 
-	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("bar") == false);
+	rule->set_min_length(-1);
+	rule->set_max_length(-1);
+	BOOST_CHECK(rule->is_adhered_to("bar") == false);
+
+	rule->set_min_length(10);
+	rule->set_max_length(10);
+	BOOST_CHECK(rule->is_adhered_to("foo") == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

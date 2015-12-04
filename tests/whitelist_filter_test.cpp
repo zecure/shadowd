@@ -33,15 +33,14 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/array.hpp>
 
-#include "blacklist_filter.h"
+#include "whitelist_filter.h"
 
-BOOST_AUTO_TEST_SUITE(blacklist_filter_test)
+BOOST_AUTO_TEST_SUITE(whitelist_filter_test)
 
-BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter = swd::blacklist_filter_ptr(new swd::blacklist_filter());
+BOOST_AUTO_TEST_CASE(matching_whitelist_filter) {
+	swd::whitelist_filter_ptr filter = swd::whitelist_filter_ptr(new swd::whitelist_filter());
 
 	filter->set_id(1);
-	filter->set_impact(5);
 
 	filter->set_regex("^foo$");
 	BOOST_CHECK(filter->matches("foo") == true);
@@ -53,11 +52,10 @@ BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
 	BOOST_CHECK(filter->matches("foo\nbar") == true);
 }
 
-BOOST_AUTO_TEST_CASE(not_matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter = swd::blacklist_filter_ptr(new swd::blacklist_filter());
+BOOST_AUTO_TEST_CASE(not_matching_whitelist_filter) {
+	swd::whitelist_filter_ptr filter = swd::whitelist_filter_ptr(new swd::whitelist_filter());
 
 	filter->set_id(1);
-	filter->set_impact(5);
 
 	filter->set_regex("^foo$");
 	BOOST_CHECK(filter->matches("foobar") == false);
