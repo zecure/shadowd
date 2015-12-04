@@ -29,37 +29,35 @@
  * files in the program, then also delete it here.
  */
 
-#include <vector>
-#include <string>
-#include <jsoncpp/json/json.h>
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
 
 #include "reply_handler.h"
-#include "log.h"
 
-swd::reply_handler::reply_handler(swd::reply_ptr reply) :
- reply_(reply) {
+BOOST_AUTO_TEST_SUITE(reply_handler_test)
+
+BOOST_AUTO_TEST_CASE(encode_normal) {
+	swd::reply_ptr reply(new swd::reply);
+	swd::reply_handler reply_handler(reply);
+
+	reply->set_status(STATUS_OK);
+
+	BOOST_CHECK(reply_handler.encode() == true);
+	BOOST_CHECK(reply->get_content() == "{\"status\":1,\"threats\":[]}\n");
 }
 
-bool swd::reply_handler::encode() {
-	try {
-		Json::Value root;
-		Json::FastWriter writer;
+BOOST_AUTO_TEST_CASE(encode_attack) {
+	swd::reply_ptr reply(new swd::reply);
+	swd::reply_handler reply_handler(reply);
 
-		root["status"] = reply_->get_status();
-		std::vector<std::string> threats = reply_->get_threats();
+	std::vector<std::string> threats;
+	threats.push_back("foo");
+	threats.push_back("bar");
+	reply->set_threats(threats);
+	reply->set_status(STATUS_ATTACK);
 
-		Json::Value output(Json::arrayValue);
-		for (std::vector<std::string>::iterator it = threats.begin(); it != threats.end(); ++it) {
-			output.append(*it);
-		}
-
-		root["threats"] = output;
-
-		reply_->set_content(writer.write(root));
-	} catch (...) {
-		swd::log::i()->send(swd::uncritical_error, "Uncaught json encode exception");
-		return false;
-	}
-
-	return true;
+	BOOST_CHECK(reply_handler.encode() == true);
+	BOOST_CHECK(reply->get_content() == "{\"status\":5,\"threats\":[\"foo\",\"bar\"]}\n");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

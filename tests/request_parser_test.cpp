@@ -35,7 +35,6 @@
 #include <sstream>
 
 #include "request_parser.h"
-#include "request.h"
 
 BOOST_AUTO_TEST_SUITE(request_parser_test)
 

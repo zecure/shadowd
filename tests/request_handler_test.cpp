@@ -33,9 +33,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "request_handler.h"
-#include "request.h"
-#include "parameter.h"
-#include "profile.h"
 
 BOOST_AUTO_TEST_SUITE(request_handler_test)
 

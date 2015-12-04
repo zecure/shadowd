@@ -80,6 +80,13 @@ namespace swd {
 			void set_content(std::string content);
 
 			/**
+			 * @brief Get the content that gets send back to the http server.
+			 *
+			 * @return The output content
+			 */
+			std::string get_content();
+
+			/**
 			 * @brief Convert the reply into a vector of buffers.
 			 *
 			 * The buffers do not own the underlying memory blocks, therefore

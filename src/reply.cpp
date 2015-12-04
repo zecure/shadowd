@@ -51,6 +51,10 @@ void swd::reply::set_content(std::string content) {
 	content_ = content;
 }
 
+std::string swd::reply::get_content() {
+	return content_;
+}
+
 std::vector<boost::asio::const_buffer> swd::reply::to_buffers() {
 	std::vector<boost::asio::const_buffer> buffers;
 	buffers.push_back(boost::asio::buffer(content_));

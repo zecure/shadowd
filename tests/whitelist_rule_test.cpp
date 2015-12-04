@@ -31,10 +31,8 @@
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include <boost/array.hpp>
 
 #include "whitelist_rule.h"
-#include "whitelist_filter.h"
 
 BOOST_AUTO_TEST_SUITE(whitelist_rule_test)
 
