@@ -157,14 +157,14 @@ void swd::storage::save(swd::request_ptr request) {
 
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
-		swd::parameter_ptr parameter((*it_parameter).second);
+		swd::parameter_ptr parameter(*it_parameter);
 
 		int parameter_id;
 
 		try {
 			parameter_id = swd::database::i()->save_parameter(
 				request_id,
-				(*it_parameter).first,
+				parameter->get_path(),
 				parameter->get_value(),
 				(request->get_profile()->is_whitelist_enabled() ? parameter->get_total_whitelist_rules() : -1),
 				(parameter->get_critical_blacklist_impact() ? 1 : 0 ),

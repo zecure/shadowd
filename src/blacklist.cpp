@@ -46,7 +46,7 @@ void swd::blacklist::scan() {
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
 		/* Save the iterators in variables for the sake of readability. */
-		swd::parameter_ptr parameter((*it_parameter).second);
+		swd::parameter_ptr parameter(*it_parameter);
 
 		for (swd::blacklist_filters::iterator it_filter = filters_.begin();
 		 it_filter != filters_.end(); it_filter++) {

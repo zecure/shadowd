@@ -66,7 +66,7 @@ swd::config::config() :
 
 	od_security_.add_options()
 		("max-parameters", po::value<int>()->default_value(64), "max number of parameters per request")
-		("max-length-name", po::value<int>()->default_value(64), "max length of parameter names")
+		("max-length-path", po::value<int>()->default_value(64), "max length of parameter paths")
 		("max-length-value", po::value<int>()->default_value(-1), "max length of parameter values");
 
 	od_database_.add_options()

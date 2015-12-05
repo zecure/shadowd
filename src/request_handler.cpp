@@ -196,10 +196,10 @@ std::vector<std::string> swd::request_handler::get_threats() {
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
 		/* Save the iterators in variables for the sake of readability. */
-		swd::parameter_ptr parameter((*it_parameter).second);
+		swd::parameter_ptr parameter(*it_parameter);
 
 		if (parameter->get_threat()) {
-			threats.push_back((*it_parameter).first);
+			threats.push_back(parameter->get_path());
 		}
 	}
 

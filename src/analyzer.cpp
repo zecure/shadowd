@@ -94,7 +94,7 @@ void swd::analyzer::start() {
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
 		/* Save the iterators in variables for the sake of readability. */
-		swd::parameter_ptr parameter((*it_parameter).second);
+		swd::parameter_ptr parameter(*it_parameter);
 
 		if (request_->get_profile()->is_blacklist_enabled()) {
 			int threshold = request_->get_profile()->get_blacklist_threshold();
@@ -102,7 +102,7 @@ void swd::analyzer::start() {
 			swd::blacklist_rules rules = swd::database::i()->get_blacklist_rules(
 				request_->get_profile()->get_id(),
 				request_->get_caller(),
-				(*it_parameter).first
+				parameter->get_path()
 			);
 
 			if (rules.size() > 0) {

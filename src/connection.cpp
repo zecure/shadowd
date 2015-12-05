@@ -229,20 +229,20 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 				throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 			}
 
-			int max_length_name = swd::config::i()->get<int>("max-length-name");
+			int max_length_path = swd::config::i()->get<int>("max-length-path");
 			int max_length_value = swd::config::i()->get<int>("max-length-value");
 
-			if ((max_length_name > -1) || (max_length_value > -1)) {
+			if ((max_length_path > -1) || (max_length_value > -1)) {
 				for (swd::parameters::iterator it_parameter = parameters.begin();
 				 it_parameter != parameters.end(); it_parameter++) {
-					swd::parameter_ptr parameter((*it_parameter).second);
+					swd::parameter_ptr parameter(*it_parameter);
 
-					if ((max_length_name > -1) && (((*it_parameter).first).length() > max_length_name)) {
-						swd::log::i()->send(swd::notice, "Too long parameter name");
+					if ((max_length_path > -1) && (parameter->get_path().length() > max_length_path)) {
+						swd::log::i()->send(swd::notice, "Too long parameter path");
 						throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 					}
 
-					if ((max_length_value > -1) && (parameter->get_length() > max_length_value)) {
+					if ((max_length_value > -1) && (parameter->get_value().length() > max_length_value)) {
 						swd::log::i()->send(swd::notice, "Too long parameter value");
 						throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 					}

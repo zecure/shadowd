@@ -45,7 +45,7 @@ swd::profile_ptr swd::request::get_profile() {
 }
 
 void swd::request::add_parameter(swd::parameter_ptr parameter) {
-	parameters_[parameter->get_path()] = parameter;
+	parameters_.push_back(parameter);
 }
 
 void swd::request::add_parameter(std::string path, std::string value) {
@@ -53,7 +53,7 @@ void swd::request::add_parameter(std::string path, std::string value) {
 	parameter->set_path(path);
 	parameter->set_value(value);
 
-	parameters_[path] = parameter;
+	parameters_.push_back(parameter);
 }
 
 swd::parameters& swd::request::get_parameters() {
@@ -169,7 +169,7 @@ bool swd::request::has_threats() {
 	/* Iterate over all parameters and check for threats. */
 	for (swd::parameters::iterator it_parameter = parameters_.begin();
 	 it_parameter != parameters_.end(); it_parameter++) {
-		swd::parameter_ptr parameter((*it_parameter).second);
+		swd::parameter_ptr parameter(*it_parameter);
 
 		/* We only need to know if there is at least one threat. */
 		if (parameter->get_threat()) {

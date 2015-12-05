@@ -32,7 +32,7 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 
-#include <map>
+#include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
 
@@ -77,13 +77,6 @@ namespace swd {
 			 * @return The raw value of the parameter
 			 */
 			std::string get_value();
-
-			/**
-			 * @brief Get the length of the value.
-			 *
-			 * @return The length of the value
-			 */
-			int get_length();
 
 			/**
 			 * @brief Add a (matching) blacklist filter to this parameter.
@@ -181,7 +174,7 @@ namespace swd {
 	/**
 	 * @brief Map of parameter pointers. The key is the path.
 	 */
-	typedef std::map<std::string, swd::parameter_ptr> parameters;
+	typedef std::vector<swd::parameter_ptr> parameters;
 }
 
 #endif /* PARAMETER_H */
