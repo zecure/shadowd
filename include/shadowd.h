@@ -65,11 +65,34 @@ namespace swd {
 			void start();
 
 		private:
+			/**
+			 * @brief The pointer to the database object.
+			 */
 			swd::database_ptr database_;
+
+			/**
+			 * @brief The pointer to the cache object.
+			 */
 			swd::cache_ptr cache_;
+
+			/**
+			 * @brief The pointer to the analyzer object.
+			 */
 			swd::analyzer_ptr analyzer_;
+
+			/**
+			 * @brief The pointer to the storage object.
+			 */
 			swd::storage_ptr storage_;
+
+			/**
+			 * @brief The daemon object.
+			 */
 			swd::daemon daemon_;
+
+			/**
+			 * @brief The server object.
+			 */
 			swd::server server_;
 	};
 }

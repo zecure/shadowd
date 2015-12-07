@@ -31,27 +31,27 @@
 
 #include "whitelist_rule.h"
 
-void swd::whitelist_rule::set_id(int id) {
+void swd::whitelist_rule::set_id(const int& id) {
 	id_ = id;
 }
 
-int swd::whitelist_rule::get_id() {
+int swd::whitelist_rule::get_id() const {
 	return id_;
 }
 
-void swd::whitelist_rule::set_filter(swd::whitelist_filter_ptr filter) {
+void swd::whitelist_rule::set_filter(const swd::whitelist_filter_ptr& filter) {
 	filter_ = filter;
 }
 
-void swd::whitelist_rule::set_min_length(int min_length) {
+void swd::whitelist_rule::set_min_length(const int& min_length) {
 	min_length_ = min_length;
 }
 
-void swd::whitelist_rule::set_max_length(int max_length) {
+void swd::whitelist_rule::set_max_length(const int& max_length) {
 	max_length_ = max_length;
 }
 
-bool swd::whitelist_rule::is_adhered_to(std::string value) {
+bool swd::whitelist_rule::is_adhered_to(const std::string& value) const {
 	int length = value.length();
 
 	if ((min_length_ > 0) && (length < min_length_)) {

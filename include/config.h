@@ -64,13 +64,13 @@ namespace swd {
 			 *
 			 * @param file The file that gets parsed
 			 */
-			void parse_config_file(std::string file);
+			void parse_config_file(const std::string& file);
 
 			/**
 			 * @brief Validate the configuration and throw an exception if something
 			 *  important is not set.
 			 */
-			void validate();
+			void validate() const;
 
 			/**
 			 * @brief Test if the configuration value is set.
@@ -81,7 +81,7 @@ namespace swd {
 			 *
 			 * @param key The key of the configuration value
 			 */
-			bool defined(std::string key) { return (vm_.count(key) > 0); }
+			bool defined(const std::string& key) const { return (vm_.count(key) > 0); }
 
 			/**
 			 * @brief Get the configuration value.
@@ -90,14 +90,37 @@ namespace swd {
 			 *
 			 * @param key The key of the configuration value
 			 */
-			template<class T> T get(std::string key) { return vm_[key].as<T>(); }
+			template<class T> T get(const std::string& key) const { return vm_[key].as<T>(); }
 
 		private:
+			/**
+			 * @brief Contains all information about generic settings.
+			 */
 			po::options_description od_generic_;
+
+			/**
+			 * @brief Contains all information about server settings.
+			 */
 			po::options_description od_server_;
+
+			/**
+			 * @brief Contains all information about daemon settings.
+			 */
 			po::options_description od_daemon_;
+
+			/**
+			 * @brief Contains all information about security settings.
+			 */
 			po::options_description od_security_;
+
+			/**
+			 * @brief Contains all information about database settings.
+			 */
 			po::options_description od_database_;
+
+			/**
+			 * @brief Contains the actual values of all settings.
+			 */
 			po::variables_map vm_;
 	};
 }

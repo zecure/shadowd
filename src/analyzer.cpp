@@ -37,12 +37,13 @@
 #include "whitelist_rule.h"
 #include "integrity_rule.h"
 
-swd::analyzer::analyzer(swd::database_ptr database, swd::cache_ptr cache) :
+swd::analyzer::analyzer(const swd::database_ptr& database,
+ const swd::cache_ptr& cache) :
  database_(database),
  cache_(cache) {
 }
 
-void swd::analyzer::scan(swd::request_ptr request) {
+void swd::analyzer::scan(swd::request_ptr& request) {
 	swd::profile_ptr profile = request->get_profile();
 
 	if (profile->is_blacklist_enabled()) {
@@ -91,7 +92,7 @@ void swd::analyzer::scan(swd::request_ptr request) {
 	}
 
 	/* Combine the results and determine which parameters are threats. */
-	swd::parameters& parameters = request->get_parameters();
+	swd::parameters parameters = request->get_parameters();
 
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
@@ -144,7 +145,7 @@ void swd::analyzer::scan(swd::request_ptr request) {
 	}
 }
 
-bool swd::analyzer::is_flooding(swd::request_ptr request) {
+bool swd::analyzer::is_flooding(const swd::request_ptr& request) const {
 	return database_->is_flooding(
 		request->get_client_ip(),
 		request->get_profile()->get_id()

@@ -35,7 +35,7 @@
 #include "database.h"
 #include "log.h"
 
-swd::storage::storage(swd::database_ptr database) :
+swd::storage::storage(const swd::database_ptr& database) :
  database_(database),
  stop_(false) {
 }
@@ -55,7 +55,7 @@ void swd::storage::stop() {
 	worker_thread_.join();
 }
 
-void swd::storage::add(swd::request_ptr request) {
+void swd::storage::add(const swd::request_ptr& request) {
 	/* Mutex to avoid race conditions. */
 	boost::unique_lock<boost::mutex> scoped_lock(queue_mutex_);
 
@@ -104,7 +104,7 @@ void swd::storage::process_next() {
 	}
 }
 
-void swd::storage::save(swd::request_ptr request) {
+void swd::storage::save(const swd::request_ptr& request) {
 	int request_id;
 
 	try {
@@ -128,7 +128,7 @@ void swd::storage::save(swd::request_ptr request) {
 	}
 
 	/* Save all hashes of the request. */
-	swd::hashes& hashes = request->get_hashes();
+	swd::hashes hashes = request->get_hashes();
 
 	for (swd::hashes::iterator it_hash = hashes.begin(); it_hash != hashes.end(); it_hash++) {
 		swd::hash_ptr hash((*it_hash).second);
@@ -164,7 +164,7 @@ void swd::storage::save(swd::request_ptr request) {
 	}
 
 	/* Now iterate over all parameters. */
-	swd::parameters& parameters = request->get_parameters();
+	swd::parameters parameters = request->get_parameters();
 
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
@@ -178,8 +178,8 @@ void swd::storage::save(swd::request_ptr request) {
 				parameter->get_path(),
 				parameter->get_value(),
 				(request->get_profile()->is_whitelist_enabled() ? parameter->get_total_whitelist_rules() : -1),
-				(parameter->get_critical_blacklist_impact() ? 1 : 0 ),
-				(parameter->get_threat() ? 1 : 0 )
+				(parameter->has_critical_blacklist_impact() ? 1 : 0 ),
+				(parameter->is_threat() ? 1 : 0 )
 			);
 		} catch (swd::exceptions::database_exception& e) {
 			swd::log::i()->send(swd::uncritical_error, e.what());

@@ -38,7 +38,7 @@
 #include "daemon.h"
 #include "shared.h"
 
-void swd::daemon::set_user(std::string user) {
+void swd::daemon::set_user(const std::string& user) {
 	struct passwd *u = getpwnam(user.c_str());
 
 	if (!u) {
@@ -50,7 +50,7 @@ void swd::daemon::set_user(std::string user) {
 	}
 }
 
-void swd::daemon::set_group(std::string group) {
+void swd::daemon::set_group(const std::string& group) {
 	if (setgroups(0, NULL) == -1) {
 		throw swd::exceptions::core_exception("setgroups() failed");
 	}
@@ -66,7 +66,7 @@ void swd::daemon::set_group(std::string group) {
 	}
 }
 
-void swd::daemon::write_pid(std::string file) {
+void swd::daemon::write_pid(const std::string& file) {
 	std::ofstream out_file(file.c_str());
 
 	if (!out_file.is_open()) {
@@ -77,7 +77,7 @@ void swd::daemon::write_pid(std::string file) {
 	out_file.close();
 }
 
-void swd::daemon::change_root(std::string directory) {
+void swd::daemon::change_root(const std::string& directory) {
 	if (chroot(directory.c_str()) < 0) {
 		throw swd::exceptions::core_exception("chroot() failed");
 	}

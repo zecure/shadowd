@@ -39,14 +39,14 @@
 #include "storage.h"
 #include "log.h"
 
-swd::request_handler::request_handler(swd::request_ptr request,
- swd::analyzer_ptr analyzer, swd::storage_ptr storage) :
+swd::request_handler::request_handler(const swd::request_ptr& request,
+ const swd::analyzer_ptr& analyzer, const swd::storage_ptr& storage) :
  request_(request),
  analyzer_(analyzer),
  storage_(storage) {
 }
 
-bool swd::request_handler::valid_signature() {
+bool swd::request_handler::valid_signature() const {
 	try {
 		/* Prepare secret key for hmac. */
 		std::string key = request_->get_profile()->get_key();
@@ -57,13 +57,13 @@ bool swd::request_handler::valid_signature() {
 		);
 
 		/* Transform user mac from lower case hex to binary. */
-		std::string mac;
+		std::string user_mac;
 
 		CryptoPP::StringSource(
 			request_->get_signature(),
 			true, /* pumpAll */
 			new CryptoPP::HexDecoder(
-				new CryptoPP::StringSink(mac)
+				new CryptoPP::StringSink(user_mac)
 			)
 		);
 
@@ -71,8 +71,8 @@ bool swd::request_handler::valid_signature() {
 		bool result = false;
 
 		CryptoPP::StringSource ss(
-			request_->get_content() + mac,
-			true, 
+			request_->get_content() + user_mac,
+			true, /* pumpAll */
 			new CryptoPP::HashVerificationFilter(
 				hmac,
 				new CryptoPP::ArraySink((byte*)&result, sizeof(result)),
@@ -180,7 +180,7 @@ bool swd::request_handler::decode() {
 }
 
 void swd::request_handler::process() {
-	/* Analyze the request with the black- and whitelist. */
+	/* Analyze the request and its parameters. */
 	analyzer_->scan(request_);
 
 	/**
@@ -188,23 +188,23 @@ void swd::request_handler::process() {
 	 * is at least one threat or if learning is enabled the complete request gets
 	 * recorded permanently.
 	 */
-	if (request_->get_threat() || request_->has_threats() ||
+	if (request_->is_threat() || request_->has_threats() ||
 	 (request_->get_profile()->get_mode() == MODE_LEARNING)) {
 		storage_->add(request_);
 	}
 }
 
-std::vector<std::string> swd::request_handler::get_threats() {
+std::vector<std::string> swd::request_handler::get_threats() const {
 	std::vector<std::string> threats;
 
-	swd::parameters& parameters = request_->get_parameters();
+	swd::parameters parameters = request_->get_parameters();
 
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
 		/* Save the iterators in variables for the sake of readability. */
 		swd::parameter_ptr parameter(*it_parameter);
 
-		if (parameter->get_threat()) {
+		if (parameter->is_threat()) {
 			threats.push_back(parameter->get_path());
 		}
 	}

@@ -48,35 +48,35 @@ namespace swd {
 			 *
 			 * @param id The id of the filter
 			 */
-			void set_id(int id);
+			void set_id(const int& id);
 
 			/**
 			 * @brief Get the id of the filter.
 			 *
 			 * @return The id of the filter
 			 */
-			int get_id();
+			int get_id() const;
 
 			/**
 			 * @brief Set the impact of the filter.
 			 *
 			 * @param impact The impact of the filter
 			 */
-			void set_impact(int impact);
+			void set_impact(const int& impact);
 
 			/**
 			 * @brief Get the impact of the filter.
 			 *
 			 * @return The impact of the filter
 			 */
-			int get_impact();
+			int get_impact() const;
 
 			/**
 			 * @brief Set the regular expression of the filter.
 			 *
 			 * @param regex The regular expression of the filter
 			 */
-			void set_regex(std::string regex);
+			void set_regex(const std::string& regex);
 
 			/**
 			 * @brief Test for input if the regular expression matches.
@@ -84,11 +84,22 @@ namespace swd {
 			 * @param input The string that should be tested
 			 * @return The result of the test
 			 */
-			bool matches(std::string input);
+			bool matches(const std::string& input) const;
 
 		private:
+			/**
+			 * @brief The database id of the filter.
+			 */
 			int id_;
+
+			/**
+			 * @brief The impact/severity of the filter.
+			 */
 			int impact_;
+
+			/**
+			 * @brief The regular expression of the filter.
+			 */
 			boost::regex regex_;
 	};
 

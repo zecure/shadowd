@@ -220,7 +220,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		std::vector<std::string> threats;
 
 		try {
-			swd::parameters& parameters = request_->get_parameters();
+			swd::parameters parameters = request_->get_parameters();
 
 			/**
 			 * Check security limitations first.
@@ -272,7 +272,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		}
 
 		if (request_->get_profile()->get_mode() == MODE_ACTIVE) {
-			if (request_->get_threat()) {
+			if (request_->is_threat()) {
 				reply_->set_status(STATUS_BAD_REQUEST);
 			} else if (request_->has_threats()) {
 				reply_->set_threats(request_handler.get_threats());

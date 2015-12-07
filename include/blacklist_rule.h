@@ -46,31 +46,38 @@ namespace swd {
 			 *
 			 * @param id The id of the rule
 			 */
-			void set_id(int id);
+			void set_id(const int& id);
 
 			/**
 			 * @brief Get the id the rule.
 			 *
 			 * @return The id of the rule
 			 */
-			int get_id();
+			int get_id() const;
 
 			/**
 			 * @brief Get the threshold of the rule.
 			 *
 			 * @param threshold The threshold of the rule
 			 */
-			void set_threshold(int threshold);
+			void set_threshold(const int& threshold);
 
 			/**
 			 * @brief Get the threshold of the rule.
 			 *
 			 * @return The threshold of the rule
 			 */
-			int get_threshold();
+			int get_threshold() const;
 
 		private:
+			/**
+			 * @brief The database id of the rule.
+			 */
 			int id_;
+
+			/**
+			 * @brief The threshold of the rule.
+			 */
 			int threshold_;
 	};
 

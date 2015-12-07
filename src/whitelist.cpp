@@ -34,12 +34,12 @@
 #include "database.h"
 #include "log.h"
 
-swd::whitelist::whitelist(swd::cache_ptr cache)
+swd::whitelist::whitelist(const swd::cache_ptr& cache)
  : cache_(cache) {
 }
 
-void swd::whitelist::scan(swd::request_ptr request) {
-	swd::parameters& parameters = request->get_parameters();
+void swd::whitelist::scan(swd::request_ptr& request) {
+	swd::parameters parameters = request->get_parameters();
 
 	/* Iterate over all parameters. */
 	for (swd::parameters::iterator it_parameter = parameters.begin();

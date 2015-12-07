@@ -31,26 +31,26 @@
 
 #include "integrity_rule.h"
 
-void swd::integrity_rule::set_id(int id) {
+void swd::integrity_rule::set_id(const int& id) {
 	id_ = id;
 }
 
-int swd::integrity_rule::get_id() {
+int swd::integrity_rule::get_id() const {
 	return id_;
 }
 
-void swd::integrity_rule::set_algorithm(std::string algorithm) {
+void swd::integrity_rule::set_algorithm(const std::string& algorithm) {
 	algorithm_ = algorithm;
 }
 
-std::string swd::integrity_rule::get_algorithm() {
+std::string swd::integrity_rule::get_algorithm() const {
 	return algorithm_;
 }
 
-void swd::integrity_rule::set_digest(std::string digest) {
+void swd::integrity_rule::set_digest(const std::string& digest) {
 	digest_ = digest;
 }
 
-std::string swd::integrity_rule::get_digest() {
+std::string swd::integrity_rule::get_digest() const {
 	return digest_;
 }

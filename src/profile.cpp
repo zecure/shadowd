@@ -31,74 +31,74 @@
 
 #include "profile.h"
 
-void swd::profile::set_server_ip(std::string server_ip) {
+void swd::profile::set_server_ip(const std::string& server_ip) {
 	server_ip_ = server_ip;
 }
 
-std::string swd::profile::get_server_ip() {
+std::string swd::profile::get_server_ip() const {
 	return server_ip_;
 }
 
-void swd::profile::set_id(int id) {
+void swd::profile::set_id(const int& id) {
 	id_ = id;
 }
 
-int swd::profile::get_id() {
+int swd::profile::get_id() const {
 	return id_;
 }
 
-void swd::profile::set_mode(int mode) {
+void swd::profile::set_mode(const int& mode) {
 	mode_ = mode;
 }
 
-int swd::profile::get_mode() {
+int swd::profile::get_mode() const {
 	return mode_;
 }
 
-void swd::profile::set_whitelist_enabled(bool whitelist_enabled) {
+void swd::profile::set_whitelist_enabled(const bool& whitelist_enabled) {
 	whitelist_enabled_ = whitelist_enabled;
 }
 
-bool swd::profile::is_whitelist_enabled() {
+bool swd::profile::is_whitelist_enabled() const {
 	return whitelist_enabled_;
 }
 
-void swd::profile::set_blacklist_enabled(bool blacklist_enabled) {
+void swd::profile::set_blacklist_enabled(const bool& blacklist_enabled) {
 	blacklist_enabled_ = blacklist_enabled;
 }
 
-bool swd::profile::is_blacklist_enabled() {
+bool swd::profile::is_blacklist_enabled() const {
 	return blacklist_enabled_;
 }
 
-void swd::profile::set_integrity_enabled(bool integrity_enabled) {
+void swd::profile::set_integrity_enabled(const bool& integrity_enabled) {
 	integrity_enabled_ = integrity_enabled;
 }
 
-bool swd::profile::is_integrity_enabled() {
+bool swd::profile::is_integrity_enabled() const {
 	return integrity_enabled_;
 }
 
-void swd::profile::set_flooding_enabled(bool flooding_enabled) {
+void swd::profile::set_flooding_enabled(const bool& flooding_enabled) {
 	flooding_enabled_ = flooding_enabled;
 }
 
-bool swd::profile::is_flooding_enabled() {
+bool swd::profile::is_flooding_enabled() const {
 	return flooding_enabled_;
 }
 
-void swd::profile::set_key(std::string key) {
+void swd::profile::set_key(const std::string& key) {
 	key_ = key;
 }
 
-std::string swd::profile::get_key() {
+std::string swd::profile::get_key() const {
 	return key_;
 }
 
-void swd::profile::set_blacklist_threshold(int blacklist_threshold) {
+void swd::profile::set_blacklist_threshold(const int& blacklist_threshold) {
 	blacklist_threshold_ = blacklist_threshold;
 }
 
-int swd::profile::get_blacklist_threshold() {
+int swd::profile::get_blacklist_threshold() const {
 	return blacklist_threshold_;
 }

@@ -50,14 +50,14 @@ namespace swd {
 			 *
 			 * @param status The status code of the reply
 			 */
-			void set_status(int status);
+			void set_status(const int& status);
 
 			/**
 			 * @brief Get the status code of the reply.
 			 *
 			 * @return The status code of the reply
 			 */
-			int get_status();
+			int get_status() const;
 
 			/**
 			 * @brief Set a list of threat paths.
@@ -65,26 +65,26 @@ namespace swd {
 			 * @param threats A list of paths strings of parameters that were
 			 *  classified as threats.
 			 */
-			void set_threats(std::vector<std::string> threats);
+			void set_threats(const std::vector<std::string>& threats);
 
 			/**
 			 * @brief Get the list of threat paths.
 			 */
-			std::vector<std::string> get_threats();
+			std::vector<std::string> get_threats() const;
 
 			/**
 			 * @brief Set the content that gets send back to the http server.
 			 *
 			 * @param content The output content
 			 */
-			void set_content(std::string content);
+			void set_content(const std::string& content);
 
 			/**
 			 * @brief Get the content that gets send back to the http server.
 			 *
 			 * @return The output content
 			 */
-			std::string get_content();
+			std::string get_content() const;
 
 			/**
 			 * @brief Convert the reply into a vector of buffers.
@@ -95,11 +95,22 @@ namespace swd {
 			 *
 			 * @return The output that gets send back to the http server
 			 */
-			std::vector<boost::asio::const_buffer> to_buffers();
+			std::vector<boost::asio::const_buffer> to_buffers() const;
 
 		private:
+			/**
+			 * @brief The status of the reply.
+			 */
 			int status_;
+
+			/**
+			 * @brief The paths of dangerous parameters.
+			 */
 			std::vector<std::string> threats_;
+
+			/**
+			 * @brief The json-encoded content of the reply.
+			 */
 			std::string content_;
 	};
 

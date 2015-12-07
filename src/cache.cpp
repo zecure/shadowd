@@ -31,7 +31,7 @@
 
 #include "cache.h"
 
-swd::cache::cache(swd::database_ptr database) :
+swd::cache::cache(const swd::database_ptr& database) :
  database_(database) {
 }
 
@@ -43,7 +43,8 @@ void swd::cache::reset() {
 	integrity_rules_.clear();
 }
 
-swd::profile_ptr swd::cache::get_profile(std::string server_ip, int profile_id) {
+swd::profile_ptr swd::cache::get_profile(const std::string& server_ip,
+ const int& profile_id) {
 	boost::unique_lock<boost::mutex> scoped_lock(profiles_mutex_);
 
 	swd::tuple_is key = std::make_tuple(profile_id, server_ip);
@@ -58,8 +59,8 @@ swd::profile_ptr swd::cache::get_profile(std::string server_ip, int profile_id) 
 	return profile;
 }
 
-swd::blacklist_rules swd::cache::get_blacklist_rules(int profile_id,
- std::string caller, std::string path) {
+swd::blacklist_rules swd::cache::get_blacklist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path) {
 	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
 
 	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
@@ -94,8 +95,8 @@ swd::blacklist_filters swd::cache::get_blacklist_filters() {
 	return blacklist_filters_;
 }
 
-swd::whitelist_rules swd::cache::get_whitelist_rules(int profile_id,
- std::string caller, std::string path) {
+swd::whitelist_rules swd::cache::get_whitelist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path) {
 	boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
 
 	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
@@ -114,8 +115,8 @@ swd::whitelist_rules swd::cache::get_whitelist_rules(int profile_id,
 	return whitelist_rules;
 }
 
-swd::integrity_rules swd::cache::get_integrity_rules(int profile_id,
- std::string caller) {
+swd::integrity_rules swd::cache::get_integrity_rules(const int& profile_id,
+ const std::string& caller) {
 	boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
 
 	swd::tuple_is key = std::make_tuple(profile_id, caller);

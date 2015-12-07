@@ -45,17 +45,20 @@ namespace swd {
 			 *
 			 * @param reply The pointer to the reply object
 			 */
-			reply_handler(swd::reply_ptr reply);
+			reply_handler(const swd::reply_ptr& reply);
 
 			/**
-			 * @brief Encode the content of the reply with json and save the encoded
-			 *  version also in the reply.
+			 * @brief Encode the data of the reply with json and save the
+			 *  encoded version in the reply.
 			 *
-			 * @return The status of the json encoding
+			 * @return The status of the encoding
 			 */
 			bool encode();
 
 		private:
+			/**
+			 * @brief reply The pointer to the reply object.
+			 */
 			swd::reply_ptr reply_;
 	};
 }

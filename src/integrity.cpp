@@ -35,11 +35,11 @@
 #include "database.h"
 #include "log.h"
 
-swd::integrity::integrity(swd::cache_ptr cache)
+swd::integrity::integrity(const swd::cache_ptr& cache)
  : cache_(cache) {
 }
 
-void swd::integrity::scan(swd::request_ptr request) {
+void swd::integrity::scan(swd::request_ptr& request) {
 	/* Import the rules from the database. */
 	swd::integrity_rules rules = cache_->get_integrity_rules(
 		request->get_profile()->get_id(),

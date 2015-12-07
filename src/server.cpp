@@ -41,8 +41,8 @@
 #include "log.h"
 #include "shared.h"
 
-swd::server::server(swd::analyzer_ptr analyzer, swd::storage_ptr storage,
- swd::cache_ptr cache) :
+swd::server::server(const swd::analyzer_ptr& analyzer, const swd::storage_ptr& storage,
+ const swd::cache_ptr& cache) :
  analyzer_(analyzer),
  storage_(storage),
  cache_(cache),

@@ -102,7 +102,7 @@ void swd::config::parse_command_line(int argc, char** argv) {
 	}
 }
 
-void swd::config::parse_config_file(std::string file) {
+void swd::config::parse_config_file(const std::string& file) {
 	std::ifstream ifs(file.c_str());
 
 	if (!ifs) {
@@ -124,7 +124,7 @@ void swd::config::parse_config_file(std::string file) {
 	ifs.close();
 }
 
-void swd::config::validate() {
+void swd::config::validate() const {
 	if (!this->defined("threads") || (this->get<int>("threads") < 1)) {
 		throw swd::exceptions::config_exception("threadpool must be greater than zero");
 	}

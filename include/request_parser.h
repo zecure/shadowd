@@ -80,7 +80,8 @@ namespace swd {
 			 * @param request The pointer to the request object
 			 * @param input The current character
 			 */
-			boost::tribool consume(swd::request_ptr request, char input);
+			boost::tribool consume(const swd::request_ptr& request,
+			 const char& input);
 
 			/**
 			 * @brief The current state of the parser.

@@ -31,18 +31,18 @@
 
 #include "blacklist_rule.h"
 
-void swd::blacklist_rule::set_id(int id) {
+void swd::blacklist_rule::set_id(const int& id) {
 	id_ = id;
 }
 
-int swd::blacklist_rule::get_id() {
+int swd::blacklist_rule::get_id() const {
 	return id_;
 }
 
-void swd::blacklist_rule::set_threshold(int threshold) {
+void swd::blacklist_rule::set_threshold(const int& threshold) {
 	threshold_ = threshold;
 }
 
-int swd::blacklist_rule::get_threshold() {
+int swd::blacklist_rule::get_threshold() const {
 	return threshold_;
 }

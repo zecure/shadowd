@@ -29,6 +29,8 @@
  * files in the program, then also delete it here.
  */
 
+#include <sstream>
+
 #include "request.h"
 
 swd::request::request() :
@@ -36,119 +38,121 @@ swd::request::request() :
  total_integrity_rules_(0) {
 }
 
-void swd::request::set_profile(swd::profile_ptr profile) {
+void swd::request::set_profile(const swd::profile_ptr& profile) {
 	profile_ = profile;
 }
 
-swd::profile_ptr swd::request::get_profile() {
+swd::profile_ptr swd::request::get_profile() const {
 	return profile_;
 }
 
-void swd::request::add_parameter(swd::parameter_ptr parameter) {
+void swd::request::add_parameter(const swd::parameter_ptr& parameter) {
 	parameters_.push_back(parameter);
 }
 
-void swd::request::add_parameter(std::string path, std::string value) {
-	swd::parameter_ptr parameter(new swd::parameter());
+void swd::request::add_parameter(const std::string& path, const std::string& value) {
+	swd::parameter_ptr parameter(new swd::parameter);
 	parameter->set_path(path);
 	parameter->set_value(value);
 
 	parameters_.push_back(parameter);
 }
 
-swd::parameters& swd::request::get_parameters() {
+const swd::parameters& swd::request::get_parameters() const {
 	return parameters_;
 }
 
-void swd::request::append_content(char input) {
+void swd::request::append_content(const char& input) {
 	content_.push_back(input);
 }
 
-void swd::request::set_content(std::string content) {
+void swd::request::set_content(const std::string& content) {
 	content_ = content;
 }
 
-std::string swd::request::get_content() {
+std::string swd::request::get_content() const {
 	return content_;
 }
 
-void swd::request::append_signature(char input) {
+void swd::request::append_signature(const char& input) {
 	signature_.push_back(input);
 }
 
-void swd::request::set_signature(std::string signature) {
+void swd::request::set_signature(const std::string& signature) {
 	signature_ = signature;
 }
 
-std::string swd::request::get_signature() {
+std::string swd::request::get_signature() const {
 	return signature_;
 }
 
-void swd::request::append_profile_id(char input) {
+void swd::request::append_profile_id(const char& input) {
 	profile_id_.push_back(input);
 }
 
-void swd::request::set_profile_id(int profile_id) {
-	profile_id_ = profile_id;
+void swd::request::set_profile_id(const int& profile_id) {
+	std::stringstream ss;
+	ss << profile_id;
+	profile_id_ = ss.str();
 }
 
-int swd::request::get_profile_id() {
+int swd::request::get_profile_id() const {
 	return atoi(profile_id_.c_str());
 }
 
-void swd::request::set_client_ip(std::string client_ip) {
+void swd::request::set_client_ip(const std::string& client_ip) {
 	client_ip_ = client_ip;
 }
 
-std::string swd::request::get_client_ip() {
+std::string swd::request::get_client_ip() const {
 	return client_ip_;
 }
 
-void swd::request::set_caller(std::string caller) {
+void swd::request::set_caller(const std::string& caller) {
 	caller_ = caller;
 }
 
-std::string swd::request::get_caller() {
+std::string swd::request::get_caller() const {
 	return caller_;
 }
 
-void swd::request::set_resource(std::string resource) {
+void swd::request::set_resource(const std::string& resource) {
 	resource_ = resource;
 }
 
-std::string swd::request::get_resource() {
+std::string swd::request::get_resource() const {
 	return resource_;
 }
 
-void swd::request::add_integrity_rule(swd::integrity_rule_ptr rule) {
+void swd::request::add_integrity_rule(const swd::integrity_rule_ptr& rule) {
 	integrity_rules_.push_back(rule);
 }
 
-const swd::integrity_rules& swd::request::get_integrity_rules() {
+const swd::integrity_rules& swd::request::get_integrity_rules() const {
 	return integrity_rules_;
 }
 
-void swd::request::set_total_integrity_rules(int total_integrity_rules) {
+void swd::request::set_total_integrity_rules(const int& total_integrity_rules) {
 	total_integrity_rules_ = total_integrity_rules;
 }
 
-int swd::request::get_total_integrity_rules() {
+int swd::request::get_total_integrity_rules() const {
 	return total_integrity_rules_;
 }
 
-void swd::request::add_hash(std::string algorithm, std::string digest) {
-	swd::hash_ptr hash(new swd::hash());
+void swd::request::add_hash(const std::string& algorithm, const std::string& digest) {
+	swd::hash_ptr hash(new swd::hash);
 	hash->set_algorithm(algorithm);
 	hash->set_digest(digest);
 
 	hashes_[algorithm] = hash;
 }
 
-swd::hashes& swd::request::get_hashes() {
+const swd::hashes& swd::request::get_hashes() const {
 	return hashes_;
 }
 
-swd::hash_ptr swd::request::get_hash(std::string algorithm) {
+swd::hash_ptr swd::request::get_hash(const std::string& algorithm) /*const*/ {
 	/* Necessary, otherwise element is created. */
 	if (hashes_.find(algorithm) == hashes_.end()) {
 		return swd::hash_ptr();
@@ -157,22 +161,22 @@ swd::hash_ptr swd::request::get_hash(std::string algorithm) {
 	return hashes_[algorithm];
 }
 
-void swd::request::set_threat(bool threat) {
+void swd::request::set_threat(const bool& threat) {
 	threat_ = threat;
 }
 
-bool swd::request::get_threat() {
+bool swd::request::is_threat() const {
 	return threat_;
 }
 
-bool swd::request::has_threats() {
+bool swd::request::has_threats() const {
 	/* Iterate over all parameters and check for threats. */
-	for (swd::parameters::iterator it_parameter = parameters_.begin();
+	for (swd::parameters::const_iterator it_parameter = parameters_.begin();
 	 it_parameter != parameters_.end(); it_parameter++) {
 		swd::parameter_ptr parameter(*it_parameter);
 
 		/* We only need to know if there is at least one threat. */
-		if (parameter->get_threat()) {
+		if (parameter->is_threat()) {
 			return true;
 		}
 	}

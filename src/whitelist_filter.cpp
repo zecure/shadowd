@@ -31,18 +31,18 @@
 
 #include "whitelist_filter.h"
 
-void swd::whitelist_filter::set_id(int id) {
+void swd::whitelist_filter::set_id(const int& id) {
 	id_ = id;
 }
 
-int swd::whitelist_filter::get_id() {
+int swd::whitelist_filter::get_id() const {
 	return id_;
 }
 
-void swd::whitelist_filter::set_regex(std::string regex) {
+void swd::whitelist_filter::set_regex(const std::string& regex) {
 	regex_.set_expression(regex, boost::regex::icase | boost::regex::mod_s);
 }
 
-bool swd::whitelist_filter::matches(std::string input) {
+bool swd::whitelist_filter::matches(const std::string& input) const {
 	return regex_search(input, regex_);
 }

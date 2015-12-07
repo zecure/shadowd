@@ -36,7 +36,7 @@
 #include "log.h"
 #include "config.h"
 
-void swd::log::open_file(std::string file) {
+void swd::log::open_file(const std::string& file) {
 	/* Use mutex to avoid race conditions. */
 	boost::unique_lock<boost::mutex> scoped_lock(mutex_);
 
@@ -44,7 +44,7 @@ void swd::log::open_file(std::string file) {
 	file_ = file;
 }
 
-void swd::log::send(swd::log_level level, std::string message) {
+void swd::log::send(const swd::log_level& level, const std::string& message) {
 	/* Skip warning & notice if verbose is not enabled. */
 	if (!swd::config::i()->defined("verbose")) {
 		if ((level == warning) || (level == notice)) {
@@ -92,7 +92,7 @@ void swd::log::send(swd::log_level level, std::string message) {
 	}
 }
 
-std::string swd::log::get_current_time() {
+std::string swd::log::get_current_time() const {
 	time_t now = time(0);
 	char buf[80];
 	struct tm tstruct = *localtime(&now);

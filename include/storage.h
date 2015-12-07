@@ -49,7 +49,7 @@ namespace swd {
 			 *
 			 * @param database The pointer to the database object
 			 */
-			storage(swd::database_ptr database);
+			storage(const swd::database_ptr& database);
 
 			/**
 			 * @brief Start insert thread.
@@ -66,7 +66,7 @@ namespace swd {
 			 *
 			 * @param request The pointer to the request object
 			 */
-			void add(swd::request_ptr request);
+			void add(const swd::request_ptr& request);
 
 		private:
 			/**
@@ -79,7 +79,7 @@ namespace swd {
 			 *
 			 * @param request The pointer to the request object
 			 */
-			void save(swd::request_ptr request);
+			void save(const swd::request_ptr& request);
 
 			/**
 			 * @brief Request queue for performance improvements.

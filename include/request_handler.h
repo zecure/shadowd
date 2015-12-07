@@ -52,15 +52,15 @@ namespace swd {
 			 * @param analyzer The pointer to the analyzer object
 			 * @param storage The pointer to the storage object
 			 */
-			request_handler(swd::request_ptr request, swd::analyzer_ptr analyzer,
-			 swd::storage_ptr storage);
+			request_handler(const swd::request_ptr& request,
+			 const swd::analyzer_ptr& analyzer, const swd::storage_ptr& storage);
 
 			/**
 			 * @brief Check if the signature of the request is valid.
 			 *
 			 * @return Status of hmac check
 			 */
-			bool valid_signature();
+			bool valid_signature() const;
 
 			/**
 			 * @brief Decode the json string.
@@ -79,11 +79,22 @@ namespace swd {
 			 *
 			 * @return A list of all paths that should be protected
 			 */
-			std::vector<std::string> get_threats();
+			std::vector<std::string> get_threats() const;
 
 		private:
+			/**
+			 * @brief The pointer to the request object.
+			 */
 			swd::request_ptr request_;
+
+			/**
+			 * @brief The pointer to the analyzer object.
+			 */
 			swd::analyzer_ptr analyzer_;
+
+			/**
+			 * @brief The pointer to the storage object.
+			 */
 			swd::storage_ptr storage_;
 	};
 }

@@ -37,7 +37,8 @@ swd::request_parser::request_parser() :
  state_(profile) {
 }
 
-boost::tribool swd::request_parser::consume(swd::request_ptr request, char input) {
+boost::tribool swd::request_parser::consume(const swd::request_ptr& request,
+ const char& input) {
 	switch (state_) {
 		case profile:
 			if (input == '\n') {

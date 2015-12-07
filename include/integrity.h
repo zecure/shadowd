@@ -46,7 +46,7 @@ namespace swd {
 			 *
 			 * @param cache The pointer to the cache object
 			 */
-			integrity(swd::cache_ptr cache);
+			integrity(const swd::cache_ptr& cache);
 
 			/**
 			 * @brief Scan all parameters in the request and add connections to broken
@@ -54,9 +54,12 @@ namespace swd {
 			 *
 			 * @param request The pointer to the request object
 			 */
-			void scan(swd::request_ptr request);
+			void scan(swd::request_ptr& request);
 
 		private:
+			/**
+			 * @brief The pointer to the cache object.
+			 */
 			swd::cache_ptr cache_;
 	};
 }

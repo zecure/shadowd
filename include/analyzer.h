@@ -48,14 +48,15 @@ namespace swd {
 			 * @param database The pointer to the database object
 			 * @param cache The pointer to the cache object
 			 */
-			analyzer(swd::database_ptr database, swd::cache_ptr cache);
+			analyzer(const swd::database_ptr& database,
+			 const swd::cache_ptr& cache);
 
 			/**
 			 * @brief Start the analysis and write results into the request object.
 			 *
 			 * @param request The pointer to the request object
 			 */
-			void scan(swd::request_ptr request);
+			void scan(swd::request_ptr& request);
 
 			/**
 			 * @brief Get the flooding status of the request.
@@ -63,10 +64,17 @@ namespace swd {
 			 * @param request The pointer to the request object
 			 * @return The status of the flooding check
 			 */
-			bool is_flooding(swd::request_ptr request);
+			bool is_flooding(const swd::request_ptr& request) const;
 
 		private:
+			/**
+			 * @brief The pointer to the database object.
+			 */
 			swd::database_ptr database_;
+
+			/**
+			 * @brief The pointer to the cache object.
+			 */
 			swd::cache_ptr cache_;
 	};
 

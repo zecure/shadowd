@@ -36,7 +36,7 @@
 #include "reply_handler.h"
 #include "log.h"
 
-swd::reply_handler::reply_handler(swd::reply_ptr reply) :
+swd::reply_handler::reply_handler(const swd::reply_ptr& reply) :
  reply_(reply) {
 }
 

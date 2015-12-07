@@ -32,13 +32,13 @@
 #include "blacklist.h"
 #include "log.h"
 
-swd::blacklist::blacklist(swd::cache_ptr cache)
+swd::blacklist::blacklist(const swd::cache_ptr& cache)
  : cache_(cache) {
 }
 
-void swd::blacklist::scan(swd::request_ptr request) {
+void swd::blacklist::scan(swd::request_ptr& request) {
 	swd::blacklist_filters filters = cache_->get_blacklist_filters();
-	swd::parameters& parameters = request->get_parameters();
+	swd::parameters parameters = request->get_parameters();
 
 	/* Iterate over all parameters and check every filter. */
 	for (swd::parameters::iterator it_parameter = parameters.begin();

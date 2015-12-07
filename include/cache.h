@@ -61,7 +61,7 @@ namespace swd {
 			 *
 			 * @param database The pointer to the database object
 			 */
-			cache(swd::database_ptr database);
+			cache(const swd::database_ptr& database);
 
 			/**
 			 * @brief Removes all elements from the cache.
@@ -75,7 +75,8 @@ namespace swd {
 			 * @param profile_id The database id of the profile
 			 * @return The corresponding table row
 			 */
-			swd::profile_ptr get_profile(std::string server_ip, int profile_id);
+			swd::profile_ptr get_profile(const std::string& server_ip,
+			 const int& profile_id);
 
 			/**
 			 * @brief Get blacklist rules.
@@ -85,8 +86,8 @@ namespace swd {
 			 * @param path The path of the parameter
 			 * @return The corresponding table rows
 			 */
-			swd::blacklist_rules get_blacklist_rules(int profile_id,
-			 std::string caller, std::string path);
+			swd::blacklist_rules get_blacklist_rules(const int& profile_id,
+			 const std::string& caller, const std::string& path);
 
 			/**
 			 * @brief Get all blacklist filters.
@@ -103,8 +104,8 @@ namespace swd {
 			 * @param path The path of the parameter
 			 * @return The corresponding table rows
 			 */
-			swd::whitelist_rules get_whitelist_rules(int profile_id,
-			 std::string caller, std::string path);
+			swd::whitelist_rules get_whitelist_rules(const int& profile_id,
+			 const std::string& caller, const std::string& path);
 
 			/**
 			 * @brief Get integrity rules.
@@ -112,20 +113,63 @@ namespace swd {
 			 * @param profile_id The profile id of the request
 			 * @param caller The caller (resource) that initiated the connection
 			 */
-			swd::integrity_rules get_integrity_rules(int profile_id,
-			 std::string caller);
+			swd::integrity_rules get_integrity_rules(const int& profile_id,
+			 const std::string& caller);
 
 		private:
+			/**
+			 * @brief The pointer to the database object.
+			 */
 			swd::database_ptr database_;
+
+			/**
+			 * @brief The cache map for profiles.
+			 */
 			std::map<swd::tuple_is, swd::profile_ptr> profiles_;
+
+			/**
+			 * @brief The cache map for blacklist rules.
+			 */
 			std::map<swd::tuple_iss, swd::blacklist_rules> blacklist_rules_;
+
+			/**
+			 * @brief The cache vector for blacklist filters.
+			 */
 			swd::blacklist_filters blacklist_filters_;
+
+			/**
+			 * @brief The cache map for whitelist rules.
+			 */
 			std::map<swd::tuple_iss, swd::whitelist_rules> whitelist_rules_;
+
+			/**
+			 * @brief The cache map for integrity rules.
+			 */
 			std::map<swd::tuple_is, swd::integrity_rules> integrity_rules_;
+
+			/**
+			 * @brief The mutex for the profiles.
+			 */
 			boost::mutex profiles_mutex_;
+
+			/**
+			 * @brief The mutex for the blacklist rules.
+			 */
 			boost::mutex blacklist_rules_mutex_;
+
+			/**
+			 * @brief The mutex for the blacklist filters.
+			 */
 			boost::mutex blacklist_filters_mutex_;
+
+			/**
+			 * @brief The mutex for the whitelist rules.
+			 */
 			boost::mutex whitelist_rules_mutex_;
+
+			/**
+			 * @brief The mutex for the integrity rules.
+			 */
 			boost::mutex integrity_rules_mutex_;
 	};
 

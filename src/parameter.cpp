@@ -37,42 +37,42 @@ swd::parameter::parameter() :
  total_whitelist_rules_(0) {
 }
 
-void swd::parameter::set_path(std::string path) {
+void swd::parameter::set_path(const std::string& path) {
 	path_ = path;
 }
 
-std::string swd::parameter::get_path() {
+std::string swd::parameter::get_path() const {
 	return path_;
 }
 
-void swd::parameter::set_value(std::string value) {
+void swd::parameter::set_value(const std::string& value) {
 	value_ = value;
 }
 
-std::string swd::parameter::get_value() {
+std::string swd::parameter::get_value() const {
 	return value_;
 }
 
-void swd::parameter::add_blacklist_filter(swd::blacklist_filter_ptr filter) {
+void swd::parameter::add_blacklist_filter(const swd::blacklist_filter_ptr& filter) {
 	blacklist_filters_.push_back(filter);
 }
 
-const swd::blacklist_filters& swd::parameter::get_blacklist_filters() {
+const swd::blacklist_filters& swd::parameter::get_blacklist_filters() const {
 	return blacklist_filters_;
 }
 
-void swd::parameter::add_whitelist_rule(swd::whitelist_rule_ptr rule) {
+void swd::parameter::add_whitelist_rule(const swd::whitelist_rule_ptr& rule) {
 	whitelist_rules_.push_back(rule);
 }
 
-const swd::whitelist_rules& swd::parameter::get_whitelist_rules() {
+const swd::whitelist_rules& swd::parameter::get_whitelist_rules() const {
 	return whitelist_rules_;
 }
 
-int swd::parameter::get_impact() {
+int swd::parameter::get_impact() const {
 	int impact = 0;
 
-	for (swd::blacklist_filters::iterator it_filter = blacklist_filters_.begin();
+	for (swd::blacklist_filters::const_iterator it_filter = blacklist_filters_.begin();
 	 it_filter != blacklist_filters_.end(); it_filter++) {
 		impact += (*it_filter)->get_impact();
 	}
@@ -80,26 +80,26 @@ int swd::parameter::get_impact() {
 	return impact;
 }
 
-void swd::parameter::set_threat(bool threat) {
+void swd::parameter::set_threat(const bool& threat) {
 	threat_ = threat;
 }
 
-bool swd::parameter::get_threat() {
+bool swd::parameter::is_threat() const {
 	return threat_;
 }
 
-void swd::parameter::set_critical_blacklist_impact(bool critical) {
+void swd::parameter::set_critical_blacklist_impact(const bool& critical) {
 	critical_blacklist_impact_ = critical;
 }
 
-bool swd::parameter::get_critical_blacklist_impact() {
+bool swd::parameter::has_critical_blacklist_impact() const {
 	return critical_blacklist_impact_;
 }
 
-void swd::parameter::set_total_whitelist_rules(int total_whitelist_rules) {
+void swd::parameter::set_total_whitelist_rules(const int& total_whitelist_rules) {
 	total_whitelist_rules_ = total_whitelist_rules;
 }
 
-int swd::parameter::get_total_whitelist_rules() {
+int swd::parameter::get_total_whitelist_rules() const {
 	return total_whitelist_rules_;
 }

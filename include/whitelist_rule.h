@@ -49,35 +49,35 @@ namespace swd {
 			 *
 			 * @param id The id of the rule
 			 */
-			void set_id(int id);
+			void set_id(const int& id);
 
 			/**
 			 * @brief Get the id of the rule.
 			 *
 			 * @return The id of the rule
 			 */
-			int get_id();
+			int get_id() const;
 
 			/**
 			 * @brief Set the whitelist filter of the rule.
 			 *
 			 * @param filter The whitelist filter of the rule
 			 */
-			void set_filter(swd::whitelist_filter_ptr filter);
+			void set_filter(const swd::whitelist_filter_ptr& filter);
 
 			/**
 			 * @brief Set the minimum length of the rule.
 			 *
 			 * @param min_length The minimum length of the rule
 			 */
-			void set_min_length(int min_length);
+			void set_min_length(const int& min_length);
 
 			/**
 			 * @brief Set the maximum length of the rule.
 			 *
 			 * @param max_length The maximum length of the rule
 			 */
-			void set_max_length(int max_length);
+			void set_max_length(const int& max_length);
 
 			/**
 			 * @brief Test for value if the filter matches and if the length is
@@ -86,12 +86,27 @@ namespace swd {
 			 * @param value The string that should be tested
 			 * @return The status of the regular expression and length test
 			 */
-			bool is_adhered_to(std::string value);
+			bool is_adhered_to(const std::string& value) const;
 
 		private:
+			/**
+			 * @brief The database id of the rule.
+			 */
 			int id_;
+
+			/**
+			 * @brief The pointer to the whitelist filter.
+			 */
 			swd::whitelist_filter_ptr filter_;
+
+			/**
+			 * @brief The minimum length of the input.
+			 */
 			int min_length_;
+
+			/**
+			 * @brief The maximum length of the input.
+			 */
 			int max_length_;
 	};
 

@@ -47,46 +47,57 @@ namespace swd {
 			 *
 			 * @param id The id of the rule
 			 */
-			void set_id(int id);
+			void set_id(const int& id);
 
 			/**
 			 * @brief Get the id the rule.
 			 *
 			 * @return The id of the rule
 			 */
-			int get_id();
+			int get_id() const;
 
 			/**
 			 * @brief Set the hash algorithm of the rule
 			 *
 			 * @param algorithm The hash algorithm of the rule
 			 */
-			void set_algorithm(std::string algorithm);
+			void set_algorithm(const std::string& algorithm);
 
 			/**
 			 * @brief Get the hash algorithm of the rule
 			 *
 			 * @return The hash algorithm of the rule
 			 */
-			std::string get_algorithm();
+			std::string get_algorithm() const;
 
 			/**
 			 * @brief Set the hash digest of the rule
 			 *
 			 * @param digest The hash digest of the rule
 			 */
-			void set_digest(std::string digest);
+			void set_digest(const std::string& digest);
 
 			/**
 			 * @brief Get the hash digest of the rule
 			 *
 			 * @return The hash digest of the rule
 			 */
-			std::string get_digest();
+			std::string get_digest() const;
 
 		private:
+			/**
+			 * @brief The database id of the rule.
+			 */
 			int id_;
+
+			/**
+			 * @brief The algorithm of the rule.
+			 */
 			std::string algorithm_;
+
+			/**
+			 * @brief The digest of the rule.
+			 */
 			std::string digest_;
 	};
 

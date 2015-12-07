@@ -60,7 +60,7 @@ namespace swd {
 			 *
 			 * @param file The file that the logs get written to
 			 */
-			void open_file(std::string file);
+			void open_file(const std::string& file);
 
 			/**
 			 * @brief Log a message.
@@ -68,13 +68,15 @@ namespace swd {
 			 * @param level The severity of the log
 			 * @param message The message of the log
 			 */
-			void send(swd::log_level level, std::string message);
+			void send(const swd::log_level& level, const std::string& message);
 
 		private:
 			/**
 			 * @brief Get the current date and time as string.
+			 *
+			 * @return The current date and time in a readable format
 			 */
-			std::string get_current_time();
+			std::string get_current_time() const;
 
 			/**
 			 * @brief The log file. If empty stderr is used instead.
@@ -82,7 +84,7 @@ namespace swd {
 			std::string file_;
 
 			/**
-			 * @brief Mutex for output.
+			 * @brief The mutex for the output.
 			 */
 			boost::mutex mutex_;
 	};

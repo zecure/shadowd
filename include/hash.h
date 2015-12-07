@@ -47,31 +47,38 @@ namespace swd {
 			 *
 			 * @param algorithm The algorithm of the hash
 			 */
-			void set_algorithm(std::string algorithm);
+			void set_algorithm(const std::string& algorithm);
 
 			/**
 			 * @brief Get the algorithm of the hash.
 			 *
 			 * @return The algorithm of the hash
 			 */
-			std::string get_algorithm();
+			std::string get_algorithm() const;
 
 			/**
 			 * @brief Set the digest of the hash.
 			 *
 			 * @param digest The digest of the hash
 			 */
-			void set_digest(std::string digest);
+			void set_digest(const std::string& digest);
 
 			/**
 			 * @brief Get the digest of the hash.
 			 *
 			 * @return The digest of the hash
 			 */
-			std::string get_digest();
+			std::string get_digest() const;
 
 		private:
+			/**
+			 * @brief The algorithm of the hash.
+			 */
 			std::string algorithm_;
+
+			/**
+			 * @brief The digest of the hash.
+			 */
 			std::string digest_;
 	};
 

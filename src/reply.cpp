@@ -31,31 +31,31 @@
 
 #include "reply.h"
 
-void swd::reply::set_status(int status) {
+void swd::reply::set_status(const int& status) {
 	status_ = status;
 }
 
-int swd::reply::get_status() {
+int swd::reply::get_status() const {
 	return status_;
 }
 
-void swd::reply::set_threats(std::vector<std::string> threats) {
+void swd::reply::set_threats(const std::vector<std::string>& threats) {
 	threats_ = threats;
 }
 
-std::vector<std::string> swd::reply::get_threats() {
+std::vector<std::string> swd::reply::get_threats() const {
 	return threats_;
 }
 
-void swd::reply::set_content(std::string content) {
+void swd::reply::set_content(const std::string& content) {
 	content_ = content;
 }
 
-std::string swd::reply::get_content() {
+std::string swd::reply::get_content() const {
 	return content_;
 }
 
-std::vector<boost::asio::const_buffer> swd::reply::to_buffers() {
+std::vector<boost::asio::const_buffer> swd::reply::to_buffers() const {
 	std::vector<boost::asio::const_buffer> buffers;
 	buffers.push_back(boost::asio::buffer(content_));
 	return buffers;
