@@ -35,6 +35,14 @@ swd::cache::cache(swd::database_ptr database) :
  database_(database) {
 }
 
+void swd::cache::reset() {
+	profiles_.clear();
+	blacklist_rules_.clear();
+	blacklist_filters_.clear();
+	whitelist_rules_.clear();
+	integrity_rules_.clear();
+}
+
 swd::profile_ptr swd::cache::get_profile(std::string server_ip, int profile_id) {
 	boost::unique_lock<boost::mutex> scoped_lock(profiles_mutex_);
 

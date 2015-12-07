@@ -64,6 +64,11 @@ namespace swd {
 			cache(swd::database_ptr database);
 
 			/**
+			 * @brief Removes all elements from the cache.
+			 */
+			void reset();
+
+			/**
 			 * @brief Get a profile.
 			 *
 			 * @param server_ip The ip of the httpd server/shadowd client

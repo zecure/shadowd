@@ -46,7 +46,8 @@ swd::server::server(swd::analyzer_ptr analyzer, swd::storage_ptr storage,
  analyzer_(analyzer),
  storage_(storage),
  cache_(cache),
- signals_(io_service_),
+ signals_stop_(io_service_),
+ signals_reload_(io_service_),
  acceptor_(io_service_),
  context_(boost::asio::ssl::context::sslv23) {
 	/**
@@ -54,14 +55,21 @@ swd::server::server(swd::analyzer_ptr analyzer, swd::storage_ptr storage,
 	 * It is safe to register for the same signal multiple times in a program,
 	 * provided all registration for the specified signal is made through asio.
 	 */
-	signals_.add(SIGINT);
-	signals_.add(SIGTERM);
+	signals_stop_.add(SIGINT);
+	signals_stop_.add(SIGTERM);
 #if defined(SIGQUIT)
-	signals_.add(SIGQUIT);
+	signals_stop_.add(SIGQUIT);
 #endif /* defined(SIGQUIT) */
 
-	signals_.async_wait(
+	signals_stop_.async_wait(
 		boost::bind(&swd::server::handle_stop, this)
+	);
+
+	/* Do the same for reload signals. */
+	signals_reload_.add(SIGHUP);
+
+	signals_reload_.async_wait(
+		boost::bind(&swd::server::handle_reload, this)
 	);
 }
 
@@ -178,9 +186,18 @@ void swd::server::handle_accept(const boost::system::error_code& e) {
 }
 
 void swd::server::handle_stop() {
+	swd::log::i()->send(swd::notice, "Received a stop signal");
+
 	/* Stop the threads of asio. */
 	io_service_.stop();
 
 	/* Also stop the storage thread. */
 	storage_->stop();
+}
+
+void swd::server::handle_reload() {
+	swd::log::i()->send(swd::notice, "Received a reload signal");
+
+	/* Reset the cache by deleting all elements. */
+	cache_->reset();
 }

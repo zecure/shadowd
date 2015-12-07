@@ -92,6 +92,11 @@ namespace swd {
 			void handle_stop();
 
 			/**
+			 * @brief Handle a request to reload internal data.
+			 */
+			void handle_reload();
+
+			/**
 			 * @brief The io_service used to perform asynchronous operations.
 			 */
 			boost::asio::io_service io_service_;
@@ -100,7 +105,13 @@ namespace swd {
 			 * @brief The signal_set is used to register for process termination
 			 *  notifications.
 			 */
-			boost::asio::signal_set signals_;
+			boost::asio::signal_set signals_stop_;
+
+			/**
+			 * @brief The signal_set is used to register for process reload
+			 *  notifications.
+			 */
+			boost::asio::signal_set signals_reload_;
 
 			/**
 			 * @brief Acceptor used to listen for incoming connections.
