@@ -48,36 +48,40 @@ swd::request_handler::request_handler(swd::request_ptr request,
 
 bool swd::request_handler::valid_signature() {
 	try {
+		/* Prepare secret key for hmac. */
 		std::string key = request_->get_profile()->get_key();
-		std::string mac, hex_mac;
 
 		CryptoPP::HMAC<CryptoPP::SHA256> hmac(
 			(const byte *)key.c_str(),
 			key.size()
 		);
 
-		/* Generate mac (hash) from hmac object (key) and the request content (xml). */
+		/* Transform user mac from lower case hex to binary. */
+		std::string mac;
+
 		CryptoPP::StringSource(
-			request_->get_content(),
-			true,
-			new CryptoPP::HashFilter(
-				hmac,
+			request_->get_signature(),
+			true, /* pumpAll */
+			new CryptoPP::HexDecoder(
 				new CryptoPP::StringSink(mac)
 			)
 		);
 
-		/* Transform mac from binary to lower case hex. */
-		CryptoPP::StringSource(
-			mac,
-			true,
-			new CryptoPP::HexEncoder(
-				new CryptoPP::StringSink(hex_mac),
-				false
+		/* Compare given mac with expected mac. */
+		bool result = false;
+
+		CryptoPP::StringSource ss(
+			request_->get_content() + mac,
+			true, 
+			new CryptoPP::HashVerificationFilter(
+				hmac,
+				new CryptoPP::ArraySink((byte*)&result, sizeof(result)),
+				CryptoPP::HashVerificationFilter::PUT_RESULT |
+				CryptoPP::HashVerificationFilter::HASH_AT_END
 			)
 		);
 
-		/* Compare given mac with expected mac. */
-		return (request_->get_signature() == hex_mac);
+		return result;
 	} catch(const CryptoPP::Exception& e) {
 		/* Something went wrong, so the authentication was not successful. */
 		return false;
