@@ -35,22 +35,22 @@
 #include "database.h"
 #include "log.h"
 
-swd::integrity::integrity(swd::request_ptr request)
- : request_(request) {
+swd::integrity::integrity(swd::cache_ptr cache)
+ : cache_(cache) {
 }
 
-void swd::integrity::scan() {
+void swd::integrity::scan(swd::request_ptr request) {
 	/* Import the rules from the database. */
-	swd::integrity_rules rules = swd::database::i()->get_integrity_rules(
-		request_->get_profile()->get_id(),
-		request_->get_caller()
+	swd::integrity_rules rules = cache_->get_integrity_rules(
+		request->get_profile()->get_id(),
+		request->get_caller()
 	);
 
 	/**
 	 * The request needs at least one rule to pass the check. Otherwise
 	 * it wouldn't be a whitelist.
 	 */
-	request_->set_total_integrity_rules(rules.size());
+	request->set_total_integrity_rules(rules.size());
 
 	/* Iterate over all rules. */
 	for (swd::integrity_rules::iterator it_rule = rules.begin();
@@ -58,11 +58,11 @@ void swd::integrity::scan() {
 		swd::integrity_rule_ptr rule(*it_rule);
 
 		try {
-			swd::hash_ptr hash = request_->get_hash(rule->get_algorithm());
+			swd::hash_ptr hash = request->get_hash(rule->get_algorithm());
 
 			/* Add pointers to all rules that do not match. */
 			if (!hash || (rule->get_digest() != hash->get_digest())) {
-				request_->add_integrity_rule(rule);
+				request->add_integrity_rule(rule);
 			}
 		} catch (...) {
 			swd::log::i()->send(swd::uncritical_error, "Unexpected integrity problem");

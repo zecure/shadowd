@@ -4,6 +4,7 @@ link_directories(${SHADOWD_BINARY_DIR}/src)
 add_executable(shadowd
 	analyzer.cpp
 	blacklist_filter.cpp
+	cache.cpp
 	config.cpp
 	daemon.cpp
 	log.cpp

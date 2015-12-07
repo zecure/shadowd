@@ -36,19 +36,20 @@
 #include <boost/thread.hpp>
 
 #include "request.h"
-#include "singleton.h"
+#include "database.h"
 
 namespace swd {
 	/**
 	 * @brief Manages the storage of a request.
 	 */
-	class storage :
-	 public swd::singleton<swd::storage> {
+	class storage {
 		public:
 			/**
 			 * @brief Initialize the storage object.
+			 *
+			 * @param database The pointer to the database object
 			 */
-			storage();
+			storage(swd::database_ptr database);
 
 			/**
 			 * @brief Start insert thread.
@@ -109,7 +110,17 @@ namespace swd {
 			 * @brief Mutex required for condition variable.
 			 */
 			boost::mutex consumer_mutex_;
+
+			/**
+			 * @brief The pointer to the database object.
+			 */
+			swd::database_ptr database_;
 	};
+
+	/**
+	 * @brief Storage pointer.
+	 */
+	typedef boost::shared_ptr<swd::storage> storage_ptr;
 }
 
 #endif /* STORAGE_H */

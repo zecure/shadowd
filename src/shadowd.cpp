@@ -31,12 +31,21 @@
 
 #include <string>
 #include <iostream>
+#include <boost/make_shared.hpp>
 
 #include "shadowd.h"
 #include "config.h"
 #include "log.h"
 #include "database.h"
 #include "storage.h"
+
+swd::shadowd::shadowd() : 
+ database_(boost::make_shared<swd::database>()),
+ cache_(boost::make_shared<swd::cache>(database_)),
+ analyzer_(boost::make_shared<swd::analyzer>(database_, cache_)),
+ storage_(boost::make_shared<swd::storage>(database_)),
+ server_(analyzer_, storage_, cache_) {
+}
 
 void swd::shadowd::init(int argc, char** argv) {
 	/**
@@ -88,7 +97,7 @@ void swd::shadowd::init(int argc, char** argv) {
 	}
 
 	/* Connect to the database. */
-	swd::database::i()->connect(
+	database_->connect(
 		swd::config::i()->get<std::string>("db-driver"),
 		swd::config::i()->get<std::string>("db-host"),
 		swd::config::i()->get<std::string>("db-port"),
@@ -118,7 +127,7 @@ void swd::shadowd::init(int argc, char** argv) {
 
 void swd::shadowd::start() {
 	/* Start the storage worker thread. */
-	swd::storage::i()->start();
+	storage_->start();
 
 	/* This adds threads to the threadpool and keeps everything running. */
 	server_.start(swd::config::i()->get<int>("threads"));

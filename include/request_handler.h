@@ -36,6 +36,8 @@
 #include <string>
 
 #include "request.h"
+#include "analyzer.h"
+#include "storage.h"
 
 namespace swd {
 	/**
@@ -47,8 +49,11 @@ namespace swd {
 			 * @brief Construct a request handler.
 			 *
 			 * @param request The pointer to the request object
+			 * @param analyzer The pointer to the analyzer object
+			 * @param storage The pointer to the storage object
 			 */
-			request_handler(swd::request_ptr request);
+			request_handler(swd::request_ptr request, swd::analyzer_ptr analyzer,
+			 swd::storage_ptr storage);
 
 			/**
 			 * @brief Check if the signature of the request is valid.
@@ -78,6 +83,8 @@ namespace swd {
 
 		private:
 			swd::request_ptr request_;
+			swd::analyzer_ptr analyzer_;
+			swd::storage_ptr storage_;
 	};
 }
 

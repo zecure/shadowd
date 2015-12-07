@@ -38,7 +38,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "connection.h"
-#include "request_handler.h"
+#include "analyzer.h"
+#include "storage.h"
+#include "cache.h"
 
 namespace swd {
 	/**
@@ -49,8 +51,13 @@ namespace swd {
 		public:
 			/**
 			 * @brief Construct an object and connect the attributes.
+			 *
+			 * @param analyzer The pointer to the analyzer object
+			 * @param storage The pointer to the storage object
+			 * @param cache The pointer to the cache object
 			 */
-			server();
+			server(swd::analyzer_ptr analyzer, swd::storage_ptr storage,
+			 swd::cache_ptr cache);
 
 			/**
 			 * @brief Initialize the server.
@@ -109,6 +116,21 @@ namespace swd {
 			 * @brief The next connection to be accepted.
 			 */
 			swd::connection_ptr new_connection_;
+
+			/**
+			 * @brief The pointer to the analyzer object.
+			 */
+			swd::analyzer_ptr analyzer_;
+
+			/**
+			 * @brief The pointer to the storage object.
+			 */
+			swd::storage_ptr storage_;
+
+			/**
+			 * @brief The pointer to the cache object.
+			 */
+			swd::cache_ptr cache_;
 	};
 }
 

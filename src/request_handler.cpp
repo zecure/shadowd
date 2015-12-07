@@ -39,8 +39,11 @@
 #include "storage.h"
 #include "log.h"
 
-swd::request_handler::request_handler(swd::request_ptr request) :
- request_(request) {
+swd::request_handler::request_handler(swd::request_ptr request,
+ swd::analyzer_ptr analyzer, swd::storage_ptr storage) :
+ request_(request),
+ analyzer_(analyzer),
+ storage_(storage) {
 }
 
 bool swd::request_handler::valid_signature() {
@@ -174,8 +177,7 @@ bool swd::request_handler::decode() {
 
 void swd::request_handler::process() {
 	/* Analyze the request with the black- and whitelist. */
-	swd::analyzer analyzer(request_);
-	analyzer.start();
+	analyzer_->scan(request_);
 
 	/**
 	 * Nothing to do if there are no threats and learning is disabled. If there
@@ -184,7 +186,7 @@ void swd::request_handler::process() {
 	 */
 	if (request_->get_threat() || request_->has_threats() ||
 	 (request_->get_profile()->get_mode() == MODE_LEARNING)) {
-		swd::storage::i()->add(request_);
+		storage_->add(request_);
 	}
 }
 

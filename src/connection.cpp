@@ -30,24 +30,27 @@
  */
 
 #include <cstdlib>
+#include <boost/make_shared.hpp>
 
 #include "connection.h"
 #include "profile.h"
 #include "request_handler.h"
 #include "reply_handler.h"
-#include "database.h"
 #include "config.h"
 #include "log.h"
 
 swd::connection::connection(boost::asio::io_service& io_service,
- swd::context& context, bool ssl) :
+ swd::context& context, bool ssl, swd::analyzer_ptr analyzer,
+ swd::storage_ptr storage, swd::cache_ptr cache) :
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
- ssl_(ssl) {
-	/* Create request and reply objects. */
-	request_ = swd::request_ptr(new swd::request());
-	reply_ = swd::reply_ptr(new swd::reply());
+ ssl_(ssl),
+ analyzer_(analyzer),
+ storage_(storage),
+ cache_(cache),
+ request_(boost::make_shared<swd::request>()),
+ reply_(boost::make_shared<swd::reply>()) {
 }
 
 swd::socket& swd::connection::socket() {
@@ -182,7 +185,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 
 		/* Try to add a profile for the request. */
 		try {
-			swd::profile_ptr profile = swd::database::i()->get_profile(
+			swd::profile_ptr profile = cache_->get_profile(
 				remote_address_.to_string(),
 				request_->get_profile_id()
 			);
@@ -194,7 +197,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		}
 
 		/* The handler used to process the incoming request. */
-		swd::request_handler request_handler(request_);
+		swd::request_handler request_handler(request_, analyzer_, storage_);
 
 		/* Only continue processing the reply if it is signed correctly. */
 		if (!request_handler.valid_signature()) {
@@ -250,7 +253,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			}
 
 			if (request_->get_profile()->is_flooding_enabled()) {
-				if (swd::database::i()->is_flooding(request_->get_client_ip(), request_->get_profile_id())) {
+				if (analyzer_->is_flooding(request_)) {
 					swd::log::i()->send(swd::notice, "Too many requests");
 					throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 				}

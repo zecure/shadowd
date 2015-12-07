@@ -35,7 +35,8 @@
 #include "database.h"
 #include "log.h"
 
-swd::storage::storage() :
+swd::storage::storage(swd::database_ptr database) :
+ database_(database),
  stop_(false) {
 }
 
@@ -46,7 +47,12 @@ void swd::storage::start() {
 }
 
 void swd::storage::stop() {
+	/* Stop on next loop. */
 	stop_ = true;
+
+	/* Wake up and join thread to finish current loop. */
+	cond_.notify_one();
+	worker_thread_.join();
 }
 
 void swd::storage::add(swd::request_ptr request) {
@@ -75,6 +81,11 @@ void swd::storage::process_next() {
 				}
 			}
 
+			/* If stop is activated do not go to sleep again. */
+			if (stop_) {
+				return;
+			}
+
 			cond_.wait(consumer_lock);
 		}
 
@@ -98,7 +109,7 @@ void swd::storage::save(swd::request_ptr request) {
 
 	try {
 		/* First we save the request and get its id in the database. */
-		request_id = swd::database::i()->save_request(
+		request_id = database_->save_request(
 			request->get_profile()->get_id(),
 			request->get_caller(),
 			request->get_resource(),
@@ -123,7 +134,7 @@ void swd::storage::save(swd::request_ptr request) {
 		swd::hash_ptr hash((*it_hash).second);
 
 		try {
-			swd::database::i()->save_hash(
+			database_->save_hash(
 				request_id,
 				hash->get_algorithm(),
 				hash->get_digest()
@@ -142,7 +153,7 @@ void swd::storage::save(swd::request_ptr request) {
 		swd::integrity_rule_ptr integrity_rule(*it_integrity_rule);
 
 		try {
-			swd::database::i()->add_integrity_request_connector(
+			database_->add_integrity_request_connector(
 				integrity_rule->get_id(),
 				request_id
 			);
@@ -162,7 +173,7 @@ void swd::storage::save(swd::request_ptr request) {
 		int parameter_id;
 
 		try {
-			parameter_id = swd::database::i()->save_parameter(
+			parameter_id = database_->save_parameter(
 				request_id,
 				parameter->get_path(),
 				parameter->get_value(),
@@ -183,7 +194,7 @@ void swd::storage::save(swd::request_ptr request) {
 			swd::blacklist_filter_ptr blacklist_filter(*it_blacklist_filter);
 
 			try {
-				swd::database::i()->add_blacklist_parameter_connector(
+				database_->add_blacklist_parameter_connector(
 					blacklist_filter->get_id(),
 					parameter_id
 				);
@@ -201,7 +212,7 @@ void swd::storage::save(swd::request_ptr request) {
 			swd::whitelist_rule_ptr whitelist_rule(*it_whitelist_rule);
 
 			try {
-				swd::database::i()->add_whitelist_parameter_connector(
+				database_->add_whitelist_parameter_connector(
 					whitelist_rule->get_id(),
 					parameter_id
 				);

@@ -33,32 +33,47 @@
 #define ANALYZER_H
 
 #include "request.h"
+#include "database.h"
+#include "cache.h"
 
 namespace swd {
 	/**
 	 * @brief Manages the examination of a request.
-	 *
-	 * At the moment the white- and blacklist get checked and results are
-	 * written directly into the request. Maybe there will be additional checks
-	 * in later versions.
 	 */
 	class analyzer {
 		public:
 			/**
 			 * @brief Construct the analyzer.
 			 *
-			 * @param request The pointer to the request object
+			 * @param database The pointer to the database object
+			 * @param cache The pointer to the cache object
 			 */
-			analyzer(swd::request_ptr request);
+			analyzer(swd::database_ptr database, swd::cache_ptr cache);
 
 			/**
 			 * @brief Start the analysis and write results into the request object.
+			 *
+			 * @param request The pointer to the request object
 			 */
-			void start();
+			void scan(swd::request_ptr request);
+
+			/**
+			 * @brief Get the flooding status of the request.
+			 *
+			 * @param request The pointer to the request object
+			 * @return The status of the flooding check
+			 */
+			bool is_flooding(swd::request_ptr request);
 
 		private:
-			swd::request_ptr request_;
+			swd::database_ptr database_;
+			swd::cache_ptr cache_;
 	};
+
+	/**
+	 * @brief Analyzer pointer.
+	 */
+	typedef boost::shared_ptr<swd::analyzer> analyzer_ptr;
 }
 
 #endif /* ANALYZER_H */

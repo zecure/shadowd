@@ -81,7 +81,7 @@ void swd::database::ensure_connection() {
 
 swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_id) {
 	std::stringstream log_message;
-	log_message << "Get profile -> server_ip: " << server_ip
+	log_message << "Get profile from db -> server_ip: " << server_ip
 	 << "; profile_id: " << profile_id;
 
 	swd::log::i()->send(swd::notice, log_message.str());
@@ -138,7 +138,7 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 
 swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
  std::string caller, std::string path) {
-	swd::log::i()->send(swd::notice, "Get blacklist rules");
+	swd::log::i()->send(swd::notice, "Get blacklist rules from db");
 
 	ensure_connection();
 
@@ -178,7 +178,7 @@ swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
 }
 
 swd::blacklist_filters swd::database::get_blacklist_filters() {
-	swd::log::i()->send(swd::notice, "Get blacklist filters");
+	swd::log::i()->send(swd::notice, "Get blacklist filters from db");
 
 	ensure_connection();
 
@@ -208,7 +208,7 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
 
 swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
  std::string caller, std::string path) {
-	swd::log::i()->send(swd::notice, "Get whitelist rules");
+	swd::log::i()->send(swd::notice, "Get whitelist rules from db");
 
 	ensure_connection();
 
@@ -260,7 +260,7 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 }
 
 swd::integrity_rules swd::database::get_integrity_rules(int profile, std::string caller) {
-	swd::log::i()->send(swd::notice, "Get integrity rules");
+	swd::log::i()->send(swd::notice, "Get integrity rules from db");
 
 	ensure_connection();
 

@@ -36,30 +36,32 @@
 #include "blacklist_rule.h"
 #include "whitelist_rule.h"
 #include "integrity_rule.h"
-#include "database.h"
 
-swd::analyzer::analyzer(swd::request_ptr request) :
- request_(request) {
+swd::analyzer::analyzer(swd::database_ptr database, swd::cache_ptr cache) :
+ database_(database),
+ cache_(cache) {
 }
 
-void swd::analyzer::start() {
-	if (request_->get_profile()->is_blacklist_enabled()) {
+void swd::analyzer::scan(swd::request_ptr request) {
+	swd::profile_ptr profile = request->get_profile();
+
+	if (profile->is_blacklist_enabled()) {
 		/**
 		 * First we initialize the blacklist. This way the filters are only read once per
 		 * request and we have a neat cache for the regex objects.
 		 */
-		swd::blacklist blacklist(request_);
+		swd::blacklist blacklist(cache_);
 
 		/**
 		 * The blacklist checks the PHPIDS filters against all parameters and calculates
 		 * the total impact for every single parameter. The impacts are saved directly in
 		 * the request object.
 		 */
-		blacklist.scan();
+		blacklist.scan(request);
 	}
 
-	if (request_->get_profile()->is_whitelist_enabled()) {
-		swd::whitelist whitelist(request_);
+	if (profile->is_whitelist_enabled()) {
+		swd::whitelist whitelist(cache_);
 
 		/**
 		 * The whitelist checks for all parameters if there exists a rule and if it
@@ -68,40 +70,40 @@ void swd::analyzer::start() {
 		 * At the moment three things get checked: the existence of a rule, the length
 		 * of the input and the character set.
 		 */
-		whitelist.scan();
+		whitelist.scan(request);
 	}
 
-	if (request_->get_profile()->is_integrity_enabled()) {
-		swd::integrity integrity(request_);
+	if (profile->is_integrity_enabled()) {
+		swd::integrity integrity(cache_);
 
 		/* Compare the hashes from the database with the hashes in the request. */
-		integrity.scan();
+		integrity.scan(request);
 
 		/* Check if there is no responsible integrity rule. */
-		if (request_->get_total_integrity_rules() == 0) {
-			request_->set_threat(true);
+		if (request->get_total_integrity_rules() == 0) {
+			request->set_threat(true);
 		}
 
 		/* Check if there are integrity rules that are not adhered to. */
-		if (request_->get_integrity_rules().size() > 0) {
-			request_->set_threat(true);
+		if (request->get_integrity_rules().size() > 0) {
+			request->set_threat(true);
 		}
 	}
 
 	/* Combine the results and determine which parameters are threats. */
-	swd::parameters& parameters = request_->get_parameters();
+	swd::parameters& parameters = request->get_parameters();
 
 	for (swd::parameters::iterator it_parameter = parameters.begin();
 	 it_parameter != parameters.end(); it_parameter++) {
 		/* Save the iterators in variables for the sake of readability. */
 		swd::parameter_ptr parameter(*it_parameter);
 
-		if (request_->get_profile()->is_blacklist_enabled()) {
-			int threshold = request_->get_profile()->get_blacklist_threshold();
+		if (profile->is_blacklist_enabled()) {
+			int threshold = profile->get_blacklist_threshold();
 
-			swd::blacklist_rules rules = swd::database::i()->get_blacklist_rules(
-				request_->get_profile()->get_id(),
-				request_->get_caller(),
+			swd::blacklist_rules rules = cache_->get_blacklist_rules(
+				profile->get_id(),
+				request->get_caller(),
 				parameter->get_path()
 			);
 
@@ -128,7 +130,7 @@ void swd::analyzer::start() {
 			}
 		}
 
-		if (request_->get_profile()->is_whitelist_enabled()) {
+		if (profile->is_whitelist_enabled()) {
 			/* Check if there is no responsible whitelist rule. */
 			if (parameter->get_total_whitelist_rules() == 0) {
 				parameter->set_threat(true);
@@ -140,4 +142,11 @@ void swd::analyzer::start() {
 			}
 		}
 	}
+}
+
+bool swd::analyzer::is_flooding(swd::request_ptr request) {
+	return database_->is_flooding(
+		request->get_client_ip(),
+		request->get_profile()->get_id()
+	);
 }

@@ -34,6 +34,10 @@
 
 #include "daemon.h"
 #include "server.h"
+#include "database.h"
+#include "cache.h"
+#include "analyzer.h"
+#include "storage.h"
 
 namespace swd {
 	/**
@@ -41,6 +45,11 @@ namespace swd {
 	 */
 	class shadowd {
 		public:
+			/**
+			 * @brief Construct a shadowd object.
+			 */
+			shadowd();
+
 			/**
 			 * @brief Prepare the configuration, daemonization and the
 			 *  initialization of the server.
@@ -56,6 +65,10 @@ namespace swd {
 			void start();
 
 		private:
+			swd::database_ptr database_;
+			swd::cache_ptr cache_;
+			swd::analyzer_ptr analyzer_;
+			swd::storage_ptr storage_;
 			swd::daemon daemon_;
 			swd::server server_;
 	};

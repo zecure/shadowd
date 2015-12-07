@@ -34,6 +34,7 @@
 
 #include <string>
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 #include <dbi/dbi.h>
 
 #include "profile.h"
@@ -42,7 +43,6 @@
 #include "blacklist_rule.h"
 #include "blacklist_filter.h"
 #include "integrity_rule.h"
-#include "singleton.h"
 #include "shared.h"
 
 namespace swd {
@@ -53,8 +53,7 @@ namespace swd {
 	 * perfect, but libdbi does not seem to be thread safe. This is also the
 	 * reason why the database queries are protected with mutexes.
 	 */
-	class database :
-	 public swd::singleton<swd::database> {
+	class database {
 		public:
 			/**
 			 * @brief Open a database connection.
@@ -93,7 +92,7 @@ namespace swd {
 			void ensure_connection();
 
 			/**
-			 * @brief Get a profile by the server ip.
+			 * @brief Get a profile.
 			 *
 			 * Since a single shadowd instance can observe multiple different
 			 * web servers at once it is necessary to separate the data.
@@ -107,15 +106,15 @@ namespace swd {
 			swd::profile_ptr get_profile(std::string server_ip, int profile_id);
 
 			/**
-			 * @brief Get blacklist rules by the profile and caller.
+			 * @brief Get blacklist rules.
 			 *
 			 * @param profile The profile id of the request
 			 * @param caller The caller (php file) that initiated the connection
 			 * @param path The path of the parameter
 			 * @return The corresponding table rows
 			 */
-			swd::blacklist_rules get_blacklist_rules(int profile, std::string caller,
-			 std::string path);
+			swd::blacklist_rules get_blacklist_rules(int profile,
+			 std::string caller, std::string path);
 
 			/**
 			 * @brief Get all blacklist filters.
@@ -125,23 +124,24 @@ namespace swd {
 			swd::blacklist_filters get_blacklist_filters();
 
 			/**
-			 * @brief Get whitelist rules by the profile and caller.
+			 * @brief Get whitelist rules.
 			 *
 			 * @param profile The profile id of the request
 			 * @param caller The caller (resource) that initiated the connection
 			 * @param path The path of the parameter
 			 * @return The corresponding table rows
 			 */
-			swd::whitelist_rules get_whitelist_rules(int profile, std::string caller,
-			 std::string path);
+			swd::whitelist_rules get_whitelist_rules(int profile,
+			 std::string caller, std::string path);
 
 			/**
-			 * @brief Get integrity rules by the profile and caller.
+			 * @brief Get integrity rules.
 			 *
 			 * @param profile The profile id of the request
 			 * @param caller The caller (resource) that initiated the connection
 			 */
-			swd::integrity_rules get_integrity_rules(int profile, std::string caller);
+			swd::integrity_rules get_integrity_rules(int profile,
+			 std::string caller);
 
 			/**
 			 * @brief Save information about a request.
@@ -206,9 +206,9 @@ namespace swd {
 			void add_integrity_request_connector(int rule, int request);
 
 			/**
-			 * @brief Get the flooding status of the attacker.
+			 * @brief Get the flooding status of the client.
 			 *
-			 * @param client_ip The ip of the attacker
+			 * @param client_ip The ip of the client
 			 * @param profile_id The profile id of the request
 			 * @return The status of the flooding check
 			 */
@@ -222,6 +222,11 @@ namespace swd {
 #endif /* defined(HAVE_DBI_NEW) */
 			boost::mutex dbi_mutex_;
 	};
+
+	/**
+	 * @brief Database pointer.
+	 */
+	typedef boost::shared_ptr<swd::database> database_ptr;
 }
 
 #endif /* DATABASE_H */

@@ -30,17 +30,15 @@
  */
 
 #include "blacklist.h"
-#include "database.h"
 #include "log.h"
 
-swd::blacklist::blacklist(swd::request_ptr request)
- : request_(request) {
-	/* Import the filters from the database. */
-	filters_ = swd::database::i()->get_blacklist_filters();
+swd::blacklist::blacklist(swd::cache_ptr cache)
+ : cache_(cache) {
 }
 
-void swd::blacklist::scan() {
-	swd::parameters& parameters = request_->get_parameters();
+void swd::blacklist::scan(swd::request_ptr request) {
+	swd::blacklist_filters filters = cache_->get_blacklist_filters();
+	swd::parameters& parameters = request->get_parameters();
 
 	/* Iterate over all parameters and check every filter. */
 	for (swd::parameters::iterator it_parameter = parameters.begin();
@@ -48,8 +46,8 @@ void swd::blacklist::scan() {
 		/* Save the iterators in variables for the sake of readability. */
 		swd::parameter_ptr parameter(*it_parameter);
 
-		for (swd::blacklist_filters::iterator it_filter = filters_.begin();
-		 it_filter != filters_.end(); it_filter++) {
+		for (swd::blacklist_filters::iterator it_filter = filters.begin();
+		 it_filter != filters.end(); it_filter++) {
 			swd::blacklist_filter_ptr filter(*it_filter);
 
 			/* If there is catastrophic backtracking boost throws an exception. */

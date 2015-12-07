@@ -33,6 +33,7 @@
 #define INTEGRITY_H
 
 #include "request.h"
+#include "cache.h"
 
 namespace swd {
 	/**
@@ -43,18 +44,20 @@ namespace swd {
 			/**
 			 * @brief Construct the integrity check.
 			 *
-			 * @param request The pointer to the request object
+			 * @param cache The pointer to the cache object
 			 */
-			integrity(swd::request_ptr request);
+			integrity(swd::cache_ptr cache);
 
 			/**
 			 * @brief Scan all parameters in the request and add connections to broken
 			 *  rules.
+			 *
+			 * @param request The pointer to the request object
 			 */
-			void scan();
+			void scan(swd::request_ptr request);
 
 		private:
-			swd::request_ptr request_;
+			swd::cache_ptr cache_;
 	};
 }
 

@@ -37,12 +37,15 @@
 #include <boost/thread/thread.hpp>
 
 #include "server.h"
-#include "storage.h"
 #include "config.h"
 #include "log.h"
 #include "shared.h"
 
-swd::server::server() :
+swd::server::server(swd::analyzer_ptr analyzer, swd::storage_ptr storage,
+ swd::cache_ptr cache) :
+ analyzer_(analyzer),
+ storage_(storage),
+ cache_(cache),
  signals_(io_service_),
  acceptor_(io_service_),
  context_(boost::asio::ssl::context::sslv23) {
@@ -144,7 +147,7 @@ void swd::server::start_accept() {
 	bool ssl = swd::config::i()->defined("ssl");
 
 	new_connection_.reset(
-		new swd::connection(io_service_, context_, ssl)
+		new swd::connection(io_service_, context_, ssl, analyzer_, storage_, cache_)
 	);
 
 	acceptor_.async_accept(
@@ -179,5 +182,5 @@ void swd::server::handle_stop() {
 	io_service_.stop();
 
 	/* Also stop the storage thread. */
-	swd::storage::i()->stop();
+	storage_->stop();
 }

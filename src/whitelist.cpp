@@ -34,12 +34,12 @@
 #include "database.h"
 #include "log.h"
 
-swd::whitelist::whitelist(swd::request_ptr request)
- : request_(request) {
+swd::whitelist::whitelist(swd::cache_ptr cache)
+ : cache_(cache) {
 }
 
-void swd::whitelist::scan() {
-	swd::parameters& parameters = request_->get_parameters();
+void swd::whitelist::scan(swd::request_ptr request) {
+	swd::parameters& parameters = request->get_parameters();
 
 	/* Iterate over all parameters. */
 	for (swd::parameters::iterator it_parameter = parameters.begin();
@@ -48,9 +48,9 @@ void swd::whitelist::scan() {
 		swd::parameter_ptr parameter(*it_parameter);
 
 		/* Import the rules from the database. */
-		swd::whitelist_rules rules = swd::database::i()->get_whitelist_rules(
-			request_->get_profile()->get_id(),
-			request_->get_caller(),
+		swd::whitelist_rules rules = cache_->get_whitelist_rules(
+			request->get_profile()->get_id(),
+			request->get_caller(),
 			parameter->get_path()
 		);
 

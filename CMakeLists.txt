@@ -46,6 +46,8 @@ if(NOT HAVE_JSONCPP_H)
 	message(FATAL_ERROR "libjsoncpp is missing")
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 # Config
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
 	${CMAKE_CURRENT_BINARY_DIR}/build_config.h

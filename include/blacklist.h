@@ -33,7 +33,7 @@
 #define BLACKLIST_H
 
 #include "request.h"
-#include "blacklist_filter.h"
+#include "cache.h"
 
 namespace swd {
 	/**
@@ -42,22 +42,22 @@ namespace swd {
 	class blacklist {
 		public:
 			/**
-			 * @brief Construct the blacklist. Initialize the blacklist filters
-			 *  once to cache them for the life time of this request.
+			 * @brief Construct the blacklist.
 			 *
-			 * @param request The pointer to the request object
+			 * @param cache The pointer to the cache object
 			 */
-			blacklist(swd::request_ptr request);
+			blacklist(swd::cache_ptr cache);
 
 			/**
 			 * @brief Scan all parameters in the request and add connections to
 			 *  matching filters.
+			 *
+			 * @param request The pointer to the request object
 			 */
-			void scan();
+			void scan(swd::request_ptr request);
 
 		private:
-			swd::request_ptr request_;
-			swd::blacklist_filters filters_;
+			swd::cache_ptr cache_;
 	};
 }
 

@@ -13,6 +13,7 @@ add_executable(tests
 	whitelist_rule_test.cpp
 	${SHADOWD_SOURCE_DIR}/src/analyzer.cpp
 	${SHADOWD_SOURCE_DIR}/src/blacklist_filter.cpp
+	${SHADOWD_SOURCE_DIR}/src/cache.cpp
 	${SHADOWD_SOURCE_DIR}/src/config.cpp
 	${SHADOWD_SOURCE_DIR}/src/daemon.cpp
 	${SHADOWD_SOURCE_DIR}/src/log.cpp
