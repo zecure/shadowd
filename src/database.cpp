@@ -35,8 +35,9 @@
 #include "database.h"
 #include "log.h"
 
-void swd::database::connect(std::string driver, std::string host, std::string port,
- std::string username, std::string password, std::string name, std::string encoding) {
+void swd::database::connect(const std::string& driver, const std::string& host,
+ const std::string& port, const std::string& username, const std::string& password,
+ const std::string& name, const std::string& encoding) {
 	driver_ = driver;
 
 #if defined(HAVE_DBI_NEW)
@@ -79,7 +80,8 @@ void swd::database::ensure_connection() {
 	}
 }
 
-swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_id) {
+swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
+ const int& profile_id) {
 	std::stringstream log_message;
 	log_message << "Get profile from db -> server_ip: " << server_ip
 	 << "; profile_id: " << profile_id;
@@ -136,8 +138,8 @@ swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_i
 	return profile;
 }
 
-swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
- std::string caller, std::string path) {
+swd::blacklist_rules swd::database::get_blacklist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path) {
 	swd::log::i()->send(swd::notice, "Get blacklist rules from db");
 
 	ensure_connection();
@@ -152,8 +154,8 @@ swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
 
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, r.threshold "
 	 "FROM blacklist_rules AS r WHERE r.profile_id = %i AND %s LIKE "
-	 "prepare_wildcard(r.caller) AND %s LIKE prepare_wildcard(r.path) AND r.status = %i",
-	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
+	 "prepare_wildcard(r.caller) AND %s LIKE prepare_wildcard(r.path) AND "
+	 "r.status = %i", profile_id, caller_esc, path_esc, STATUS_ACTIVATED);
 
 	free(caller_esc);
 	free(path_esc);
@@ -206,8 +208,8 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
 	return filters;
 }
 
-swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
- std::string caller, std::string path) {
+swd::whitelist_rules swd::database::get_whitelist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path) {
 	swd::log::i()->send(swd::notice, "Get whitelist rules from db");
 
 	ensure_connection();
@@ -229,7 +231,7 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 	 "f.rule, f.impact, r.min_length, r.max_length FROM whitelist_rules AS r, "
 	 "whitelist_filters AS f WHERE r.filter_id = f.id AND r.profile_id = %i AND %s LIKE "
 	 "prepare_wildcard(r.caller) AND %s LIKE prepare_wildcard(r.path) AND r.status = %i",
-	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
+	 profile_id, caller_esc, path_esc, STATUS_ACTIVATED);
 
 	free(caller_esc);
 	free(path_esc);
@@ -259,7 +261,8 @@ swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
 	return rules;
 }
 
-swd::integrity_rules swd::database::get_integrity_rules(int profile, std::string caller) {
+swd::integrity_rules swd::database::get_integrity_rules(const int& profile_id,
+ const std::string& caller) {
 	swd::log::i()->send(swd::notice, "Get integrity rules from db");
 
 	ensure_connection();
@@ -271,7 +274,7 @@ swd::integrity_rules swd::database::get_integrity_rules(int profile, std::string
 
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.algorithm, r.digest FROM "
 	 "integrity_rules AS r WHERE r.profile_id = %i AND %s LIKE prepare_wildcard(r.caller) "
-	 "AND r.status = %i", profile, caller_esc, STATUS_ACTIVATED);
+	 "AND r.status = %i", profile_id, caller_esc, STATUS_ACTIVATED);
 
 	free(caller_esc);
 
@@ -295,11 +298,11 @@ swd::integrity_rules swd::database::get_integrity_rules(int profile, std::string
 	return rules;
 }
 
-int swd::database::save_request(int profile, std::string caller,
- std::string resource, int mode, std::string client_ip,
- int total_integrity_rules) {
+int swd::database::save_request(const int& profile_id, const std::string& caller,
+ const std::string& resource, const int& mode, const std::string& client_ip,
+ const int& total_integrity_rules) {
 	std::stringstream log_message;
-	log_message << "Save request -> profile: " << profile
+	log_message << "Save request -> profile: " << profile_id
 	 << "; caller: " << caller << "; resource: " << resource
 	 << "; mode: " << mode << "; client_ip: " << client_ip;
 
@@ -320,7 +323,7 @@ int swd::database::save_request(int profile, std::string caller,
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO requests (profile_id, "
 	 "caller, resource, mode, client_ip, total_integrity_rules) VALUES (%i, %s, "
-	 "%s, %i, %s, %i)", profile, caller_esc, resource_esc, mode, client_ip_esc,
+	 "%s, %i, %s, %i)", profile_id, caller_esc, resource_esc, mode, client_ip_esc,
 	 total_integrity_rules);
 
 	free(caller_esc);
@@ -338,8 +341,9 @@ int swd::database::save_request(int profile, std::string caller,
 	return id;
 }
 
-int swd::database::save_parameter(int request, std::string path, std::string value,
- int total_whitelist_rules, int critical_impact, int threat) {
+int swd::database::save_parameter(const int& request_id, const std::string& path,
+ const std::string& value, const int& total_whitelist_rules,
+ const int& critical_impact, const int& threat) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
@@ -350,9 +354,10 @@ int swd::database::save_parameter(int request, std::string path, std::string val
 	char *value_esc = strdup(value.c_str());
 	dbi_conn_quote_string(conn_, &value_esc);
 
-	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO parameters (request_id, "
-	 "path, value, total_whitelist_rules, critical_impact, threat) VALUES (%i, %s, %s, %i, %i, %i)",
-	 request, path_esc, value_esc, total_whitelist_rules, critical_impact, threat);
+	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO parameters "
+	 "(request_id, path, value, total_whitelist_rules, critical_impact, threat) "
+	 "VALUES (%i, %s, %s, %i, %i, %i)", request_id, path_esc, value_esc,
+	 total_whitelist_rules, critical_impact, threat);
 
 	free(path_esc);
 	free(value_esc);
@@ -369,7 +374,8 @@ int swd::database::save_parameter(int request, std::string path, std::string val
 }
 
 
-int swd::database::save_hash(int request, std::string algorithm, std::string digest) {
+int swd::database::save_hash(const int& request_id, const std::string& algorithm,
+ const std::string& digest) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
@@ -381,7 +387,7 @@ int swd::database::save_hash(int request, std::string algorithm, std::string dig
 	dbi_conn_quote_string(conn_, &digest_esc);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO hashes (request_id, "
-	 "algorithm, digest) VALUES (%i, %s, %s)", request, algorithm_esc, digest_esc);
+	 "algorithm, digest) VALUES (%i, %s, %s)", request_id, algorithm_esc, digest_esc);
 
 	free(algorithm_esc);
 	free(digest_esc);
@@ -397,46 +403,50 @@ int swd::database::save_hash(int request, std::string algorithm, std::string dig
 	return id;
 }
 
-void swd::database::add_blacklist_parameter_connector(int filter, int parameter) {
+void swd::database::add_blacklist_parameter_connector(const int& filter_id,
+ const int& parameter_id) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO blacklist_parameters "
-	 "(filter_id, parameter_id) VALUES (%i, %i)", filter, parameter);
+	 "(filter_id, parameter_id) VALUES (%i, %i)", filter_id, parameter_id);
 
 	if (!res) {
 		throw swd::exceptions::database_exception("Can't execute blacklist_parameter query");
 	}
 }
 
-void swd::database::add_whitelist_parameter_connector(int rule, int parameter) {
+void swd::database::add_whitelist_parameter_connector(const int& rule_id,
+ const int& parameter_id) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO whitelist_parameters "
-	 "(rule_id, parameter_id) VALUES (%i, %i)", rule, parameter);
+	 "(rule_id, parameter_id) VALUES (%i, %i)", rule_id, parameter_id);
 
 	if (!res) {
 		throw swd::exceptions::database_exception("Can't execute whitelist_parameter query");
 	}
 }
 
-void swd::database::add_integrity_request_connector(int rule, int request) {
+void swd::database::add_integrity_request_connector(const int& rule_id,
+ const int& request_id) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
 	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO integrity_requests "
-	 "(rule_id, request_id) VALUES (%i, %i)", rule, request);
+	 "(rule_id, request_id) VALUES (%i, %i)", rule_id, request_id);
 
 	if (!res) {
 		throw swd::exceptions::database_exception("Can't execute integrity_request query");
 	}
 }
 
-bool swd::database::is_flooding(std::string client_ip, int profile_id) {
+bool swd::database::is_flooding(const std::string& client_ip,
+ const int& profile_id) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);

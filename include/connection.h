@@ -87,8 +87,8 @@ namespace swd {
 			 * @param cache The pointer to the cache object
 			 */
 			explicit connection(boost::asio::io_service& io_service,
-			 swd::context& context, bool ssl, swd::analyzer_ptr analyzer,
-			 swd::storage_ptr storage, swd::cache_ptr cache);
+			 swd::context& context, bool ssl, const swd::analyzer_ptr& analyzer,
+			 const swd::storage_ptr& storage, const swd::cache_ptr& cache);
 
 			/**
 			 * @brief Get the socket associated with the connection.

@@ -42,16 +42,16 @@ namespace swd {
 	class profile {
 		public:
 			/**
-			 * @brief Set the ip of the http server/shadowd client.
+			 * @brief Set the allowed ips of the http server/shadowd client.
 			 *
-			 * @param server_ip The ip of the http server/shadowd client
+			 * @param server_ip The allowed ips of the http server/shadowd client
 			 */
 			void set_server_ip(const std::string& server_ip);
 
 			/**
 			 * @brief Get the ip of the http server/shadowd client.
 			 *
-			 * @return The server ip
+			 * @return The allowed ips of the http server/shadowd clients
 			 */
 			std::string get_server_ip() const;
 
@@ -178,7 +178,7 @@ namespace swd {
 
 		private:
 			/**
-			 * @brief TODO
+			 * @brief The allowed ips of the http server/shadowd client.
 			 */
 			std::string server_ip_;
 

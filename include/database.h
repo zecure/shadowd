@@ -69,9 +69,10 @@ namespace swd {
 			 * @param name The database name, originating from the config
 			 * @param encoding The database encoding, originating from the config
 			 */
-			void connect(std::string driver, std::string host, std::string port,
-			 std::string username, std::string password, std::string name,
-			 std::string encoding);
+			void connect(const std::string& driver, const std::string& host,
+			 const std::string& port, const std::string& username,
+			 const std::string& password, const std::string& name,
+			 const std::string& encoding);
 
 			/**
 			 * @brief Close the database connection.
@@ -85,9 +86,9 @@ namespace swd {
 			 * @brief Ensure that the database connection is still open.
 			 *
 			 * This method tests the database connection and tries to reconnect
-			 * if the connection is closed. The manual of libdbi states that some
-			 * drivers attempt to reconnect automatically if dbi_conn_ping is called,
-			 * but this does not seem to be the norm.
+			 * if the connection is closed. The manual of libdbi states that
+			 * some drivers attempt to reconnect automatically if dbi_conn_ping
+			 * is called, but this does not seem to be the norm.
 			 */
 			void ensure_connection();
 
@@ -103,7 +104,8 @@ namespace swd {
 			 * @param profile_id The database id of the profile
 			 * @return The corresponding table row
 			 */
-			swd::profile_ptr get_profile(std::string server_ip, int profile_id);
+			swd::profile_ptr get_profile(const std::string& server_ip,
+			 const int& profile_id);
 
 			/**
 			 * @brief Get blacklist rules.
@@ -113,8 +115,8 @@ namespace swd {
 			 * @param path The path of the parameter
 			 * @return The corresponding table rows
 			 */
-			swd::blacklist_rules get_blacklist_rules(int profile,
-			 std::string caller, std::string path);
+			swd::blacklist_rules get_blacklist_rules(const int& profile,
+			 const std::string& caller, const std::string& path);
 
 			/**
 			 * @brief Get all blacklist filters.
@@ -131,8 +133,8 @@ namespace swd {
 			 * @param path The path of the parameter
 			 * @return The corresponding table rows
 			 */
-			swd::whitelist_rules get_whitelist_rules(int profile,
-			 std::string caller, std::string path);
+			swd::whitelist_rules get_whitelist_rules(const int& profile,
+			 const std::string& caller, const std::string& path);
 
 			/**
 			 * @brief Get integrity rules.
@@ -140,13 +142,13 @@ namespace swd {
 			 * @param profile The profile id of the request
 			 * @param caller The caller (resource) that initiated the connection
 			 */
-			swd::integrity_rules get_integrity_rules(int profile,
-			 std::string caller);
+			swd::integrity_rules get_integrity_rules(const int& profile,
+			 const std::string& caller);
 
 			/**
 			 * @brief Save information about a request.
 			 *
-			 * @param profile The profile id of the request
+			 * @param profile_id The profile id of the request
 			 * @param caller The caller (php file) that initiated the connection
 			 * @param resource The resource identifier
 			 * @param mode The status of the system
@@ -154,13 +156,14 @@ namespace swd {
 			 * @param total_integrity_rules The number of broken integrity rules
 			 * @return The id of the new row
 			 */
-			int save_request(int profile, std::string caller, std::string resource,
-			 int mode, std::string client_ip, int total_integrity_rules);
+			int save_request(const int& profile_id, const std::string& caller,
+			 const std::string& resource, const int& mode,
+			 const std::string& client_ip, const int& total_integrity_rules);
 
 			/**
 			 * @brief Save information about a parameter.
 			 *
-			 * @param request The id of the corresponding request
+			 * @param request_id The id of the corresponding request
 			 * @param path The path (i.e. key) of the parameter
 			 * @param value The value of the parameter
 			 * @param total_whitelist_rules The total number of whitelist rules
@@ -169,41 +172,46 @@ namespace swd {
 			 * @param threat The status of the analyzer
 			 * @return The id of the new row
 			 */
-			int save_parameter(int request, std::string path, std::string value,
-			 int total_whitelist_rules, int critical_impact, int threat);
+			int save_parameter(const int& request_id, const std::string& path,
+			 const std::string& value, const int& total_whitelist_rules,
+			 const int& critical_impact, const int& threat);
 
 			/**
 			 * @brief Save information about a hash.
 			 *
-			 * @param request The id of the corresponding request
+			 * @param request_id The id of the corresponding request
 			 * @param algorithm The algorithm that is used to calculate the hash
 			 * @param digest The output of the hash algorithm on the message
 			 */
-			int save_hash(int request, std::string algorithm, std::string digest);
+			int save_hash(const int& request_id, const std::string& algorithm,
+			 const std::string& digest);
 
 			/**
 			 * @brief Add a many to many connector for a matching blacklist filter.
 			 *
-			 * @param filter The id of the blacklist filter
-			 * @param parameter The id of the parameter
+			 * @param filter_id The id of the blacklist filter
+			 * @param parameter_id The id of the parameter
 			 */
-			void add_blacklist_parameter_connector(int filter, int parameter);
+			void add_blacklist_parameter_connector(const int& filter_id,
+			 const int& parameter_id);
 
 			/**
 			 * @brief Add a many to many connector for a broken whitelist rule.
 			 *
-			 * @param rule The id of the whitelist rule
-			 * @param parameter The id of the parameter
+			 * @param rule_id The id of the whitelist rule
+			 * @param parameter_id The id of the parameter
 			 */
-			void add_whitelist_parameter_connector(int rule, int parameter);
+			void add_whitelist_parameter_connector(const int& rule_id,
+			 const int& parameter_id);
 
 			/**
 			 * @brief Add a many to many connector for a broken integrity rule.
 			 *
-			 * @param rule The id of the integrity rule
-			 * @param request The id of the request
+			 * @param rule_id The id of the integrity rule
+			 * @param request_id The id of the request
 			 */
-			void add_integrity_request_connector(int rule, int request);
+			void add_integrity_request_connector(const int& rule_id,
+			 const int& request_id);
 
 			/**
 			 * @brief Get the flooding status of the client.
@@ -212,14 +220,29 @@ namespace swd {
 			 * @param profile_id The profile id of the request
 			 * @return The status of the flooding check
 			 */
-			bool is_flooding(std::string client_ip, int profile_id);
+			bool is_flooding(const std::string& client_ip, const int& profile_id);
 
 		private:
+			/**
+			 * @brief The selected database driver.
+			 */
 			std::string driver_;
+
+			/**
+			 * @brief The database connection.
+			 */
 			dbi_conn conn_;
+
+			/**
+			 * @brief The database instance.
+			 */
 #if defined(HAVE_DBI_NEW)
 			dbi_inst instance_;
 #endif /* defined(HAVE_DBI_NEW) */
+
+			/**
+			 * @brief The mutex for database access.
+			 */
 			boost::mutex dbi_mutex_;
 	};
 
