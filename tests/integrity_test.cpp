@@ -32,37 +32,60 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "blacklist_filter.h"
+#include "integrity.h"
+#include "integrity_rule.h"
+#include "hash.h"
+#include "request.h"
+#include "profile.h"
+#include "database.h"
+#include "cache.h"
 
-BOOST_AUTO_TEST_SUITE(blacklist_filter_test)
+BOOST_AUTO_TEST_SUITE(integrity_test)
 
-BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+BOOST_AUTO_TEST_CASE(positive_integrity_check) {
+	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+	swd::integrity integrity(cache);
 
-	filter->set_id(1);
-	filter->set_impact(5);
+	swd::request_ptr request(new swd::request);
+	swd::profile_ptr profile(new swd::profile);
+	profile->set_id(1);
+	request->set_profile(profile);
+	request->set_caller("qux");
+	request->add_hash("boo", "far");
 
-	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foo") == true);
+	swd::integrity_rule_ptr rule(new swd::integrity_rule);
+	rule->set_algorithm("foo");
+	rule->set_digest("bar");
 
-	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("BOOFOOBAR") == true);
+	swd::integrity_rules rules;
+	rules.push_back(rule);
+	cache->add_integrity_rules(1, "qux", rules);
 
-	filter->set_regex("(?:(foo(.*)bar))");
-	BOOST_CHECK(filter->matches("foo\nbar") == true);
+	integrity.scan(request);
+	BOOST_CHECK(request->get_integrity_rules().size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(not_matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+BOOST_AUTO_TEST_CASE(negative_integrity_check) {
+	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+	swd::integrity integrity(cache);
 
-	filter->set_id(1);
-	filter->set_impact(5);
+	swd::request_ptr request(new swd::request);
+	swd::profile_ptr profile(new swd::profile);
+	profile->set_id(1);
+	request->set_profile(profile);
+	request->set_caller("qux");
+	request->add_hash("foo", "bar");
 
-	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foobar") == false);
+	swd::integrity_rule_ptr rule(new swd::integrity_rule);
+	rule->set_algorithm("foo");
+	rule->set_digest("bar");
 
-	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("bar") == false);
+	swd::integrity_rules rules;
+	rules.push_back(rule);
+	cache->add_integrity_rules(1, "qux", rules);
+
+	integrity.scan(request);
+	BOOST_CHECK(request->get_integrity_rules().size() == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

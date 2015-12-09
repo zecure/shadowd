@@ -140,7 +140,8 @@ int swd::request::get_total_integrity_rules() const {
 	return total_integrity_rules_;
 }
 
-void swd::request::add_hash(const std::string& algorithm, const std::string& digest) {
+void swd::request::add_hash(const std::string& algorithm,
+ const std::string& digest) {
 	swd::hash_ptr hash(new swd::hash);
 	hash->set_algorithm(algorithm);
 	hash->set_digest(digest);

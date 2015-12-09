@@ -54,3 +54,12 @@ void swd::integrity_rule::set_digest(const std::string& digest) {
 std::string swd::integrity_rule::get_digest() const {
 	return digest_;
 }
+
+bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
+	if (!hash) {
+		return false;
+	}
+
+	return (algorithm_ == hash->get_algorithm()) &&
+	 (digest_ == hash->get_digest());
+}

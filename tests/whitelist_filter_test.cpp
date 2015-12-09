@@ -37,7 +37,7 @@
 BOOST_AUTO_TEST_SUITE(whitelist_filter_test)
 
 BOOST_AUTO_TEST_CASE(matching_whitelist_filter) {
-	swd::whitelist_filter_ptr filter = swd::whitelist_filter_ptr(new swd::whitelist_filter());
+	swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
 
 	filter->set_id(1);
 
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(matching_whitelist_filter) {
 }
 
 BOOST_AUTO_TEST_CASE(not_matching_whitelist_filter) {
-	swd::whitelist_filter_ptr filter = swd::whitelist_filter_ptr(new swd::whitelist_filter());
+	swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
 
 	filter->set_id(1);
 

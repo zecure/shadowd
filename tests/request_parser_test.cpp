@@ -39,7 +39,7 @@
 BOOST_AUTO_TEST_SUITE(request_parser_test)
 
 BOOST_AUTO_TEST_CASE(valid_parse) {
-	swd::request_ptr request = swd::request_ptr(new swd::request());
+	swd::request_ptr request(new swd::request);
 
 	/* Prepare the input and copy it into a boost char array. */
 	int profile_id = 13;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(valid_parse) {
 }
 
 BOOST_AUTO_TEST_CASE(incomplete_parse) {
-	swd::request_ptr request = swd::request_ptr(new swd::request());
+	swd::request_ptr request(new swd::request);
 
 	/* Prepare the input and copy it into a boost char array. */
 	std::string input = "1\na\na";
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(incomplete_parse) {
 }
 
 BOOST_AUTO_TEST_CASE(invalid_parse_id) {
-	swd::request_ptr request = swd::request_ptr(new swd::request());
+	swd::request_ptr request(new swd::request);
 
 	/* Prepare the input and copy it into a boost char array. */
 	std::string input = "!\na\na\n";
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(invalid_parse_id) {
 }
 
 BOOST_AUTO_TEST_CASE(invalid_parse_hmac) {
-	swd::request_ptr request = swd::request_ptr(new swd::request());
+	swd::request_ptr request(new swd::request);
 
 	/* Prepare the input and copy it into a boost char array. */
 	std::string input = "1\n!\na\n";

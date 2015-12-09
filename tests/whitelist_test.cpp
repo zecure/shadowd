@@ -32,44 +32,75 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
+#include "whitelist.h"
 #include "whitelist_rule.h"
+#include "whitelist_filter.h"
+#include "request.h"
+#include "parameter.h"
+#include "profile.h"
+#include "database.h"
+#include "cache.h"
 
-BOOST_AUTO_TEST_SUITE(whitelist_rule_test)
+BOOST_AUTO_TEST_SUITE(whitelist_test)
 
-BOOST_AUTO_TEST_CASE(adhered_whitelist_rule) {
+BOOST_AUTO_TEST_CASE(positive_whitelist_check) {
+	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+	swd::whitelist whitelist(cache);
+
+	swd::request_ptr request(new swd::request);
+	swd::profile_ptr profile(new swd::profile);
+	profile->set_id(1);
+	request->set_profile(profile);
+	request->set_caller("qux");
+
+	swd::parameter_ptr parameter(new swd::parameter);
+	parameter->set_path("bar");
+	parameter->set_value("foo");
+	request->add_parameter(parameter);
+
 	swd::whitelist_rule_ptr rule(new swd::whitelist_rule);
 	swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
-
-	filter->set_id(1);
-	filter->set_regex("^foo$");
-	rule->set_id(1);
+	filter->set_regex("boo");
 	rule->set_filter(filter);
+	rule->set_min_length(5);
+	rule->set_max_length(5);
 
-	rule->set_min_length(-1);
-	rule->set_max_length(-1);
-	BOOST_CHECK(rule->is_adhered_to("foo") == true);
+	swd::whitelist_rules rules;
+	rules.push_back(rule);
+	cache->add_whitelist_rules(1, "qux", "bar", rules);
 
-	rule->set_min_length(3);
-	rule->set_max_length(3);
-	BOOST_CHECK(rule->is_adhered_to("foo") == true);
+	whitelist.scan(request);
+	BOOST_CHECK(parameter->get_whitelist_rules().size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(not_adhered_whitelist_rule) {
+BOOST_AUTO_TEST_CASE(negative_whitelist_check) {
+	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+	swd::whitelist whitelist(cache);
+
+	swd::request_ptr request(new swd::request);
+	swd::profile_ptr profile(new swd::profile);
+	profile->set_id(1);
+	request->set_profile(profile);
+	request->set_caller("qux");
+
+	swd::parameter_ptr parameter(new swd::parameter);
+	parameter->set_path("bar");
+	parameter->set_value("foo");
+	request->add_parameter(parameter);
+
 	swd::whitelist_rule_ptr rule(new swd::whitelist_rule);
 	swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
-
-	filter->set_id(1);
-	filter->set_regex("^foo$");
-	rule->set_id(1);
+	filter->set_regex("foo");
 	rule->set_filter(filter);
+	rule->set_min_length(3);
+	rule->set_max_length(3);
 
-	rule->set_min_length(-1);
-	rule->set_max_length(-1);
-	BOOST_CHECK(rule->is_adhered_to("bar") == false);
+	swd::whitelist_rules rules;
+	rules.push_back(rule);
+	cache->add_whitelist_rules(1, "qux", "bar", rules);
 
-	rule->set_min_length(10);
-	rule->set_max_length(10);
-	BOOST_CHECK(rule->is_adhered_to("foo") == false);
+	whitelist.scan(request);
+	BOOST_CHECK(parameter->get_whitelist_rules().size() == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

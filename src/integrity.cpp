@@ -61,7 +61,7 @@ void swd::integrity::scan(swd::request_ptr& request) {
 			swd::hash_ptr hash = request->get_hash(rule->get_algorithm());
 
 			/* Add pointers to all rules that do not match. */
-			if (!hash || (rule->get_digest() != hash->get_digest())) {
+			if (!rule->matches(hash)) {
 				request->add_integrity_rule(rule);
 			}
 		} catch (...) {

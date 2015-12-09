@@ -32,37 +32,57 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
+#include "blacklist.h"
 #include "blacklist_filter.h"
+#include "request.h"
+#include "parameter.h"
+#include "database.h"
+#include "cache.h"
 
-BOOST_AUTO_TEST_SUITE(blacklist_filter_test)
+BOOST_AUTO_TEST_SUITE(blacklist_test)
 
-BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
+BOOST_AUTO_TEST_CASE(positive_blacklist_check) {
+	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+	swd::blacklist blacklist(cache);
+
+	swd::request_ptr request(new swd::request);
+	swd::parameter_ptr parameter(new swd::parameter);
+	parameter->set_path("bar");
+	parameter->set_value("foo");
+	request->add_parameter(parameter);
+
 	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-
-	filter->set_id(1);
-	filter->set_impact(5);
-
-	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foo") == true);
-
+	filter->set_impact(2);
 	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("BOOFOOBAR") == true);
 
-	filter->set_regex("(?:(foo(.*)bar))");
-	BOOST_CHECK(filter->matches("foo\nbar") == true);
+	swd::blacklist_filters filters;
+	filters.push_back(filter);
+	cache->set_blacklist_filters(filters);
+
+	blacklist.scan(request);
+	BOOST_CHECK(parameter->get_blacklist_filters().size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(not_matching_blacklist_filter) {
+BOOST_AUTO_TEST_CASE(negative_blacklist_check) {
+	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+	swd::blacklist blacklist(cache);
+
+	swd::request_ptr request(new swd::request);
+	swd::parameter_ptr parameter(new swd::parameter);
+	parameter->set_path("boo");
+	parameter->set_value("far");
+	request->add_parameter(parameter);
+
 	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-
-	filter->set_id(1);
-	filter->set_impact(5);
-
-	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foobar") == false);
-
+	filter->set_impact(2);
 	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("bar") == false);
+
+	swd::blacklist_filters filters;
+	filters.push_back(filter);
+	cache->set_blacklist_filters(filters);
+
+	blacklist.scan(request);
+	BOOST_CHECK(parameter->get_blacklist_filters().size() == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

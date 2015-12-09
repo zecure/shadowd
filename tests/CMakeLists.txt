@@ -4,6 +4,9 @@ link_directories(${SHADOWD_BINARY_DIR}/src)
 add_executable(tests
 	shadowd_tests.cpp
 	blacklist_filter_test.cpp
+	blacklist_test.cpp
+	integrity_test.cpp
+	integrity_rule_test.cpp
 	parameter_test.cpp
 	reply_handler_test.cpp
 	request_handler_test.cpp
@@ -11,6 +14,7 @@ add_executable(tests
 	request_test.cpp
 	whitelist_filter_test.cpp
 	whitelist_rule_test.cpp
+	whitelist_test.cpp
 	${SHADOWD_SOURCE_DIR}/src/analyzer.cpp
 	${SHADOWD_SOURCE_DIR}/src/blacklist_filter.cpp
 	${SHADOWD_SOURCE_DIR}/src/cache.cpp

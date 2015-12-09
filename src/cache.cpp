@@ -63,6 +63,16 @@ void swd::cache::reset() {
 	}
 }
 
+void swd::cache::add_blacklist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path,
+ const swd::blacklist_rules& blacklist_rules) {
+	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
+
+	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
+	blacklist_rules_[key] = blacklist_rules;
+}
+
+
 swd::blacklist_rules swd::cache::get_blacklist_rules(const int& profile_id,
  const std::string& caller, const std::string& path) {
 	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
@@ -87,6 +97,13 @@ swd::blacklist_rules swd::cache::get_blacklist_rules(const int& profile_id,
 	return blacklist_rules;
 }
 
+void swd::cache::set_blacklist_filters(const swd::blacklist_filters&
+ blacklist_filters) {
+	boost::unique_lock<boost::mutex> scoped_lock(blacklist_filters_mutex_);
+
+	blacklist_filters_ = blacklist_filters;
+}
+
 swd::blacklist_filters swd::cache::get_blacklist_filters() {
 	boost::unique_lock<boost::mutex> scoped_lock(blacklist_filters_mutex_);
 
@@ -97,6 +114,15 @@ swd::blacklist_filters swd::cache::get_blacklist_filters() {
 	blacklist_filters_ = database_->get_blacklist_filters();
 
 	return blacklist_filters_;
+}
+
+void swd::cache::add_whitelist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path,
+ const swd::whitelist_rules& whitelist_rules) {
+	boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
+
+	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
+	whitelist_rules_[key] = whitelist_rules;
 }
 
 swd::whitelist_rules swd::cache::get_whitelist_rules(const int& profile_id,
@@ -117,6 +143,14 @@ swd::whitelist_rules swd::cache::get_whitelist_rules(const int& profile_id,
 	}
 
 	return whitelist_rules;
+}
+
+void swd::cache::add_integrity_rules(const int& profile_id,
+ const std::string& caller, const swd::integrity_rules& integrity_rules) {
+	boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
+
+	swd::tuple_is key = std::make_tuple(profile_id, caller);
+	integrity_rules_[key] = integrity_rules;
 }
 
 swd::integrity_rules swd::cache::get_integrity_rules(const int& profile_id,

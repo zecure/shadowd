@@ -36,6 +36,8 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+#include "hash.h"
+
 namespace swd {
 	/**
 	 * @brief Models an integrity rule.
@@ -83,6 +85,13 @@ namespace swd {
 			 * @return The hash digest of the rule
 			 */
 			std::string get_digest() const;
+
+			/**
+			 * @brief Checks if the hash matches the rule.
+			 *
+			 * @param hash The pointer to the hash object that should be checked.
+			 */
+			bool matches(const swd::hash_ptr& hash);
 
 		private:
 			/**

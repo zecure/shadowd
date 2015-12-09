@@ -31,6 +31,7 @@
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
+#include <boost/make_shared.hpp>
 
 #include "parameter.h"
 
@@ -41,10 +42,8 @@ BOOST_AUTO_TEST_CASE(get_impact) {
 	swd::blacklist_filter_ptr filter1(new swd::blacklist_filter);
 	swd::blacklist_filter_ptr filter2(new swd::blacklist_filter);
 
-	filter1->set_id(1);
 	filter1->set_impact(2);
 	filter1->set_regex("foo");
-	filter2->set_id(2);
 	filter2->set_impact(5);
 	filter2->set_regex("bar");
 

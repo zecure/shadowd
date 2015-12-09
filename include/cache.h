@@ -53,6 +53,15 @@ namespace swd {
 
 	/**
 	 * @brief Interface to the database that caches results.
+	 *
+	 * This class provides methods with the same names and parameters as the
+	 * database class. It first checks if the requested data is already saved
+	 * in the memory. Otherwise it fetches the data automatically from the
+	 * database and saves them in the memory.
+	 *
+	 * It is possible to add values manually to the cache, but this is only
+	 * intended for the unit tests, since the cache is filled automatically
+	 * when used normally.
 	 */
 	class cache {
 		public:
@@ -69,6 +78,18 @@ namespace swd {
 			void reset();
 
 			/**
+			 * @brief Add whitelist rules to the cache. Unit tests only.
+			 *
+			 * @param profile_id The profile id of the request
+			 * @param caller The caller (php file) that initiated the connection
+			 * @param path The path of the parameter
+			 * @param blacklist_rules The vector of blacklist rules
+			 */
+			void add_blacklist_rules(const int& profile_id,
+			 const std::string& caller, const std::string& path,
+			 const swd::blacklist_rules& blacklist_rules);
+
+			/**
 			 * @brief Get blacklist rules.
 			 *
 			 * @param profile_id The profile id of the request
@@ -80,11 +101,31 @@ namespace swd {
 			 const std::string& caller, const std::string& path);
 
 			/**
+			 * @brief Set the blacklist filters. Unit tests only.
+			 *
+			 * @param blacklist_filters The vector of blacklist filters
+			 */
+			void set_blacklist_filters(const swd::blacklist_filters&
+			 blacklist_filters);
+
+			/**
 			 * @brief Get all blacklist filters.
 			 *
 			 * @return The corresponding table rows
 			 */
 			swd::blacklist_filters get_blacklist_filters();
+
+			/**
+			 * @brief Add whitelist rules to the cache. Unit tests only.
+			 *
+			 * @param profile_id The profile id of the request
+			 * @param caller The caller (php file) that initiated the connection
+			 * @param path The path of the parameter
+			 * @param whitelist_rules The vector of whitelist rules
+			 */
+			void add_whitelist_rules(const int& profile_id,
+			 const std::string& caller, const std::string& path,
+			 const swd::whitelist_rules& whitelist_rules);
 
 			/**
 			 * @brief Get whitelist rules.
@@ -96,6 +137,17 @@ namespace swd {
 			 */
 			swd::whitelist_rules get_whitelist_rules(const int& profile_id,
 			 const std::string& caller, const std::string& path);
+
+			/**
+			 * @brief Add integrity rules to the cache. Unit tests only.
+			 *
+			 * @param profile_id The profile id of the request
+			 * @param caller The caller (php file) that initiated the connection
+			 * @param integrity_rules The vector of integrity rules
+			 */
+			void add_integrity_rules(const int& profile_id,
+			 const std::string& caller, const swd::integrity_rules&
+			 integrity_rules);
 
 			/**
 			 * @brief Get integrity rules.

@@ -32,37 +32,46 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "blacklist_filter.h"
+#include "integrity_rule.h"
+#include "hash.h"
 
-BOOST_AUTO_TEST_SUITE(blacklist_filter_test)
+BOOST_AUTO_TEST_SUITE(integrity_rule_test)
 
-BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+BOOST_AUTO_TEST_CASE(matching_integrity_rule) {
+	swd::integrity_rule_ptr rule(new swd::integrity_rule);
+	swd::hash_ptr hash(new swd::hash);
 
-	filter->set_id(1);
-	filter->set_impact(5);
+	rule->set_algorithm("foo");
+	rule->set_digest("bar");
+	hash->set_algorithm("foo");
+	hash->set_digest("bar");
 
-	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foo") == true);
-
-	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("BOOFOOBAR") == true);
-
-	filter->set_regex("(?:(foo(.*)bar))");
-	BOOST_CHECK(filter->matches("foo\nbar") == true);
+	BOOST_CHECK(rule->matches(hash) == true);
 }
 
-BOOST_AUTO_TEST_CASE(not_matching_blacklist_filter) {
-	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+BOOST_AUTO_TEST_CASE(not_matching_integrity_rule) {
+	swd::integrity_rule_ptr rule(new swd::integrity_rule);
+	swd::hash_ptr hash(new swd::hash);
 
-	filter->set_id(1);
-	filter->set_impact(5);
+	rule->set_algorithm("foo");
+	rule->set_digest("bar");
 
-	filter->set_regex("^foo$");
-	BOOST_CHECK(filter->matches("foobar") == false);
+	BOOST_CHECK(rule->matches(swd::hash_ptr()) == false);
 
-	filter->set_regex("foo");
-	BOOST_CHECK(filter->matches("bar") == false);
+	hash->set_algorithm("boo");
+	hash->set_digest("bar");
+
+	BOOST_CHECK(rule->matches(hash) == false);
+
+	hash->set_algorithm("foo");
+	hash->set_digest("far");
+
+	BOOST_CHECK(rule->matches(hash) == false);
+
+	hash->set_algorithm("");
+	hash->set_digest("");
+
+	BOOST_CHECK(rule->matches(hash) == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
