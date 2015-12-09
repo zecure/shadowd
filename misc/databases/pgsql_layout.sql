@@ -58,7 +58,8 @@ CREATE TABLE profiles (
 	flooding_enabled	smallint NOT NULL,
 	blacklist_threshold	int NOT NULL,
 	flooding_timeframe	int NOT NULL,
-	flooding_threshold	int NOT NULL
+	flooding_threshold	int NOT NULL,
+	cache_outdated		smallint NOT NULL
 );
 
 CREATE INDEX ON profiles (server_ip);

@@ -176,6 +176,20 @@ namespace swd {
 			 */
 			int get_blacklist_threshold() const;
 
+			/**
+			 * @brief Set the status of the cache for the profile.
+			 *
+			 * @param cache_outdated The status of the cache
+			 */
+			void set_cache_outdated(const bool& cache_outdated);
+
+			/**
+			 * @brief Get the status of the cache for the profile.
+			 *
+			 * @return The status of the cache
+			 */
+			bool is_cache_outdated() const;
+
 		private:
 			/**
 			 * @brief The allowed ips of the http server/shadowd client.
@@ -221,6 +235,11 @@ namespace swd {
 			 * @brief The global blacklist threshold of the profile.
 			 */
 			int blacklist_threshold_;
+
+			/**
+			 * @brief The status of the cache.
+			 */
+			bool cache_outdated_;
 
 	};
 

@@ -25,6 +25,7 @@ ALTER TABLE profiles ADD flooding_enabled smallint NOT NULL DEFAULT 1;
 ALTER TABLE profiles ADD mode int NOT NULL DEFAULT 1;
 ALTER TABLE profiles CHANGE threshold blacklist_threshold INT;
 ALTER TABLE profiles CHANGE flooding_time flooding_timeframe INT;
+ALTER TABLE profiles ADD cache_outdated smallint NOT NULL DEFAULT 0;
 ALTER TABLE parameters CHANGE total_rules total_whitelist_rules INT;
 ALTER TABLE requests ADD total_integrity_rules INT NOT NULL DEFAULT 0;
 ALTER TABLE requests ADD resource text NOT NULL DEFAULT '';

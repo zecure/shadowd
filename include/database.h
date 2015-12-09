@@ -222,6 +222,13 @@ namespace swd {
 			 */
 			bool is_flooding(const std::string& client_ip, const int& profile_id);
 
+			/**
+			 * @brief Set the status of the cache.
+			 *
+			 * @param cache_outdated The status of the cache
+			 */
+			void set_cache_outdated(const bool& cache_outdated);
+
 		private:
 			/**
 			 * @brief The selected database driver.

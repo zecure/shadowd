@@ -88,7 +88,8 @@ namespace swd {
 			 */
 			explicit connection(boost::asio::io_service& io_service,
 			 swd::context& context, bool ssl, const swd::analyzer_ptr& analyzer,
-			 const swd::storage_ptr& storage, const swd::cache_ptr& cache);
+			 const swd::storage_ptr& storage, const swd::database_ptr& database,
+			 const swd::cache_ptr& cache);
 
 			/**
 			 * @brief Get the socket associated with the connection.
@@ -195,6 +196,11 @@ namespace swd {
 			 * @brief The pointer to the storage object.
 			 */
 			swd::storage_ptr storage_;
+
+			/**
+			 * @brief The pointer to the database object.
+			 */
+			swd::database_ptr database_;
 
 			/**
 			 * @brief The pointer to the cache object.

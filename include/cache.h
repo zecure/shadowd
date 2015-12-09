@@ -69,16 +69,6 @@ namespace swd {
 			void reset();
 
 			/**
-			 * @brief Get a profile.
-			 *
-			 * @param server_ip The ip of the httpd server/shadowd client
-			 * @param profile_id The database id of the profile
-			 * @return The corresponding table row
-			 */
-			swd::profile_ptr get_profile(const std::string& server_ip,
-			 const int& profile_id);
-
-			/**
 			 * @brief Get blacklist rules.
 			 *
 			 * @param profile_id The profile id of the request
@@ -123,11 +113,6 @@ namespace swd {
 			swd::database_ptr database_;
 
 			/**
-			 * @brief The cache map for profiles.
-			 */
-			std::map<swd::tuple_is, swd::profile_ptr> profiles_;
-
-			/**
 			 * @brief The cache map for blacklist rules.
 			 */
 			std::map<swd::tuple_iss, swd::blacklist_rules> blacklist_rules_;
@@ -146,11 +131,6 @@ namespace swd {
 			 * @brief The cache map for integrity rules.
 			 */
 			std::map<swd::tuple_is, swd::integrity_rules> integrity_rules_;
-
-			/**
-			 * @brief The mutex for the profiles.
-			 */
-			boost::mutex profiles_mutex_;
 
 			/**
 			 * @brief The mutex for the blacklist rules.

@@ -30,33 +30,37 @@
  */
 
 #include "cache.h"
+#include "log.h"
 
 swd::cache::cache(const swd::database_ptr& database) :
  database_(database) {
 }
 
 void swd::cache::reset() {
-	profiles_.clear();
-	blacklist_rules_.clear();
-	blacklist_filters_.clear();
-	whitelist_rules_.clear();
-	integrity_rules_.clear();
-}
+	swd::log::i()->send(swd::notice, "Resetting the cache");
 
-swd::profile_ptr swd::cache::get_profile(const std::string& server_ip,
- const int& profile_id) {
-	boost::unique_lock<boost::mutex> scoped_lock(profiles_mutex_);
+	/* Reset the cache status for all profiles. */
+	database_->set_cache_outdated(false);
 
-	swd::tuple_is key = std::make_tuple(profile_id, server_ip);
-
-	if (profiles_.find(key) != profiles_.end()) {
-		return profiles_[key];
+	{
+		boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
+		blacklist_rules_.clear();
 	}
 
-	swd::profile_ptr profile = database_->get_profile(server_ip, profile_id);
-	profiles_[key] = profile;
+	{
+		boost::unique_lock<boost::mutex> scoped_lock(blacklist_filters_mutex_);
+		blacklist_filters_.clear();
+	}
 
-	return profile;
+	{
+		boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
+		whitelist_rules_.clear();
+	}
+
+	{
+		boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
+		integrity_rules_.clear();
+	}
 }
 
 swd::blacklist_rules swd::cache::get_blacklist_rules(const int& profile_id,

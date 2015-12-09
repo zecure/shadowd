@@ -41,13 +41,15 @@
 
 swd::connection::connection(boost::asio::io_service& io_service,
  swd::context& context, bool ssl, const swd::analyzer_ptr& analyzer,
- const swd::storage_ptr& storage, const swd::cache_ptr& cache) :
+ const swd::storage_ptr& storage, const swd::database_ptr& database,
+ const swd::cache_ptr& cache) :
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
  ssl_(ssl),
  analyzer_(analyzer),
  storage_(storage),
+ database_(database),
  cache_(cache),
  request_(boost::make_shared<swd::request>()),
  reply_(boost::make_shared<swd::reply>()) {
@@ -185,7 +187,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 
 		/* Try to add a profile for the request. */
 		try {
-			swd::profile_ptr profile = cache_->get_profile(
+			swd::profile_ptr profile = database_->get_profile(
 				remote_address_.to_string(),
 				request_->get_profile_id()
 			);
@@ -214,6 +216,13 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			swd::log::i()->send(swd::warning, "Bad json from "
 			 + remote_address_.to_string());
 			throw swd::exceptions::connection_exception(STATUS_BAD_JSON);
+		}
+
+		/* Check profile for outdated cache. */
+		swd::profile_ptr profile = request_->get_profile();
+
+		if (profile->is_cache_outdated()) {
+			cache_->reset();
 		}
 
 		/* Process the request. */
@@ -252,7 +261,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 				}
 			}
 
-			if (request_->get_profile()->is_flooding_enabled()) {
+			if (profile->is_flooding_enabled()) {
 				if (analyzer_->is_flooding(request_)) {
 					swd::log::i()->send(swd::notice, "Too many requests");
 					throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
@@ -271,7 +280,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 		}
 
-		if (request_->get_profile()->get_mode() == MODE_ACTIVE) {
+		if (profile->get_mode() == MODE_ACTIVE) {
 			if (request_->is_threat()) {
 				reply_->set_status(STATUS_BAD_REQUEST);
 			} else if (request_->has_threats()) {

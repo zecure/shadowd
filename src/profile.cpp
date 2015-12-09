@@ -102,3 +102,11 @@ void swd::profile::set_blacklist_threshold(const int& blacklist_threshold) {
 int swd::profile::get_blacklist_threshold() const {
 	return blacklist_threshold_;
 }
+
+void swd::profile::set_cache_outdated(const bool& cache_outdated) {
+	cache_outdated_ = cache_outdated;
+}
+
+bool swd::profile::is_cache_outdated() const {
+	return cache_outdated_;
+}

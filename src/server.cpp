@@ -42,9 +42,10 @@
 #include "shared.h"
 
 swd::server::server(const swd::analyzer_ptr& analyzer, const swd::storage_ptr& storage,
- const swd::cache_ptr& cache) :
+ const swd::database_ptr& database, const swd::cache_ptr& cache) :
  analyzer_(analyzer),
  storage_(storage),
+ database_(database),
  cache_(cache),
  signals_stop_(io_service_),
  signals_reload_(io_service_),
@@ -155,7 +156,15 @@ void swd::server::start_accept() {
 	bool ssl = swd::config::i()->defined("ssl");
 
 	new_connection_.reset(
-		new swd::connection(io_service_, context_, ssl, analyzer_, storage_, cache_)
+		new swd::connection(
+			io_service_,
+			context_,
+			ssl,
+			analyzer_,
+			storage_,
+			database_,
+			cache_
+		)
 	);
 
 	acceptor_.async_accept(

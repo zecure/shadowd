@@ -104,8 +104,8 @@ swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
 	/* Insert the ip and execute the query. */
 	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, mode, "
 	 "whitelist_enabled, blacklist_enabled, integrity_enabled, flooding_enabled, "
-	 "blacklist_threshold FROM profiles WHERE %s LIKE prepare_wildcard(server_ip) "
-	 "AND id = %i", server_ip_esc, profile_id);
+	 "blacklist_threshold, cache_outdated FROM profiles WHERE %s LIKE "
+	 "prepare_wildcard(server_ip) AND id = %i", server_ip_esc, profile_id);
 
 	/* Don't forget to free server_ip_esc to avoid a memory leak. */
 	free(server_ip_esc);
@@ -132,6 +132,7 @@ swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
 	profile->set_flooding_enabled(dbi_result_get_uint(res, "flooding_enabled") == 1);
 	profile->set_key(dbi_result_get_string(res, "hmac_key"));
 	profile->set_blacklist_threshold(dbi_result_get_uint(res, "blacklist_threshold"));
+	profile->set_cache_outdated(dbi_result_get_uint(res, "cache_outdated") == 1);
 
 	dbi_result_free(res);
 
@@ -485,4 +486,17 @@ bool swd::database::is_flooding(const std::string& client_ip,
 	dbi_result_free(res);
 
 	return status;
+}
+
+void swd::database::set_cache_outdated(const bool& cache_outdated) {
+	ensure_connection();
+
+	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+
+	dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i",
+	 (cache_outdated ? 1 : 0));
+
+	if (!res) {
+		throw swd::exceptions::database_exception("Can't execute cache_outdated query");
+	}
 }
