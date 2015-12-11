@@ -35,8 +35,8 @@
 #include "database.h"
 #include "log.h"
 
-swd::integrity::integrity(const swd::cache_ptr& cache)
- : cache_(cache) {
+swd::integrity::integrity(const swd::cache_ptr& cache) :
+ cache_(cache) {
 }
 
 void swd::integrity::scan(swd::request_ptr& request) {

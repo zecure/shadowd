@@ -231,11 +231,6 @@ namespace swd {
 
 		private:
 			/**
-			 * @brief The selected database driver.
-			 */
-			std::string driver_;
-
-			/**
 			 * @brief The database connection.
 			 */
 			dbi_conn conn_;

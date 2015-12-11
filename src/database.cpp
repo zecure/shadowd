@@ -38,8 +38,6 @@
 void swd::database::connect(const std::string& driver, const std::string& host,
  const std::string& port, const std::string& username, const std::string& password,
  const std::string& name, const std::string& encoding) {
-	driver_ = driver;
-
 #if defined(HAVE_DBI_NEW)
 	dbi_initialize_r(NULL, &instance_);
 	conn_ = dbi_conn_new_r(driver.c_str(), instance_);
@@ -455,25 +453,8 @@ bool swd::database::is_flooding(const std::string& client_ip,
 	char *client_ip_esc = strdup(client_ip.c_str());
 	dbi_conn_quote_string(conn_, &client_ip_esc);
 
-	dbi_result res;
-
-	if (driver_ == "pgsql") {
-		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.mode != 3 AND "
-		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
-		 "> NOW() - ((SELECT profiles.flooding_timeframe FROM profiles WHERE profiles.id "
-		 "= %i) || ' second')::INTERVAL) r WHERE r.request_count >= (SELECT "
-		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i)",
-		 client_ip_esc, profile_id, profile_id, profile_id);
-	} else if (driver_ == "mysql") {
-		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.mode != 3 AND "
-		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
-		 "> NOW() - INTERVAL (SELECT profiles.flooding_timeframe FROM profiles WHERE "
-		 "profiles.id = %i) SECOND) r WHERE r.request_count >= (SELECT "
-		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i)",
-		 client_ip_esc, profile_id, profile_id, profile_id);
-	}
+	dbi_result res = dbi_conn_queryf(conn_, "SELECT is_flooding(%i, %s) AS result",
+	 profile_id, client_ip_esc);
 
 	free(client_ip_esc);
 
@@ -481,11 +462,19 @@ bool swd::database::is_flooding(const std::string& client_ip,
 		throw swd::exceptions::database_exception("Can't execute request count query");
 	}
 
-	bool status = (dbi_result_get_numrows(res) == 1);
+	bool flooding = false;
+
+	if (dbi_result_get_numrows(res) == 1) {
+		if (!dbi_result_next_row(res)) {
+			throw swd::exceptions::database_exception("No flooding?");
+		}
+
+		flooding = (dbi_result_get_uint(res, "result") == 1);
+	}
 
 	dbi_result_free(res);
 
-	return status;
+	return flooding;
 }
 
 void swd::database::set_cache_outdated(const bool& cache_outdated) {

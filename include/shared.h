@@ -64,7 +64,7 @@ namespace swd {
 			/**
 			 * @brief Constructs an exception.
 			 */
-			core_exception(std::string ss) : s(ss) {}
+			core_exception(const std::string& ss) : s(ss) {}
 
 			/**
 			 * @brief Destroys the exception.
@@ -89,7 +89,7 @@ namespace swd {
 			/**
 			 * @brief Constructs an exception.
 			 */
-			config_exception(std::string ss) : s(ss) {}
+			config_exception(const std::string& ss) : s(ss) {}
 
 			/**
 			 * @brief Destroys the exception.
@@ -114,7 +114,7 @@ namespace swd {
 			/**
 			 * @brief Constructs an exception.
 			 */
-			database_exception(std::string ss) : s(ss) {}
+			database_exception(const std::string& ss) : s(ss) {}
 
 			/**
 			 * @brief Destroys the exception.
@@ -139,7 +139,7 @@ namespace swd {
 			/**
 			 * @brief Constructs an exception.
 			 */
-			connection_exception(int code) : code_(code) {}
+			connection_exception(const int& code) : code_(code) {}
 
 			/**
 			 * @brief Destroys the exception.

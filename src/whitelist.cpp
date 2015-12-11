@@ -34,8 +34,8 @@
 #include "database.h"
 #include "log.h"
 
-swd::whitelist::whitelist(const swd::cache_ptr& cache)
- : cache_(cache) {
+swd::whitelist::whitelist(const swd::cache_ptr& cache) :
+ cache_(cache) {
 }
 
 void swd::whitelist::scan(swd::request_ptr& request) {

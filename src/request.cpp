@@ -50,7 +50,8 @@ void swd::request::add_parameter(const swd::parameter_ptr& parameter) {
 	parameters_.push_back(parameter);
 }
 
-void swd::request::add_parameter(const std::string& path, const std::string& value) {
+void swd::request::add_parameter(const std::string& path,
+ const std::string& value) {
 	swd::parameter_ptr parameter(new swd::parameter);
 	parameter->set_path(path);
 	parameter->set_value(value);

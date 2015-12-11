@@ -33,8 +33,8 @@
 #include "blacklist_rule.h"
 #include "log.h"
 
-swd::blacklist::blacklist(const swd::cache_ptr& cache)
- : cache_(cache) {
+swd::blacklist::blacklist(const swd::cache_ptr& cache) :
+ cache_(cache) {
 }
 
 void swd::blacklist::scan(swd::request_ptr& request) {

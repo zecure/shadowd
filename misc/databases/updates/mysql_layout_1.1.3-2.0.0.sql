@@ -17,6 +17,16 @@ BEGIN
     RETURN wildcard2;
 END; //
 
+CREATE FUNCTION is_flooding(input_profile_id int, input_client_ip text) RETURNS int DETERMINISTIC
+BEGIN
+    RETURN (SELECT 1 FROM (SELECT COUNT(requests.id)
+        AS request_count FROM requests WHERE requests.mode != 3 AND 
+        requests.client_ip = input_client_ip AND requests.profile_id = input_profile_id AND requests.date 
+        > NOW() - INTERVAL (SELECT profiles.flooding_timeframe FROM profiles WHERE 
+        profiles.id = input_profile_id) SECOND) r WHERE r.request_count >= (SELECT 
+        profiles.flooding_threshold FROM profiles WHERE profiles.id = input_profile_id));
+END; //
+
 DELIMITER ;
 
 ALTER TABLE profiles DROP COLUMN learning_enabled;

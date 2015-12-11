@@ -2,19 +2,31 @@
 
 CREATE FUNCTION prepare_wildcard(input text) RETURNS text AS $$
 DECLARE
-    escape_us   text;
-    escape_pc   text;
-    wildcard1   text;
-    unescape_ar text;
-    wildcard2   text;
+	escape_us   text;
+	escape_pc   text;
+	wildcard1   text;
+	unescape_ar text;
+	wildcard2   text;
 BEGIN
-    escape_us   := REPLACE(input, '_', '\_');
-    escape_pc   := REPLACE(escape_us, '%', '\%');
-    wildcard1   := REPLACE(escape_pc, '*', '{WILDCARD}');
-    unescape_ar := REPLACE(wildcard1, '\{WILDCARD}', '*');
-    wildcard2   := REPLACE(unescape_ar, '{WILDCARD}', '%');
+	escape_us   := REPLACE(input, '_', '\_');
+	escape_pc   := REPLACE(escape_us, '%', '\%');
+	wildcard1   := REPLACE(escape_pc, '*', '{WILDCARD}');
+	unescape_ar := REPLACE(wildcard1, '\{WILDCARD}', '*');
+	wildcard2   := REPLACE(unescape_ar, '{WILDCARD}', '%');
 
-    RETURN wildcard2;
+	RETURN wildcard2;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION is_flooding(input_profile_id int, input_client_ip text) RETURNS int AS $$
+BEGIN
+	RETURN (SELECT 1 FROM
+		(SELECT COUNT(requests.id) AS request_count FROM requests WHERE
+		requests.mode != 3 AND requests.client_ip = input_client_ip AND requests.profile_id
+		= input_profile_id AND requests.date > NOW() - ((SELECT profiles.flooding_timeframe
+		FROM profiles WHERE profiles.id = input_profile_id) || ' second')::INTERVAL) r WHERE
+		r.request_count >= (SELECT profiles.flooding_threshold FROM profiles WHERE
+		profiles.id = input_profile_id));
 END;
 $$ LANGUAGE plpgsql;
 
