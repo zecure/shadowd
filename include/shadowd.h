@@ -36,7 +36,6 @@
 #include "server.h"
 #include "database.h"
 #include "cache.h"
-#include "analyzer.h"
 #include "storage.h"
 
 namespace swd {
@@ -74,11 +73,6 @@ namespace swd {
 			 * @brief The pointer to the cache object.
 			 */
 			swd::cache_ptr cache_;
-
-			/**
-			 * @brief The pointer to the analyzer object.
-			 */
-			swd::analyzer_ptr analyzer_;
 
 			/**
 			 * @brief The pointer to the storage object.

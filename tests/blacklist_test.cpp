@@ -33,11 +33,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "blacklist.h"
-#include "blacklist_filter.h"
-#include "request.h"
-#include "parameter.h"
-#include "database.h"
-#include "cache.h"
 
 BOOST_AUTO_TEST_SUITE(blacklist_test)
 
@@ -46,21 +41,31 @@ BOOST_AUTO_TEST_CASE(positive_blacklist_check) {
 	swd::blacklist blacklist(cache);
 
 	swd::request_ptr request(new swd::request);
+	request->set_caller("qux");
 	swd::parameter_ptr parameter(new swd::parameter);
 	parameter->set_path("bar");
 	parameter->set_value("foo");
 	request->add_parameter(parameter);
 
 	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-	filter->set_impact(2);
+	filter->set_impact(6);
 	filter->set_regex("foo");
 
 	swd::blacklist_filters filters;
 	filters.push_back(filter);
 	cache->set_blacklist_filters(filters);
 
+	swd::blacklist_rules rules;
+	cache->add_blacklist_rules(1, "qux", "bar", rules);
+
+	swd::profile_ptr profile(new swd::profile);
+	profile->set_id(1);
+	profile->set_blacklist_threshold(5);
+	request->set_profile(profile);
+
 	blacklist.scan(request);
 	BOOST_CHECK(parameter->get_blacklist_filters().size() == 1);
+	BOOST_CHECK(parameter->is_threat() == true);
 }
 
 BOOST_AUTO_TEST_CASE(negative_blacklist_check) {
@@ -68,21 +73,31 @@ BOOST_AUTO_TEST_CASE(negative_blacklist_check) {
 	swd::blacklist blacklist(cache);
 
 	swd::request_ptr request(new swd::request);
+	request->set_caller("qux");
 	swd::parameter_ptr parameter(new swd::parameter);
 	parameter->set_path("boo");
 	parameter->set_value("far");
 	request->add_parameter(parameter);
 
 	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-	filter->set_impact(2);
+	filter->set_impact(6);
 	filter->set_regex("foo");
 
 	swd::blacklist_filters filters;
 	filters.push_back(filter);
 	cache->set_blacklist_filters(filters);
 
+	swd::blacklist_rules rules;
+	cache->add_blacklist_rules(1, "qux", "boo", rules);
+
+	swd::profile_ptr profile(new swd::profile);
+	profile->set_id(1);
+	profile->set_blacklist_threshold(5);
+	request->set_profile(profile);
+
 	blacklist.scan(request);
 	BOOST_CHECK(parameter->get_blacklist_filters().size() == 0);
+	BOOST_CHECK(parameter->is_threat() == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

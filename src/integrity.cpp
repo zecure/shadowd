@@ -52,6 +52,10 @@ void swd::integrity::scan(swd::request_ptr& request) {
 	 */
 	request->set_total_integrity_rules(rules.size());
 
+	if (request->get_total_integrity_rules() == 0) {
+		request->set_threat(true);
+	}
+
 	/* Iterate over all rules. */
 	for (swd::integrity_rules::iterator it_rule = rules.begin();
 	 it_rule != rules.end(); it_rule++) {
@@ -63,9 +67,14 @@ void swd::integrity::scan(swd::request_ptr& request) {
 			/* Add pointers to all rules that do not match. */
 			if (!rule->matches(hash)) {
 				request->add_integrity_rule(rule);
+				request->set_threat(true);
 			}
 		} catch (...) {
 			swd::log::i()->send(swd::uncritical_error, "Unexpected integrity problem");
+
+			/* Add the rule anyway to avoid a potential bypass. */
+			request->add_integrity_rule(rule);
+			request->set_threat(true);
 		}
 	}
 }

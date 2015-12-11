@@ -42,9 +42,8 @@
 swd::shadowd::shadowd() : 
  database_(boost::make_shared<swd::database>()),
  cache_(boost::make_shared<swd::cache>(database_)),
- analyzer_(boost::make_shared<swd::analyzer>(database_, cache_)),
  storage_(boost::make_shared<swd::storage>(database_)),
- server_(analyzer_, storage_, database_, cache_) {
+ server_(storage_, database_, cache_) {
 }
 
 void swd::shadowd::init(int argc, char** argv) {

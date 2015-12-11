@@ -33,13 +33,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "whitelist.h"
-#include "whitelist_rule.h"
-#include "whitelist_filter.h"
-#include "request.h"
-#include "parameter.h"
-#include "profile.h"
-#include "database.h"
-#include "cache.h"
 
 BOOST_AUTO_TEST_SUITE(whitelist_test)
 
@@ -71,6 +64,7 @@ BOOST_AUTO_TEST_CASE(positive_whitelist_check) {
 
 	whitelist.scan(request);
 	BOOST_CHECK(parameter->get_whitelist_rules().size() == 1);
+	BOOST_CHECK(parameter->is_threat() == true);
 }
 
 BOOST_AUTO_TEST_CASE(negative_whitelist_check) {
@@ -101,6 +95,7 @@ BOOST_AUTO_TEST_CASE(negative_whitelist_check) {
 
 	whitelist.scan(request);
 	BOOST_CHECK(parameter->get_whitelist_rules().size() == 0);
+	BOOST_CHECK(parameter->is_threat() == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

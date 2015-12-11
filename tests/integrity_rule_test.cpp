@@ -33,7 +33,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "integrity_rule.h"
-#include "hash.h"
 
 BOOST_AUTO_TEST_SUITE(integrity_rule_test)
 

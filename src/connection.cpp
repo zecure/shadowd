@@ -40,14 +40,12 @@
 #include "log.h"
 
 swd::connection::connection(boost::asio::io_service& io_service,
- swd::context& context, bool ssl, const swd::analyzer_ptr& analyzer,
- const swd::storage_ptr& storage, const swd::database_ptr& database,
- const swd::cache_ptr& cache) :
+ swd::context& context, bool ssl, const swd::storage_ptr& storage,
+ const swd::database_ptr& database, const swd::cache_ptr& cache) :
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
  ssl_(ssl),
- analyzer_(analyzer),
  storage_(storage),
  database_(database),
  cache_(cache),
@@ -199,7 +197,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		}
 
 		/* The handler used to process the incoming request. */
-		swd::request_handler request_handler(request_, analyzer_, storage_);
+		swd::request_handler request_handler(request_, cache_, storage_);
 
 		/* Only continue processing the reply if it is signed correctly. */
 		if (!request_handler.valid_signature()) {
@@ -262,7 +260,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 			}
 
 			if (profile->is_flooding_enabled()) {
-				if (analyzer_->is_flooding(request_)) {
+				if (database_->is_flooding(request_->get_client_ip(), profile->get_id())) {
 					swd::log::i()->send(swd::notice, "Too many requests");
 					throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
 				}

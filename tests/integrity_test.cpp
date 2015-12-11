@@ -33,12 +33,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "integrity.h"
-#include "integrity_rule.h"
-#include "hash.h"
-#include "request.h"
-#include "profile.h"
-#include "database.h"
-#include "cache.h"
 
 BOOST_AUTO_TEST_SUITE(integrity_test)
 
@@ -63,6 +57,7 @@ BOOST_AUTO_TEST_CASE(positive_integrity_check) {
 
 	integrity.scan(request);
 	BOOST_CHECK(request->get_integrity_rules().size() == 1);
+	BOOST_CHECK(request->is_threat() == true);
 }
 
 BOOST_AUTO_TEST_CASE(negative_integrity_check) {
@@ -86,6 +81,7 @@ BOOST_AUTO_TEST_CASE(negative_integrity_check) {
 
 	integrity.scan(request);
 	BOOST_CHECK(request->get_integrity_rules().size() == 0);
+	BOOST_CHECK(request->is_threat() == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

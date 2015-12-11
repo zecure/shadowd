@@ -2,7 +2,6 @@ include_directories(${SHADOWD_SOURCE_DIR}/include)
 link_directories(${SHADOWD_BINARY_DIR}/src)
 
 add_executable(shadowd
-	analyzer.cpp
 	blacklist_filter.cpp
 	cache.cpp
 	config.cpp

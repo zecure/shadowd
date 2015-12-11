@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_SUITE(request_handler_test)
 
 BOOST_AUTO_TEST_CASE(valid_signature) {
 	swd::request_ptr request(new swd::request);
-	swd::request_handler request_handler(request, swd::analyzer_ptr(), swd::storage_ptr());
+	swd::request_handler request_handler(request, swd::cache_ptr(), swd::storage_ptr());
 	swd::profile_ptr profile(new swd::profile);
 
 	profile->set_key("foo");
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(valid_signature) {
 
 BOOST_AUTO_TEST_CASE(invalid_signature) {
 	swd::request_ptr request(new swd::request);
-	swd::request_handler request_handler(request, swd::analyzer_ptr(), swd::storage_ptr());
+	swd::request_handler request_handler(request, swd::cache_ptr(), swd::storage_ptr());
 	swd::profile_ptr profile(new swd::profile);
 
 	profile->set_key("qux");
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(invalid_signature) {
 
 BOOST_AUTO_TEST_CASE(valid_decode) {
 	swd::request_ptr request(new swd::request);
-	swd::request_handler request_handler(request, swd::analyzer_ptr(), swd::storage_ptr());
+	swd::request_handler request_handler(request, swd::cache_ptr(), swd::storage_ptr());
 
 	request->set_content("{\"version\":\"2.0.0-php\",\"client_ip\":\"127.0.0.1\",\"caller\":"
 	 "\"foo\",\"resource\":\"\\/bar.php\",\"input\":{\"foo\":\"bar\"},\"hashes\":{\"foo\":\"bar\"}}");
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(valid_decode) {
 
 BOOST_AUTO_TEST_CASE(invalid_decode) {
 	swd::request_ptr request(new swd::request);
-	swd::request_handler request_handler(request, swd::analyzer_ptr(), swd::storage_ptr());
+	swd::request_handler request_handler(request, swd::cache_ptr(), swd::storage_ptr());
 
 	BOOST_CHECK(request_handler.decode() == false);
 
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(invalid_decode) {
 
 BOOST_AUTO_TEST_CASE(get_threats) {
 	swd::request_ptr request(new swd::request);
-	swd::request_handler request_handler(request, swd::analyzer_ptr(), swd::storage_ptr());
+	swd::request_handler request_handler(request, swd::cache_ptr(), swd::storage_ptr());
 	swd::parameter_ptr parameter_ok(new swd::parameter);
 	swd::parameter_ptr parameter_threat(new swd::parameter);
 

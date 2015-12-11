@@ -35,14 +35,16 @@
 #include <jsoncpp/json/json.h>
 
 #include "request_handler.h"
-#include "analyzer.h"
+#include "blacklist.h"
+#include "whitelist.h"
+#include "integrity.h"
 #include "storage.h"
 #include "log.h"
 
 swd::request_handler::request_handler(const swd::request_ptr& request,
- const swd::analyzer_ptr& analyzer, const swd::storage_ptr& storage) :
+ const swd::cache_ptr& cache, const swd::storage_ptr& storage) :
  request_(request),
- analyzer_(analyzer),
+ cache_(cache),
  storage_(storage) {
 }
 
@@ -181,7 +183,22 @@ bool swd::request_handler::decode() {
 
 void swd::request_handler::process() {
 	/* Analyze the request and its parameters. */
-	analyzer_->scan(request_);
+	swd::profile_ptr profile = request_->get_profile();
+
+	if (profile->is_integrity_enabled()) {
+		swd::integrity integrity(cache_);
+		integrity.scan(request_);
+	}
+
+	if (profile->is_blacklist_enabled()) {
+		swd::blacklist blacklist(cache_);
+		blacklist.scan(request_);
+	}
+
+	if (profile->is_whitelist_enabled()) {
+		swd::whitelist whitelist(cache_);
+		whitelist.scan(request_);
+	}
 
 	/**
 	 * Nothing to do if there are no threats and learning is disabled. If there

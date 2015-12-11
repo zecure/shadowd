@@ -60,18 +60,28 @@ void swd::whitelist::scan(swd::request_ptr& request) {
 		 */
 		parameter->set_total_whitelist_rules(rules.size());
 
+		if (parameter->get_total_whitelist_rules() == 0) {
+			parameter->set_threat(true);
+		}
+
 		/* Iterate over all rules. */
 		for (swd::whitelist_rules::iterator it_rule = rules.begin();
 		 it_rule != rules.end(); it_rule++) {
 			swd::whitelist_rule_ptr rule(*it_rule);
 
 			try {
-				/* Add pointers to all rules that are not adhered to by this parameter. */
+				/* Add pointers to all rules that are not adhered to. */
 				if (!rule->is_adhered_to(parameter->get_value())) {
 					parameter->add_whitelist_rule(rule);
+					parameter->set_threat(true);
 				}
 			} catch (...) {
-				swd::log::i()->send(swd::uncritical_error, "Unexpected whitelist problem");
+				swd::log::i()->send(swd::uncritical_error,
+				 "Unexpected whitelist problem");
+
+				/* Add the rule anyway to avoid a potential bypass. */
+				parameter->add_whitelist_rule(rule);
+				parameter->set_threat(true);
 			}
 		}
 	}

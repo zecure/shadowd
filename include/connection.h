@@ -42,7 +42,6 @@
 
 #include "reply.h"
 #include "request.h"
-#include "analyzer.h"
 #include "storage.h"
 #include "cache.h"
 #include "request_parser.h"
@@ -82,14 +81,12 @@ namespace swd {
 			 *  operations.
 			 * @param context The (possible empty) ssl context
 			 * @param ssl True if ssl is enabled
-			 * @param analyzer The pointer to the analyzer object
 			 * @param storage The pointer to the storage object
 			 * @param cache The pointer to the cache object
 			 */
 			explicit connection(boost::asio::io_service& io_service,
-			 swd::context& context, bool ssl, const swd::analyzer_ptr& analyzer,
-			 const swd::storage_ptr& storage, const swd::database_ptr& database,
-			 const swd::cache_ptr& cache);
+			 swd::context& context, bool ssl, const swd::storage_ptr& storage,
+			 const swd::database_ptr& database, const swd::cache_ptr& cache);
 
 			/**
 			 * @brief Get the socket associated with the connection.
@@ -186,11 +183,6 @@ namespace swd {
 			 * @brief The status of ssl usage
 			 */
 			bool ssl_;
-
-			/**
-			 * @brief The pointer to the analyzer object.
-			 */
-			swd::analyzer_ptr analyzer_;
 
 			/**
 			 * @brief The pointer to the storage object.

@@ -36,7 +36,7 @@
 #include <string>
 
 #include "request.h"
-#include "analyzer.h"
+#include "cache.h"
 #include "storage.h"
 
 namespace swd {
@@ -49,11 +49,11 @@ namespace swd {
 			 * @brief Construct a request handler.
 			 *
 			 * @param request The pointer to the request object
-			 * @param analyzer The pointer to the analyzer object
+			 * @param cache The pointer to the cache object
 			 * @param storage The pointer to the storage object
 			 */
 			request_handler(const swd::request_ptr& request,
-			 const swd::analyzer_ptr& analyzer, const swd::storage_ptr& storage);
+			 const swd::cache_ptr& cache, const swd::storage_ptr& storage);
 
 			/**
 			 * @brief Check if the signature of the request is valid.
@@ -88,9 +88,9 @@ namespace swd {
 			swd::request_ptr request_;
 
 			/**
-			 * @brief The pointer to the analyzer object.
+			 * @brief The pointer to the cache object.
 			 */
-			swd::analyzer_ptr analyzer_;
+			swd::cache_ptr cache_;
 
 			/**
 			 * @brief The pointer to the storage object.

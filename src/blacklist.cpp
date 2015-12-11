@@ -30,6 +30,7 @@
  */
 
 #include "blacklist.h"
+#include "blacklist_rule.h"
 #include "log.h"
 
 swd::blacklist::blacklist(const swd::cache_ptr& cache)
@@ -59,9 +60,46 @@ void swd::blacklist::scan(swd::request_ptr& request) {
 			} catch (...) {
 				swd::log::i()->send(swd::uncritical_error, "Unexpected blacklist problem");
 
-				/* Add the filter anyway to avoid a potential blacklist bypass. */
+				/* Add the filter anyway to avoid a potential bypass. */
 				parameter->add_blacklist_filter(filter);
 			}
+		}
+	}
+
+	/* Iterate over all parameters again and check total impact. */
+	for (swd::parameters::iterator it_parameter = parameters.begin();
+	 it_parameter != parameters.end(); it_parameter++) {
+		/* Save the iterators in variables for the sake of readability. */
+		swd::parameter_ptr parameter(*it_parameter);
+
+		swd::blacklist_rules rules = cache_->get_blacklist_rules(
+			request->get_profile()->get_id(),
+			request->get_caller(),
+			parameter->get_path()
+		);
+
+		int threshold = request->get_profile()->get_blacklist_threshold();
+
+		if (rules.size() > 0) {
+			/* Get the most secure threshold in case of an overlap. */
+			for (swd::blacklist_rules::iterator it_rule = rules.begin();
+			 it_rule != rules.end(); it_rule++) {
+				swd::blacklist_rule_ptr rule(*it_rule);
+
+				if (it_rule == rules.begin()) {
+					threshold = rule->get_threshold();
+				} else if (rule->get_threshold() > -1) {
+					if ((threshold < 0) || (rule->get_threshold() < threshold)) {
+						threshold = rule->get_threshold();
+					}
+				}
+			}
+		}
+
+		/* Check if the impact is higher than the threshold. */
+		if ((threshold > -1) && (parameter->get_impact() > threshold)) {
+			parameter->set_threat(true);
+			parameter->set_critical_blacklist_impact(true);
 		}
 	}
 }

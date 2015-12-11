@@ -41,9 +41,8 @@
 #include "log.h"
 #include "shared.h"
 
-swd::server::server(const swd::analyzer_ptr& analyzer, const swd::storage_ptr& storage,
+swd::server::server(const swd::storage_ptr& storage,
  const swd::database_ptr& database, const swd::cache_ptr& cache) :
- analyzer_(analyzer),
  storage_(storage),
  database_(database),
  cache_(cache),
@@ -160,7 +159,6 @@ void swd::server::start_accept() {
 			io_service_,
 			context_,
 			ssl,
-			analyzer_,
 			storage_,
 			database_,
 			cache_
