@@ -29,40 +29,76 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef SINGLETON_H
-#define SINGLETON_H
+#ifndef CACHED_H
+#define CACHED_H
+
+#include <time.h>
 
 namespace swd {
 	/**
-	 * @brief Interface for singleton classes.
+	 * @brief Encapsulates cache objects to keep track of their activity.
 	 */
-	template <typename C> class singleton {
+	template <class T> class cached {
 		public:
-			virtual ~singleton () {
-				instance_ = 0;
+			/**
+			 * @brief Construct a cached object.
+			 *
+			 * @param value The element that is encapsulated
+			 */
+			cached(const T& value) :
+			 value_(value),
+			 counter_(0),
+			 last_(time(NULL)) {
 			}
 
 			/**
-			 * @brief Get the global instance of the template class.
+			 * @brief Update stats and return the element that is encapsulated.
 			 *
-			 * @return Pointer to the template class.
+			 * @return The element that is encapsulated
 			 */
-			static C* i() {
-				if (!instance_) {
-					instance_ = new C();
+			T get_value() {
+				/* Increase counter, but do not allow overflowing. */
+				if (counter_++ > 4096) {
+					counter_ = 1024;
 				}
 
-				return instance_;
+				/* Update the last access time. */
+				last_ = time(NULL);
+
+				return value_;
+			}
+
+			/**
+			 * @brief Check if the last access time was too long ago.
+			 *
+			 * @return Status of the outdated check.
+			 */
+			bool is_outdated() const {
+				if (counter_ < 5) {
+					return ((time(NULL) - last_) > 300);
+				} else if (counter_ < 25) {
+					return ((time(NULL) - last_) > 600);
+				} else {
+					return ((time(NULL) - last_) > 900);
+				}
 			}
 
 		private:
-			static C* instance_;
+			/**
+			 * @brief The element that is encapsulated.
+			 */
+			T value_;
 
-		protected:
-			singleton() {}
+			/**
+			 * @brief The access counter for the element.
+			 */
+			int counter_;
+
+			/**
+			 * @brief The last access time for the element.
+			 */
+			time_t last_;
 	};
-
-	template <typename C> C* singleton <C>::instance_ = 0;
 }
 
-#endif /* SINGLETON_H */
+#endif /* CACHED_H */

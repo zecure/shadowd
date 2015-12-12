@@ -29,11 +29,83 @@
  * files in the program, then also delete it here.
  */
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #include "cache.h"
 #include "log.h"
 
 swd::cache::cache(const swd::database_ptr& database) :
- database_(database) {
+ database_(database),
+ stop_(false) {
+}
+
+void swd::cache::start() {
+	worker_thread_ = boost::thread(
+		boost::bind(&swd::cache::cleanup, this)
+	);
+}
+
+void swd::cache::stop() {
+	/* Stop on next loop. */
+	stop_ = true;
+
+	/* Interrupt and join thread to wait for end. */
+	worker_thread_.interrupt();
+	worker_thread_.join();
+}
+
+void swd::cache::cleanup() {
+	while (!stop_) {
+		{
+			boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
+
+			auto it_blacklist_rule = blacklist_rules_.begin();
+			while (it_blacklist_rule != blacklist_rules_.end()) {
+				swd::cached_blacklist_rules_ptr rule(it_blacklist_rule->second);
+
+				if (rule->is_outdated()) {
+					it_blacklist_rule = blacklist_rules_.erase(it_blacklist_rule);
+				} else {
+					it_blacklist_rule++;
+				}
+			}
+		}
+
+		{
+			boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
+
+			auto it_whitelist_rule = whitelist_rules_.begin();
+			while (it_whitelist_rule != whitelist_rules_.end()) {
+				swd::cached_whitelist_rules_ptr rule(it_whitelist_rule->second);
+
+				if (rule->is_outdated()) {
+					it_whitelist_rule = whitelist_rules_.erase(it_whitelist_rule);
+				} else {
+					it_whitelist_rule++;
+				}
+			}
+		}
+
+		{
+			boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
+
+			auto it_integrity_rule = integrity_rules_.begin();
+			while (it_integrity_rule != integrity_rules_.end()) {
+				swd::cached_integrity_rules_ptr rule(it_integrity_rule->second);
+
+				if (rule->is_outdated()) {
+					it_integrity_rule = integrity_rules_.erase(it_integrity_rule);
+				} else {
+					it_integrity_rule++;
+				}
+			}
+		}
+
+		/* Sleep most of the time for performance. */
+		try {
+			boost::this_thread::sleep(boost::posix_time::seconds(60));
+		} catch (boost::thread_interrupted) {}
+	}
 }
 
 void swd::cache::reset() {
@@ -69,7 +141,12 @@ void swd::cache::add_blacklist_rules(const int& profile_id,
 	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
 
 	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
-	blacklist_rules_[key] = blacklist_rules;
+
+	swd::cached_blacklist_rules_ptr cached_blacklist_rules(
+		new swd::cached_blacklist_rules(blacklist_rules)
+	);
+
+	blacklist_rules_[key] = cached_blacklist_rules;
 }
 
 
@@ -80,19 +157,17 @@ swd::blacklist_rules swd::cache::get_blacklist_rules(const int& profile_id,
 	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
 
 	if (blacklist_rules_.find(key) != blacklist_rules_.end()) {
-		return blacklist_rules_[key];
+		return blacklist_rules_[key]->get_value();
 	}
 
 	swd::blacklist_rules blacklist_rules =
 	 database_->get_blacklist_rules(profile_id, caller, path);
 
-	/**
-	 * Don't store non-existent results, otherwise memory could be filled with
-	 * garbage by malicious clients via the path input.
-	 */
-	if (!blacklist_rules.empty()) {
-		blacklist_rules_[key] = blacklist_rules;
-	}
+	swd::cached_blacklist_rules_ptr cached_blacklist_rules(
+		new swd::cached_blacklist_rules(blacklist_rules)
+	);
+
+	blacklist_rules_[key] = cached_blacklist_rules;
 
 	return blacklist_rules;
 }
@@ -122,7 +197,12 @@ void swd::cache::add_whitelist_rules(const int& profile_id,
 	boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
 
 	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
-	whitelist_rules_[key] = whitelist_rules;
+
+	swd::cached_whitelist_rules_ptr cached_whitelist_rules(
+		new swd::cached_whitelist_rules(whitelist_rules)
+	);
+
+	whitelist_rules_[key] = cached_whitelist_rules;
 }
 
 swd::whitelist_rules swd::cache::get_whitelist_rules(const int& profile_id,
@@ -132,15 +212,17 @@ swd::whitelist_rules swd::cache::get_whitelist_rules(const int& profile_id,
 	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
 
 	if (whitelist_rules_.find(key) != whitelist_rules_.end()) {
-		return whitelist_rules_[key];
+		return whitelist_rules_[key]->get_value();
 	}
 
 	swd::whitelist_rules whitelist_rules =
 	 database_->get_whitelist_rules(profile_id, caller, path);
 
-	if (!whitelist_rules.empty()) {
-		whitelist_rules_[key] = whitelist_rules;
-	}
+	swd::cached_whitelist_rules_ptr cached_whitelist_rules(
+		new swd::cached_whitelist_rules(whitelist_rules)
+	);
+
+	whitelist_rules_[key] = cached_whitelist_rules;
 
 	return whitelist_rules;
 }
@@ -150,7 +232,12 @@ void swd::cache::add_integrity_rules(const int& profile_id,
 	boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
 
 	swd::tuple_is key = std::make_tuple(profile_id, caller);
-	integrity_rules_[key] = integrity_rules;
+
+	swd::cached_integrity_rules_ptr cached_integrity_rules(
+		new swd::cached_integrity_rules(integrity_rules)
+	);
+
+	integrity_rules_[key] = cached_integrity_rules;
 }
 
 swd::integrity_rules swd::cache::get_integrity_rules(const int& profile_id,
@@ -160,15 +247,17 @@ swd::integrity_rules swd::cache::get_integrity_rules(const int& profile_id,
 	swd::tuple_is key = std::make_tuple(profile_id, caller);
 
 	if (integrity_rules_.find(key) != integrity_rules_.end()) {
-		return integrity_rules_[key];
+		return integrity_rules_[key]->get_value();
 	}
 
 	swd::integrity_rules integrity_rules =
 	 database_->get_integrity_rules(profile_id, caller);
 
-	if (!integrity_rules.empty()) {
-		integrity_rules_[key] = integrity_rules;
-	}
+	swd::cached_integrity_rules_ptr cached_integrity_rules(
+		new swd::cached_integrity_rules(integrity_rules)
+	);
+
+	integrity_rules_[key] = cached_integrity_rules;
 
 	return integrity_rules;
 }

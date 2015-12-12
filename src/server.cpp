@@ -198,8 +198,11 @@ void swd::server::handle_stop() {
 	/* Stop the threads of asio. */
 	io_service_.stop();
 
-	/* Also stop the storage thread. */
+	/* Stop the storage thread. */
 	storage_->stop();
+
+	/* Stop the cache thread. */
+	cache_->stop();
 }
 
 void swd::server::handle_reload() {

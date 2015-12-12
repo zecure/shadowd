@@ -70,7 +70,7 @@ namespace swd {
 
 		private:
 			/**
-			 * @brief Process next request in queue in recursive manner.
+			 * @brief Process the next request in the queue.
 			 */
 			void process_next();
 

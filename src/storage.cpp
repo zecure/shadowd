@@ -50,7 +50,7 @@ void swd::storage::stop() {
 	/* Stop on next loop. */
 	stop_ = true;
 
-	/* Wake up and join thread to finish current loop. */
+	/* Wake up thread to finish current loop and join to wait for end. */
 	cond_.notify_one();
 	worker_thread_.join();
 }

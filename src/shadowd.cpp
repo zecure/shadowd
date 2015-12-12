@@ -128,6 +128,9 @@ void swd::shadowd::start() {
 	/* Start the storage worker thread. */
 	storage_->start();
 
+	/* Start the cache worker thread. */
+	cache_->start();
+
 	/* This adds threads to the threadpool and keeps everything running. */
 	server_.start(swd::config::i()->get<int>("threads"));
 }
