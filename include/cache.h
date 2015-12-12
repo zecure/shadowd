@@ -202,7 +202,7 @@ namespace swd {
 
 		private:
 			/**
-			 * @brief Process next request in queue in recursive manner.
+			 * @brief Loop over the cached objects and remove outdated elements.
 			 */
 			void cleanup();
 
