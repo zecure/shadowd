@@ -56,7 +56,7 @@ namespace swd {
 			 *
 			 * @return The element that is encapsulated
 			 */
-			T get_value() {
+			const T& get_value() {
 				/* Increase counter, but do not allow overflowing. */
 				if (counter_++ > 4096) {
 					counter_ = 1024;
