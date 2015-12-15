@@ -156,7 +156,11 @@ void swd::cache::cleanup() {
 void swd::cache::reset(int profile_id) {
 	swd::log::i()->send(swd::notice, "Resetting the cache");
 
-	database_->set_cache_outdated(profile_id, false);
+	try {
+		database_->set_cache_outdated(profile_id, false);
+	} catch (swd::exceptions::database_exception& e) {
+		swd::log::i()->send(swd::uncritical_error, e.what());
+	}
 
 	{
 		boost::unique_lock<boost::mutex> scoped_lock(blacklist_filters_mutex_);
