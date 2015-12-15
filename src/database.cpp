@@ -477,13 +477,14 @@ bool swd::database::is_flooding(const std::string& client_ip,
 	return flooding;
 }
 
-void swd::database::set_cache_outdated(const bool& cache_outdated) {
+void swd::database::set_cache_outdated(const int& profile_id,
+ const bool& cache_outdated) {
 	ensure_connection();
 
 	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i",
-	 (cache_outdated ? 1 : 0));
+	dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i "
+	 "WHERE profile_id = %i OR %i < 0", (cache_outdated ? 1 : 0), profile_id, profile_id);
 
 	if (!res) {
 		throw swd::exceptions::database_exception("Can't execute cache_outdated query");

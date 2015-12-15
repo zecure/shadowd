@@ -59,14 +59,32 @@ void swd::cache::cleanup() {
 		{
 			boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
 
-			auto it_blacklist_rule = blacklist_rules_.begin();
-			while (it_blacklist_rule != blacklist_rules_.end()) {
-				swd::cached_blacklist_rules_ptr rule(it_blacklist_rule->second);
+			auto it_profile_id = blacklist_rules_.begin();
+			while (it_profile_id != blacklist_rules_.end()) {
+				auto it_caller = it_profile_id->second.begin();
+				while (it_caller != it_profile_id->second.end()) {
+					auto it_blacklist_rule = it_caller->second.begin();
+					while (it_blacklist_rule != it_caller->second.end()) {
+						swd::cached_blacklist_rules_ptr rule(it_blacklist_rule->second);
 
-				if (rule->is_outdated()) {
-					it_blacklist_rule = blacklist_rules_.erase(it_blacklist_rule);
+						if (rule->is_outdated()) {
+							it_blacklist_rule = it_caller->second.erase(it_blacklist_rule);
+						} else {
+							it_blacklist_rule++;
+						}
+					}
+
+					if (it_caller->second.empty()) {
+						it_caller = it_profile_id->second.erase(it_caller);
+					} else {
+						it_caller++;
+					}
+				}
+
+				if (it_profile_id->second.empty()) {
+					it_profile_id = blacklist_rules_.erase(it_profile_id);
 				} else {
-					it_blacklist_rule++;
+					it_profile_id++;
 				}
 			}
 		}
@@ -74,14 +92,32 @@ void swd::cache::cleanup() {
 		{
 			boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
 
-			auto it_whitelist_rule = whitelist_rules_.begin();
-			while (it_whitelist_rule != whitelist_rules_.end()) {
-				swd::cached_whitelist_rules_ptr rule(it_whitelist_rule->second);
+			auto it_profile_id = whitelist_rules_.begin();
+			while (it_profile_id != whitelist_rules_.end()) {
+				auto it_caller = it_profile_id->second.begin();
+				while (it_caller != it_profile_id->second.end()) {
+					auto it_whitelist_rule = it_caller->second.begin();
+					while (it_whitelist_rule != it_caller->second.end()) {
+						swd::cached_whitelist_rules_ptr rule(it_whitelist_rule->second);
 
-				if (rule->is_outdated()) {
-					it_whitelist_rule = whitelist_rules_.erase(it_whitelist_rule);
+						if (rule->is_outdated()) {
+							it_whitelist_rule = it_caller->second.erase(it_whitelist_rule);
+						} else {
+							it_whitelist_rule++;
+						}
+					}
+
+					if (it_caller->second.empty()) {
+						it_caller = it_profile_id->second.erase(it_caller);
+					} else {
+						it_caller++;
+					}
+				}
+
+				if (it_profile_id->second.empty()) {
+					it_profile_id = whitelist_rules_.erase(it_profile_id);
 				} else {
-					it_whitelist_rule++;
+					it_profile_id++;
 				}
 			}
 		}
@@ -89,14 +125,23 @@ void swd::cache::cleanup() {
 		{
 			boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
 
-			auto it_integrity_rule = integrity_rules_.begin();
-			while (it_integrity_rule != integrity_rules_.end()) {
-				swd::cached_integrity_rules_ptr rule(it_integrity_rule->second);
+			auto it_profile_id = integrity_rules_.begin();
+			while (it_profile_id != integrity_rules_.end()) {
+				auto it_integrity_rule = it_profile_id->second.begin();
+				while (it_integrity_rule != it_profile_id->second.end()) {
+					swd::cached_integrity_rules_ptr rule(it_integrity_rule->second);
 
-				if (rule->is_outdated()) {
-					it_integrity_rule = integrity_rules_.erase(it_integrity_rule);
+					if (rule->is_outdated()) {
+						it_integrity_rule = it_profile_id->second.erase(it_integrity_rule);
+					} else {
+						it_integrity_rule++;
+					}
+				}
+
+				if (it_profile_id->second.empty()) {
+					it_profile_id = integrity_rules_.erase(it_profile_id);
 				} else {
-					it_integrity_rule++;
+					it_profile_id++;
 				}
 			}
 		}
@@ -108,16 +153,10 @@ void swd::cache::cleanup() {
 	}
 }
 
-void swd::cache::reset() {
+void swd::cache::reset(int profile_id) {
 	swd::log::i()->send(swd::notice, "Resetting the cache");
 
-	/* Reset the cache status for all profiles. */
-	database_->set_cache_outdated(false);
-
-	{
-		boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
-		blacklist_rules_.clear();
-	}
+	database_->set_cache_outdated(profile_id, false);
 
 	{
 		boost::unique_lock<boost::mutex> scoped_lock(blacklist_filters_mutex_);
@@ -125,51 +164,34 @@ void swd::cache::reset() {
 	}
 
 	{
+		boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
+
+		if (profile_id > -1) {
+			blacklist_rules_[profile_id].clear();
+		} else {
+			blacklist_rules_.clear();
+		}
+	}
+
+	{
 		boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
-		whitelist_rules_.clear();
+
+		if (profile_id > -1) {
+			whitelist_rules_[profile_id].clear();
+		} else {
+			whitelist_rules_.clear();
+		}
 	}
 
 	{
 		boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
-		integrity_rules_.clear();
+
+		if (profile_id > -1) {
+			integrity_rules_[profile_id].clear();
+		} else {
+			integrity_rules_.clear();
+		}
 	}
-}
-
-void swd::cache::add_blacklist_rules(const int& profile_id,
- const std::string& caller, const std::string& path,
- const swd::blacklist_rules& blacklist_rules) {
-	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
-
-	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
-
-	swd::cached_blacklist_rules_ptr cached_blacklist_rules(
-		new swd::cached_blacklist_rules(blacklist_rules)
-	);
-
-	blacklist_rules_[key] = cached_blacklist_rules;
-}
-
-
-swd::blacklist_rules swd::cache::get_blacklist_rules(const int& profile_id,
- const std::string& caller, const std::string& path) {
-	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
-
-	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
-
-	if (blacklist_rules_.find(key) != blacklist_rules_.end()) {
-		return blacklist_rules_[key]->get_value();
-	}
-
-	swd::blacklist_rules blacklist_rules =
-	 database_->get_blacklist_rules(profile_id, caller, path);
-
-	swd::cached_blacklist_rules_ptr cached_blacklist_rules(
-		new swd::cached_blacklist_rules(blacklist_rules)
-	);
-
-	blacklist_rules_[key] = cached_blacklist_rules;
-
-	return blacklist_rules;
 }
 
 void swd::cache::set_blacklist_filters(const swd::blacklist_filters&
@@ -191,28 +213,59 @@ swd::blacklist_filters swd::cache::get_blacklist_filters() {
 	return blacklist_filters_;
 }
 
+void swd::cache::add_blacklist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path,
+ const swd::blacklist_rules& blacklist_rules) {
+	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
+
+	swd::cached_blacklist_rules_ptr cached_blacklist_rules(
+		new swd::cached_blacklist_rules(blacklist_rules)
+	);
+
+	blacklist_rules_[profile_id][caller][path] = cached_blacklist_rules;
+}
+
+
+swd::blacklist_rules swd::cache::get_blacklist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path) {
+	boost::unique_lock<boost::mutex> scoped_lock(blacklist_rules_mutex_);
+
+	if (blacklist_rules_[profile_id][caller].find(path) !=
+	 blacklist_rules_[profile_id][caller].end()) {
+		return blacklist_rules_[profile_id][caller][path]->get_value();
+	}
+
+	swd::blacklist_rules blacklist_rules =
+	 database_->get_blacklist_rules(profile_id, caller, path);
+
+	swd::cached_blacklist_rules_ptr cached_blacklist_rules(
+		new swd::cached_blacklist_rules(blacklist_rules)
+	);
+
+	blacklist_rules_[profile_id][caller][path] = cached_blacklist_rules;
+
+	return blacklist_rules;
+}
+
 void swd::cache::add_whitelist_rules(const int& profile_id,
  const std::string& caller, const std::string& path,
  const swd::whitelist_rules& whitelist_rules) {
 	boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
 
-	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
-
 	swd::cached_whitelist_rules_ptr cached_whitelist_rules(
 		new swd::cached_whitelist_rules(whitelist_rules)
 	);
 
-	whitelist_rules_[key] = cached_whitelist_rules;
+	whitelist_rules_[profile_id][caller][path] = cached_whitelist_rules;
 }
 
 swd::whitelist_rules swd::cache::get_whitelist_rules(const int& profile_id,
  const std::string& caller, const std::string& path) {
 	boost::unique_lock<boost::mutex> scoped_lock(whitelist_rules_mutex_);
 
-	swd::tuple_iss key = std::make_tuple(profile_id, caller, path);
-
-	if (whitelist_rules_.find(key) != whitelist_rules_.end()) {
-		return whitelist_rules_[key]->get_value();
+	if (whitelist_rules_[profile_id][caller].find(path) !=
+	 whitelist_rules_[profile_id][caller].end()) {
+		return whitelist_rules_[profile_id][caller][path]->get_value();
 	}
 
 	swd::whitelist_rules whitelist_rules =
@@ -222,7 +275,7 @@ swd::whitelist_rules swd::cache::get_whitelist_rules(const int& profile_id,
 		new swd::cached_whitelist_rules(whitelist_rules)
 	);
 
-	whitelist_rules_[key] = cached_whitelist_rules;
+	whitelist_rules_[profile_id][caller][path] = cached_whitelist_rules;
 
 	return whitelist_rules;
 }
@@ -231,23 +284,20 @@ void swd::cache::add_integrity_rules(const int& profile_id,
  const std::string& caller, const swd::integrity_rules& integrity_rules) {
 	boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
 
-	swd::tuple_is key = std::make_tuple(profile_id, caller);
-
 	swd::cached_integrity_rules_ptr cached_integrity_rules(
 		new swd::cached_integrity_rules(integrity_rules)
 	);
 
-	integrity_rules_[key] = cached_integrity_rules;
+	integrity_rules_[profile_id][caller] = cached_integrity_rules;
 }
 
 swd::integrity_rules swd::cache::get_integrity_rules(const int& profile_id,
  const std::string& caller) {
 	boost::unique_lock<boost::mutex> scoped_lock(integrity_rules_mutex_);
 
-	swd::tuple_is key = std::make_tuple(profile_id, caller);
-
-	if (integrity_rules_.find(key) != integrity_rules_.end()) {
-		return integrity_rules_[key]->get_value();
+	if (integrity_rules_[profile_id].find(caller) !=
+	 integrity_rules_[profile_id].end()) {
+		return integrity_rules_[profile_id][caller]->get_value();
 	}
 
 	swd::integrity_rules integrity_rules =
@@ -257,7 +307,7 @@ swd::integrity_rules swd::cache::get_integrity_rules(const int& profile_id,
 		new swd::cached_integrity_rules(integrity_rules)
 	);
 
-	integrity_rules_[key] = cached_integrity_rules;
+	integrity_rules_[profile_id][caller] = cached_integrity_rules;
 
 	return integrity_rules;
 }

@@ -225,9 +225,11 @@ namespace swd {
 			/**
 			 * @brief Set the status of the cache.
 			 *
+			 * @param profile_id The id of the profile, negative if all
 			 * @param cache_outdated The status of the cache
 			 */
-			void set_cache_outdated(const bool& cache_outdated);
+			void set_cache_outdated(const int& profile_id,
+			 const bool& cache_outdated);
 
 		private:
 			/**

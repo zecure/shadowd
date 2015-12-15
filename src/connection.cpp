@@ -220,7 +220,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 		swd::profile_ptr profile = request_->get_profile();
 
 		if (profile->is_cache_outdated()) {
-			cache_->reset();
+			cache_->reset(profile->get_id());
 		}
 
 		/* Process the request. */

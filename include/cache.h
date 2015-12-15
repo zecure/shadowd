@@ -33,7 +33,6 @@
 #define CACHE_H
 
 #include <map>
-#include <tuple>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -43,16 +42,6 @@
 #include "blacklist_rule.h"
 
 namespace swd {
-	/**
-	 * @brief Tuple of integer and string.
-	 */
-	typedef std::tuple<int, std::string> tuple_is;
-
-	/**
-	 * @brief Tuple of integer and two strings.
-	 */
-	typedef std::tuple<int, std::string, std::string> tuple_iss;
-
 	/**
 	 * @brief Cached blacklist rules.
 	 */
@@ -116,8 +105,25 @@ namespace swd {
 
 			/**
 			 * @brief Remove all elements from the cache.
+			 *
+			 * @param profile_id The id of the profile, negative if all
 			 */
-			void reset();
+			void reset(int profile_id = -1);
+
+			/**
+			 * @brief Set the blacklist filters. Unit tests only.
+			 *
+			 * @param blacklist_filters The vector of blacklist filters
+			 */
+			void set_blacklist_filters(const swd::blacklist_filters&
+			 blacklist_filters);
+
+			/**
+			 * @brief Get all blacklist filters.
+			 *
+			 * @return The corresponding table rows
+			 */
+			swd::blacklist_filters get_blacklist_filters();
 
 			/**
 			 * @brief Add whitelist rules to the cache. Unit tests only.
@@ -141,21 +147,6 @@ namespace swd {
 			 */
 			swd::blacklist_rules get_blacklist_rules(const int& profile_id,
 			 const std::string& caller, const std::string& path);
-
-			/**
-			 * @brief Set the blacklist filters. Unit tests only.
-			 *
-			 * @param blacklist_filters The vector of blacklist filters
-			 */
-			void set_blacklist_filters(const swd::blacklist_filters&
-			 blacklist_filters);
-
-			/**
-			 * @brief Get all blacklist filters.
-			 *
-			 * @return The corresponding table rows
-			 */
-			swd::blacklist_filters get_blacklist_filters();
 
 			/**
 			 * @brief Add whitelist rules to the cache. Unit tests only.
@@ -212,34 +203,37 @@ namespace swd {
 			swd::database_ptr database_;
 
 			/**
-			 * @brief The cache map for blacklist rules.
-			 */
-			std::map<swd::tuple_iss, swd::cached_blacklist_rules_ptr> blacklist_rules_;
-
-			/**
 			 * @brief The cache vector for blacklist filters.
 			 */
 			swd::blacklist_filters blacklist_filters_;
 
 			/**
+			 * @brief The cache map for blacklist rules.
+			 */
+			std::map< int, std::map< std::string, std::map<std::string,
+			 swd::cached_blacklist_rules_ptr> > > blacklist_rules_;
+
+			/**
 			 * @brief The cache map for whitelist rules.
 			 */
-			std::map<swd::tuple_iss, swd::cached_whitelist_rules_ptr> whitelist_rules_;
+			std::map< int, std::map< std::string, std::map<std::string,
+			 swd::cached_whitelist_rules_ptr> > > whitelist_rules_;
 
 			/**
 			 * @brief The cache map for integrity rules.
 			 */
-			std::map<swd::tuple_is, swd::cached_integrity_rules_ptr> integrity_rules_;
-
-			/**
-			 * @brief The mutex for the blacklist rules.
-			 */
-			boost::mutex blacklist_rules_mutex_;
+			std::map< int, std::map<std::string,
+			 swd::cached_integrity_rules_ptr> > integrity_rules_;
 
 			/**
 			 * @brief The mutex for the blacklist filters.
 			 */
 			boost::mutex blacklist_filters_mutex_;
+
+			/**
+			 * @brief The mutex for the blacklist rules.
+			 */
+			boost::mutex blacklist_rules_mutex_;
 
 			/**
 			 * @brief The mutex for the whitelist rules.
