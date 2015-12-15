@@ -3,7 +3,7 @@
 
 **Shadow Daemon** is a collection of tools to **detect**, **protocol** and **prevent** **attacks** on *web applications*. Technically speaking, Shadow Daemon is a **web application firewall** that intercepts requests and filters out malicious parameters. It is a modular system that separates web application, analysis and interface to increase security, flexibility and expandability.
 
-This component is the background server that handles the analysis and storage of requests.
+This is the main component that handles the analysis and storage of requests.
 
 # Documentation
 For the full documentation please refer to [shadowd.zecure.org](https://shadowd.zecure.org/).
@@ -29,4 +29,4 @@ Install and configure a database server. At the moment shadowd officially suppor
     mysql -ushadowd -p shadowd < /usr/share/shadowd/mysql_layout.sql
 
 # Configuration
-The installer creates a configuration at */etc/shadowd/shadowd.ini* which has to be edited. The config is annotated and should be self-explanatory.
+The installer copies the configuration file to */etc/shadowd/shadowd.ini*. The file is annotated and should be self-explanatory.
