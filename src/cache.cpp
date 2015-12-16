@@ -162,7 +162,7 @@ void swd::cache::reset(int profile_id) {
 		swd::log::i()->send(swd::uncritical_error, e.what());
 	}
 
-	{
+	if (profile_id < 0) {
 		boost::unique_lock<boost::mutex> scoped_lock(blacklist_filters_mutex_);
 		blacklist_filters_.clear();
 	}
