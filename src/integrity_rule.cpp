@@ -56,10 +56,29 @@ std::string swd::integrity_rule::get_digest() const {
 }
 
 bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
+	/* Stop if there is no hash (for this algorithm). */
 	if (!hash) {
 		return false;
 	}
 
-	return (algorithm_ == hash->get_algorithm()) &&
-	 (digest_ == hash->get_digest());
+	/* The algorithms should always match, but better safe than sorry. */
+	if (algorithm_ != hash->get_algorithm()) {
+		return false;
+	}
+
+	/* No need to compare the digests if the length is different. */
+	std::string user_digest = hash->get_digest();
+
+	if (digest_.length() != user_digest.length()) {
+		return false;
+	}
+
+	/* Use constant-time comparison for the digests to avoid timing attacks. */
+	unsigned char result = 0;
+
+	for (int i = 0; i < digest_.length(); i++) {
+		result |= digest_.at(i) ^ user_digest.at(i);
+	}
+
+	return (result == 0);
 }
