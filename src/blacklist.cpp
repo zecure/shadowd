@@ -87,6 +87,7 @@ void swd::blacklist::scan(swd::request_ptr& request) {
 				swd::blacklist_rule_ptr rule(*it_rule);
 
 				if (it_rule == rules.begin()) {
+                    /* If there is a rule the global threshold is ignored. */
 					threshold = rule->get_threshold();
 				} else if (rule->get_threshold() > -1) {
 					if ((threshold < 0) || (rule->get_threshold() < threshold)) {
