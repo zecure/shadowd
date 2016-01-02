@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -36,32 +36,32 @@
 #include "cache.h"
 
 namespace swd {
-	/**
-	 * @brief Handles the whitelist examination of a request.
-	 */
-	class whitelist {
-		public:
-			/**
-			 * @brief Construct the whitelist.
-			 *
-			 * @param cache The pointer to the cache object
-			 */
-			whitelist(const swd::cache_ptr& cache);
+    /**
+     * @brief Handles the whitelist examination of a request.
+     */
+    class whitelist {
+        public:
+            /**
+             * @brief Construct the whitelist.
+             *
+             * @param cache The pointer to the cache object
+             */
+            whitelist(const swd::cache_ptr& cache);
 
-			/**
-			 * @brief Scan all parameters in the request and add connections to
-			 *  broken rules.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			void scan(swd::request_ptr& request);
+            /**
+             * @brief Scan all parameters in the request and add connections to
+             *  broken rules.
+             *
+             * @param request The pointer to the request object
+             */
+            void scan(swd::request_ptr& request);
 
-		private:
-			/**
-			 * @brief The pointer to the cache object.
-			 */
-			swd::cache_ptr cache_;
-	};
+        private:
+            /**
+             * @brief The pointer to the cache object.
+             */
+            swd::cache_ptr cache_;
+    };
 }
 
 #endif /* WHITELIST_H */

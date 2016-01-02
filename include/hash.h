@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,60 +37,60 @@
 #include <boost/shared_ptr.hpp>
 
 namespace swd {
-	/**
-	 * @brief Models a hash.
-	 */
-	class hash {
-		public:
-			/**
-			 * @brief Set the algorithm of the hash.
-			 *
-			 * @param algorithm The algorithm of the hash
-			 */
-			void set_algorithm(const std::string& algorithm);
+    /**
+     * @brief Models a hash.
+     */
+    class hash {
+        public:
+            /**
+             * @brief Set the algorithm of the hash.
+             *
+             * @param algorithm The algorithm of the hash
+             */
+            void set_algorithm(const std::string& algorithm);
 
-			/**
-			 * @brief Get the algorithm of the hash.
-			 *
-			 * @return The algorithm of the hash
-			 */
-			std::string get_algorithm() const;
+            /**
+             * @brief Get the algorithm of the hash.
+             *
+             * @return The algorithm of the hash
+             */
+            std::string get_algorithm() const;
 
-			/**
-			 * @brief Set the digest of the hash.
-			 *
-			 * @param digest The digest of the hash
-			 */
-			void set_digest(const std::string& digest);
+            /**
+             * @brief Set the digest of the hash.
+             *
+             * @param digest The digest of the hash
+             */
+            void set_digest(const std::string& digest);
 
-			/**
-			 * @brief Get the digest of the hash.
-			 *
-			 * @return The digest of the hash
-			 */
-			std::string get_digest() const;
+            /**
+             * @brief Get the digest of the hash.
+             *
+             * @return The digest of the hash
+             */
+            std::string get_digest() const;
 
-		private:
-			/**
-			 * @brief The algorithm of the hash.
-			 */
-			std::string algorithm_;
+        private:
+            /**
+             * @brief The algorithm of the hash.
+             */
+            std::string algorithm_;
 
-			/**
-			 * @brief The digest of the hash.
-			 */
-			std::string digest_;
-	};
+            /**
+             * @brief The digest of the hash.
+             */
+            std::string digest_;
+    };
 
-	/**
-	 * @brief Hash pointer.
-	 */
-	typedef boost::shared_ptr<swd::hash> hash_ptr;
+    /**
+     * @brief Hash pointer.
+     */
+    typedef boost::shared_ptr<swd::hash> hash_ptr;
 
-	/**
-	 * @brief Map of hashes pointers. The key is the algorithm.
-	 */
-	typedef std::map<std::string, swd::hash_ptr> hashes;
+    /**
+     * @brief Map of hashes pointers. The key is the algorithm.
+     */
+    typedef std::map<std::string, swd::hash_ptr> hashes;
 }
 
 #endif /* HASH_H */

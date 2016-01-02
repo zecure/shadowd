@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,51 +37,51 @@
 BOOST_AUTO_TEST_SUITE(integrity_test)
 
 BOOST_AUTO_TEST_CASE(positive_integrity_check) {
-	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
-	swd::integrity integrity(cache);
+    swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+    swd::integrity integrity(cache);
 
-	swd::request_ptr request(new swd::request);
-	swd::profile_ptr profile(new swd::profile);
-	profile->set_id(1);
-	request->set_profile(profile);
-	request->set_caller("qux");
-	request->add_hash("boo", "far");
+    swd::request_ptr request(new swd::request);
+    swd::profile_ptr profile(new swd::profile);
+    profile->set_id(1);
+    request->set_profile(profile);
+    request->set_caller("qux");
+    request->add_hash("boo", "far");
 
-	swd::integrity_rule_ptr rule(new swd::integrity_rule);
-	rule->set_algorithm("foo");
-	rule->set_digest("bar");
+    swd::integrity_rule_ptr rule(new swd::integrity_rule);
+    rule->set_algorithm("foo");
+    rule->set_digest("bar");
 
-	swd::integrity_rules rules;
-	rules.push_back(rule);
-	cache->add_integrity_rules(1, "qux", rules);
+    swd::integrity_rules rules;
+    rules.push_back(rule);
+    cache->add_integrity_rules(1, "qux", rules);
 
-	integrity.scan(request);
-	BOOST_CHECK(request->get_integrity_rules().size() == 1);
-	BOOST_CHECK(request->is_threat() == true);
+    integrity.scan(request);
+    BOOST_CHECK(request->get_integrity_rules().size() == 1);
+    BOOST_CHECK(request->is_threat() == true);
 }
 
 BOOST_AUTO_TEST_CASE(negative_integrity_check) {
-	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
-	swd::integrity integrity(cache);
+    swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+    swd::integrity integrity(cache);
 
-	swd::request_ptr request(new swd::request);
-	swd::profile_ptr profile(new swd::profile);
-	profile->set_id(1);
-	request->set_profile(profile);
-	request->set_caller("qux");
-	request->add_hash("foo", "bar");
+    swd::request_ptr request(new swd::request);
+    swd::profile_ptr profile(new swd::profile);
+    profile->set_id(1);
+    request->set_profile(profile);
+    request->set_caller("qux");
+    request->add_hash("foo", "bar");
 
-	swd::integrity_rule_ptr rule(new swd::integrity_rule);
-	rule->set_algorithm("foo");
-	rule->set_digest("bar");
+    swd::integrity_rule_ptr rule(new swd::integrity_rule);
+    rule->set_algorithm("foo");
+    rule->set_digest("bar");
 
-	swd::integrity_rules rules;
-	rules.push_back(rule);
-	cache->add_integrity_rules(1, "qux", rules);
+    swd::integrity_rules rules;
+    rules.push_back(rule);
+    cache->add_integrity_rules(1, "qux", rules);
 
-	integrity.scan(request);
-	BOOST_CHECK(request->get_integrity_rules().size() == 0);
-	BOOST_CHECK(request->is_threat() == false);
+    integrity.scan(request);
+    BOOST_CHECK(request->get_integrity_rules().size() == 0);
+    BOOST_CHECK(request->is_threat() == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

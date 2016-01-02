@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,67 +37,67 @@
 BOOST_AUTO_TEST_SUITE(blacklist_test)
 
 BOOST_AUTO_TEST_CASE(positive_blacklist_check) {
-	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
-	swd::blacklist blacklist(cache);
+    swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+    swd::blacklist blacklist(cache);
 
-	swd::request_ptr request(new swd::request);
-	request->set_caller("qux");
-	swd::parameter_ptr parameter(new swd::parameter);
-	parameter->set_path("bar");
-	parameter->set_value("foo");
-	request->add_parameter(parameter);
+    swd::request_ptr request(new swd::request);
+    request->set_caller("qux");
+    swd::parameter_ptr parameter(new swd::parameter);
+    parameter->set_path("bar");
+    parameter->set_value("foo");
+    request->add_parameter(parameter);
 
-	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-	filter->set_impact(6);
-	filter->set_regex("foo");
+    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+    filter->set_impact(6);
+    filter->set_regex("foo");
 
-	swd::blacklist_filters filters;
-	filters.push_back(filter);
-	cache->set_blacklist_filters(filters);
+    swd::blacklist_filters filters;
+    filters.push_back(filter);
+    cache->set_blacklist_filters(filters);
 
-	swd::blacklist_rules rules;
-	cache->add_blacklist_rules(1, "qux", "bar", rules);
+    swd::blacklist_rules rules;
+    cache->add_blacklist_rules(1, "qux", "bar", rules);
 
-	swd::profile_ptr profile(new swd::profile);
-	profile->set_id(1);
-	profile->set_blacklist_threshold(5);
-	request->set_profile(profile);
+    swd::profile_ptr profile(new swd::profile);
+    profile->set_id(1);
+    profile->set_blacklist_threshold(5);
+    request->set_profile(profile);
 
-	blacklist.scan(request);
-	BOOST_CHECK(parameter->get_blacklist_filters().size() == 1);
-	BOOST_CHECK(parameter->is_threat() == true);
+    blacklist.scan(request);
+    BOOST_CHECK(parameter->get_blacklist_filters().size() == 1);
+    BOOST_CHECK(parameter->is_threat() == true);
 }
 
 BOOST_AUTO_TEST_CASE(negative_blacklist_check) {
-	swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
-	swd::blacklist blacklist(cache);
+    swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+    swd::blacklist blacklist(cache);
 
-	swd::request_ptr request(new swd::request);
-	request->set_caller("qux");
-	swd::parameter_ptr parameter(new swd::parameter);
-	parameter->set_path("boo");
-	parameter->set_value("far");
-	request->add_parameter(parameter);
+    swd::request_ptr request(new swd::request);
+    request->set_caller("qux");
+    swd::parameter_ptr parameter(new swd::parameter);
+    parameter->set_path("boo");
+    parameter->set_value("far");
+    request->add_parameter(parameter);
 
-	swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-	filter->set_impact(6);
-	filter->set_regex("foo");
+    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+    filter->set_impact(6);
+    filter->set_regex("foo");
 
-	swd::blacklist_filters filters;
-	filters.push_back(filter);
-	cache->set_blacklist_filters(filters);
+    swd::blacklist_filters filters;
+    filters.push_back(filter);
+    cache->set_blacklist_filters(filters);
 
-	swd::blacklist_rules rules;
-	cache->add_blacklist_rules(1, "qux", "boo", rules);
+    swd::blacklist_rules rules;
+    cache->add_blacklist_rules(1, "qux", "boo", rules);
 
-	swd::profile_ptr profile(new swd::profile);
-	profile->set_id(1);
-	profile->set_blacklist_threshold(5);
-	request->set_profile(profile);
+    swd::profile_ptr profile(new swd::profile);
+    profile->set_id(1);
+    profile->set_blacklist_threshold(5);
+    request->set_profile(profile);
 
-	blacklist.scan(request);
-	BOOST_CHECK(parameter->get_blacklist_filters().size() == 0);
-	BOOST_CHECK(parameter->is_threat() == false);
+    blacklist.scan(request);
+    BOOST_CHECK(parameter->get_blacklist_filters().size() == 0);
+    BOOST_CHECK(parameter->is_threat() == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

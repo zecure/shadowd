@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -40,63 +40,63 @@
 #include "storage.h"
 
 namespace swd {
-	/**
-	 * @brief Handles a request object.
-	 */
-	class request_handler {
-		public:
-			/**
-			 * @brief Construct a request handler.
-			 *
-			 * @param request The pointer to the request object
-			 * @param cache The pointer to the cache object
-			 * @param storage The pointer to the storage object
-			 */
-			request_handler(const swd::request_ptr& request,
-			 const swd::cache_ptr& cache, const swd::storage_ptr& storage);
+    /**
+     * @brief Handles a request object.
+     */
+    class request_handler {
+        public:
+            /**
+             * @brief Construct a request handler.
+             *
+             * @param request The pointer to the request object
+             * @param cache The pointer to the cache object
+             * @param storage The pointer to the storage object
+             */
+            request_handler(const swd::request_ptr& request,
+             const swd::cache_ptr& cache, const swd::storage_ptr& storage);
 
-			/**
-			 * @brief Check if the signature of the request is valid.
-			 *
-			 * @return Status of hmac check
-			 */
-			bool valid_signature() const;
+            /**
+             * @brief Check if the signature of the request is valid.
+             *
+             * @return Status of hmac check
+             */
+            bool valid_signature() const;
 
-			/**
-			 * @brief Decode the json string.
-			 *
-			 * @return Status of decoding
-			 */
-			bool decode();
+            /**
+             * @brief Decode the json string.
+             *
+             * @return Status of decoding
+             */
+            bool decode();
 
-			/**
-			 * @brief Start the real processing of the request.
-			 */
-			void process();
+            /**
+             * @brief Start the real processing of the request.
+             */
+            void process();
 
-			/**
-			 * @brief Get the threats of the processing.
-			 *
-			 * @return A list of all paths that should be protected
-			 */
-			std::vector<std::string> get_threats() const;
+            /**
+             * @brief Get the threats of the processing.
+             *
+             * @return A list of all paths that should be protected
+             */
+            std::vector<std::string> get_threats() const;
 
-		private:
-			/**
-			 * @brief The pointer to the request object.
-			 */
-			swd::request_ptr request_;
+        private:
+            /**
+             * @brief The pointer to the request object.
+             */
+            swd::request_ptr request_;
 
-			/**
-			 * @brief The pointer to the cache object.
-			 */
-			swd::cache_ptr cache_;
+            /**
+             * @brief The pointer to the cache object.
+             */
+            swd::cache_ptr cache_;
 
-			/**
-			 * @brief The pointer to the storage object.
-			 */
-			swd::storage_ptr storage_;
-	};
+            /**
+             * @brief The pointer to the storage object.
+             */
+            swd::storage_ptr storage_;
+    };
 }
 
 #endif /* REQUEST_HANDLER_H */

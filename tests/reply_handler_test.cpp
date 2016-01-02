@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,27 +37,27 @@
 BOOST_AUTO_TEST_SUITE(reply_handler_test)
 
 BOOST_AUTO_TEST_CASE(encode_normal) {
-	swd::reply_ptr reply(new swd::reply);
-	swd::reply_handler reply_handler(reply);
+    swd::reply_ptr reply(new swd::reply);
+    swd::reply_handler reply_handler(reply);
 
-	reply->set_status(STATUS_OK);
+    reply->set_status(STATUS_OK);
 
-	BOOST_CHECK(reply_handler.encode() == true);
-	BOOST_CHECK(reply->get_content() == "{\"status\":1,\"threats\":[]}\n");
+    BOOST_CHECK(reply_handler.encode() == true);
+    BOOST_CHECK(reply->get_content() == "{\"status\":1,\"threats\":[]}\n");
 }
 
 BOOST_AUTO_TEST_CASE(encode_attack) {
-	swd::reply_ptr reply(new swd::reply);
-	swd::reply_handler reply_handler(reply);
+    swd::reply_ptr reply(new swd::reply);
+    swd::reply_handler reply_handler(reply);
 
-	std::vector<std::string> threats;
-	threats.push_back("foo");
-	threats.push_back("bar");
-	reply->set_threats(threats);
-	reply->set_status(STATUS_ATTACK);
+    std::vector<std::string> threats;
+    threats.push_back("foo");
+    threats.push_back("bar");
+    reply->set_threats(threats);
+    reply->set_status(STATUS_ATTACK);
 
-	BOOST_CHECK(reply_handler.encode() == true);
-	BOOST_CHECK(reply->get_content() == "{\"status\":5,\"threats\":[\"foo\",\"bar\"]}\n");
+    BOOST_CHECK(reply_handler.encode() == true);
+    BOOST_CHECK(reply->get_content() == "{\"status\":5,\"threats\":[\"foo\",\"bar\"]}\n");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

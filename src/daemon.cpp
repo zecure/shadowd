@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -39,61 +39,61 @@
 #include "shared.h"
 
 void swd::daemon::set_user(const std::string& user) {
-	struct passwd *u = getpwnam(user.c_str());
+    struct passwd *u = getpwnam(user.c_str());
 
-	if (!u) {
-		throw swd::exceptions::core_exception("getpwnam() failed");
-	}
+    if (!u) {
+        throw swd::exceptions::core_exception("getpwnam() failed");
+    }
 
-	if (setuid(u->pw_uid) == -1) {
-		throw swd::exceptions::core_exception("setuid() failed");
-	}
+    if (setuid(u->pw_uid) == -1) {
+        throw swd::exceptions::core_exception("setuid() failed");
+    }
 }
 
 void swd::daemon::set_group(const std::string& group) {
-	if (setgroups(0, NULL) == -1) {
-		throw swd::exceptions::core_exception("setgroups() failed");
-	}
+    if (setgroups(0, NULL) == -1) {
+        throw swd::exceptions::core_exception("setgroups() failed");
+    }
 
-	struct group *g = getgrnam(group.c_str());
+    struct group *g = getgrnam(group.c_str());
 
-	if (!g) {
-		throw swd::exceptions::core_exception("getgrnam() failed");
-	}
+    if (!g) {
+        throw swd::exceptions::core_exception("getgrnam() failed");
+    }
 
-	if (setgid(g->gr_gid) == -1) {
-		throw swd::exceptions::core_exception("setgid() failed");
-	}
+    if (setgid(g->gr_gid) == -1) {
+        throw swd::exceptions::core_exception("setgid() failed");
+    }
 }
 
 void swd::daemon::write_pid(const std::string& file) {
-	std::ofstream out_file(file.c_str());
+    std::ofstream out_file(file.c_str());
 
-	if (!out_file.is_open()) {
-		throw swd::exceptions::core_exception("Failed to write pid file");
-	}
+    if (!out_file.is_open()) {
+        throw swd::exceptions::core_exception("Failed to write pid file");
+    }
 
-	out_file << getpid();
-	out_file.close();
+    out_file << getpid();
+    out_file.close();
 }
 
 void swd::daemon::change_root(const std::string& directory) {
-	if (chroot(directory.c_str()) < 0) {
-		throw swd::exceptions::core_exception("chroot() failed");
-	}
+    if (chroot(directory.c_str()) < 0) {
+        throw swd::exceptions::core_exception("chroot() failed");
+    }
 
-	if (chdir("/") < 0) {
-		throw swd::exceptions::core_exception("chdir() after chroot() failed");
-	}
+    if (chdir("/") < 0) {
+        throw swd::exceptions::core_exception("chdir() after chroot() failed");
+    }
 }
 
 void swd::daemon::detach() {
-	/**
-	 * This forks the process, changes the current working directory to the
-	 * root directory and closes the standard input, standard output and
-	 * standard error (redirect to /dev/null).
-	 */
-	if (::daemon(0, 0) < 0) {
-		throw swd::exceptions::core_exception("daemon() failed");
-	}
+    /**
+     * This forks the process, changes the current working directory to the
+     * root directory and closes the standard input, standard output and
+     * standard error (redirect to /dev/null).
+     */
+    if (::daemon(0, 0) < 0) {
+        throw swd::exceptions::core_exception("daemon() failed");
+    }
 }

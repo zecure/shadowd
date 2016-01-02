@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -39,149 +39,149 @@ swd::request::request() :
 }
 
 void swd::request::set_profile(const swd::profile_ptr& profile) {
-	profile_ = profile;
+    profile_ = profile;
 }
 
 swd::profile_ptr swd::request::get_profile() const {
-	return profile_;
+    return profile_;
 }
 
 void swd::request::add_parameter(const swd::parameter_ptr& parameter) {
-	parameters_.push_back(parameter);
+    parameters_.push_back(parameter);
 }
 
 void swd::request::add_parameter(const std::string& path,
  const std::string& value) {
-	swd::parameter_ptr parameter(new swd::parameter);
-	parameter->set_path(path);
-	parameter->set_value(value);
+    swd::parameter_ptr parameter(new swd::parameter);
+    parameter->set_path(path);
+    parameter->set_value(value);
 
-	parameters_.push_back(parameter);
+    parameters_.push_back(parameter);
 }
 
 const swd::parameters& swd::request::get_parameters() const {
-	return parameters_;
+    return parameters_;
 }
 
 void swd::request::append_content(const char& input) {
-	content_.push_back(input);
+    content_.push_back(input);
 }
 
 void swd::request::set_content(const std::string& content) {
-	content_ = content;
+    content_ = content;
 }
 
 std::string swd::request::get_content() const {
-	return content_;
+    return content_;
 }
 
 void swd::request::append_signature(const char& input) {
-	signature_.push_back(input);
+    signature_.push_back(input);
 }
 
 void swd::request::set_signature(const std::string& signature) {
-	signature_ = signature;
+    signature_ = signature;
 }
 
 std::string swd::request::get_signature() const {
-	return signature_;
+    return signature_;
 }
 
 void swd::request::append_profile_id(const char& input) {
-	profile_id_.push_back(input);
+    profile_id_.push_back(input);
 }
 
 void swd::request::set_profile_id(const int& profile_id) {
-	std::stringstream ss;
-	ss << profile_id;
-	profile_id_ = ss.str();
+    std::stringstream ss;
+    ss << profile_id;
+    profile_id_ = ss.str();
 }
 
 int swd::request::get_profile_id() const {
-	return atoi(profile_id_.c_str());
+    return atoi(profile_id_.c_str());
 }
 
 void swd::request::set_client_ip(const std::string& client_ip) {
-	client_ip_ = client_ip;
+    client_ip_ = client_ip;
 }
 
 std::string swd::request::get_client_ip() const {
-	return client_ip_;
+    return client_ip_;
 }
 
 void swd::request::set_caller(const std::string& caller) {
-	caller_ = caller;
+    caller_ = caller;
 }
 
 std::string swd::request::get_caller() const {
-	return caller_;
+    return caller_;
 }
 
 void swd::request::set_resource(const std::string& resource) {
-	resource_ = resource;
+    resource_ = resource;
 }
 
 std::string swd::request::get_resource() const {
-	return resource_;
+    return resource_;
 }
 
 void swd::request::add_integrity_rule(const swd::integrity_rule_ptr& rule) {
-	integrity_rules_.push_back(rule);
+    integrity_rules_.push_back(rule);
 }
 
 const swd::integrity_rules& swd::request::get_integrity_rules() const {
-	return integrity_rules_;
+    return integrity_rules_;
 }
 
 void swd::request::set_total_integrity_rules(const int& total_integrity_rules) {
-	total_integrity_rules_ = total_integrity_rules;
+    total_integrity_rules_ = total_integrity_rules;
 }
 
 int swd::request::get_total_integrity_rules() const {
-	return total_integrity_rules_;
+    return total_integrity_rules_;
 }
 
 void swd::request::add_hash(const std::string& algorithm,
  const std::string& digest) {
-	swd::hash_ptr hash(new swd::hash);
-	hash->set_algorithm(algorithm);
-	hash->set_digest(digest);
+    swd::hash_ptr hash(new swd::hash);
+    hash->set_algorithm(algorithm);
+    hash->set_digest(digest);
 
-	hashes_[algorithm] = hash;
+    hashes_[algorithm] = hash;
 }
 
 const swd::hashes& swd::request::get_hashes() const {
-	return hashes_;
+    return hashes_;
 }
 
 swd::hash_ptr swd::request::get_hash(const std::string& algorithm) /*const*/ {
-	/* Necessary, otherwise element is created. */
-	if (hashes_.find(algorithm) == hashes_.end()) {
-		return swd::hash_ptr();
-	}
+    /* Necessary, otherwise element is created. */
+    if (hashes_.find(algorithm) == hashes_.end()) {
+        return swd::hash_ptr();
+    }
 
-	return hashes_[algorithm];
+    return hashes_[algorithm];
 }
 
 void swd::request::set_threat(const bool& threat) {
-	threat_ = threat;
+    threat_ = threat;
 }
 
 bool swd::request::is_threat() const {
-	return threat_;
+    return threat_;
 }
 
 bool swd::request::has_threats() const {
-	/* Iterate over all parameters and check for threats. */
-	for (swd::parameters::const_iterator it_parameter = parameters_.begin();
-	 it_parameter != parameters_.end(); it_parameter++) {
-		swd::parameter_ptr parameter(*it_parameter);
+    /* Iterate over all parameters and check for threats. */
+    for (swd::parameters::const_iterator it_parameter = parameters_.begin();
+     it_parameter != parameters_.end(); it_parameter++) {
+        swd::parameter_ptr parameter(*it_parameter);
 
-		/* We only need to know if there is at least one threat. */
-		if (parameter->is_threat()) {
-			return true;
-		}
-	}
+        /* We only need to know if there is at least one threat. */
+        if (parameter->is_threat()) {
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -35,32 +35,32 @@
 #include "reply.h"
 
 namespace swd {
-	/**
-	 * @brief Prepares a reply before it can be send to the client.
-	 */
-	class reply_handler {
-		public:
-			/**
-			 * @brief Construct a reply handler.
-			 *
-			 * @param reply The pointer to the reply object
-			 */
-			reply_handler(const swd::reply_ptr& reply);
+    /**
+     * @brief Prepares a reply before it can be send to the client.
+     */
+    class reply_handler {
+        public:
+            /**
+             * @brief Construct a reply handler.
+             *
+             * @param reply The pointer to the reply object
+             */
+            reply_handler(const swd::reply_ptr& reply);
 
-			/**
-			 * @brief Encode the data of the reply with json and save the
-			 *  encoded version in the reply.
-			 *
-			 * @return The status of the encoding
-			 */
-			bool encode();
+            /**
+             * @brief Encode the data of the reply with json and save the
+             *  encoded version in the reply.
+             *
+             * @return The status of the encoding
+             */
+            bool encode();
 
-		private:
-			/**
-			 * @brief reply The pointer to the reply object.
-			 */
-			swd::reply_ptr reply_;
-	};
+        private:
+            /**
+             * @brief reply The pointer to the reply object.
+             */
+            swd::reply_ptr reply_;
+    };
 }
 
 #endif /* REPLY_HANDLER_H */

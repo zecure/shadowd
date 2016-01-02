@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -32,17 +32,17 @@
 #include "hash.h"
 
 void swd::hash::set_algorithm(const std::string& algorithm) {
-	algorithm_ = algorithm;
+    algorithm_ = algorithm;
 }
 
 std::string swd::hash::get_algorithm() const {
-	return algorithm_;
+    return algorithm_;
 }
 
 void swd::hash::set_digest(const std::string& digest) {
-	digest_ = digest;
+    digest_ = digest;
 }
 
 std::string swd::hash::get_digest() const {
-	return digest_;
+    return digest_;
 }

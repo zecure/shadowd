@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,39 +37,39 @@
 BOOST_AUTO_TEST_SUITE(whitelist_rule_test)
 
 BOOST_AUTO_TEST_CASE(adhered_whitelist_rule) {
-	swd::whitelist_rule_ptr rule(new swd::whitelist_rule);
-	swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
+    swd::whitelist_rule_ptr rule(new swd::whitelist_rule);
+    swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
 
-	filter->set_id(1);
-	filter->set_regex("^foo$");
-	rule->set_id(1);
-	rule->set_filter(filter);
+    filter->set_id(1);
+    filter->set_regex("^foo$");
+    rule->set_id(1);
+    rule->set_filter(filter);
 
-	rule->set_min_length(-1);
-	rule->set_max_length(-1);
-	BOOST_CHECK(rule->is_adhered_to("foo") == true);
+    rule->set_min_length(-1);
+    rule->set_max_length(-1);
+    BOOST_CHECK(rule->is_adhered_to("foo") == true);
 
-	rule->set_min_length(3);
-	rule->set_max_length(3);
-	BOOST_CHECK(rule->is_adhered_to("foo") == true);
+    rule->set_min_length(3);
+    rule->set_max_length(3);
+    BOOST_CHECK(rule->is_adhered_to("foo") == true);
 }
 
 BOOST_AUTO_TEST_CASE(not_adhered_whitelist_rule) {
-	swd::whitelist_rule_ptr rule(new swd::whitelist_rule);
-	swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
+    swd::whitelist_rule_ptr rule(new swd::whitelist_rule);
+    swd::whitelist_filter_ptr filter(new swd::whitelist_filter);
 
-	filter->set_id(1);
-	filter->set_regex("^foo$");
-	rule->set_id(1);
-	rule->set_filter(filter);
+    filter->set_id(1);
+    filter->set_regex("^foo$");
+    rule->set_id(1);
+    rule->set_filter(filter);
 
-	rule->set_min_length(-1);
-	rule->set_max_length(-1);
-	BOOST_CHECK(rule->is_adhered_to("bar") == false);
+    rule->set_min_length(-1);
+    rule->set_max_length(-1);
+    BOOST_CHECK(rule->is_adhered_to("bar") == false);
 
-	rule->set_min_length(10);
-	rule->set_max_length(10);
-	BOOST_CHECK(rule->is_adhered_to("foo") == false);
+    rule->set_min_length(10);
+    rule->set_max_length(10);
+    BOOST_CHECK(rule->is_adhered_to("foo") == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

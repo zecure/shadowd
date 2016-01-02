@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -40,41 +40,41 @@ swd::integrity::integrity(const swd::cache_ptr& cache) :
 }
 
 void swd::integrity::scan(swd::request_ptr& request) {
-	/* Import the rules from the database. */
-	swd::integrity_rules rules = cache_->get_integrity_rules(
-		request->get_profile()->get_id(),
-		request->get_caller()
-	);
+    /* Import the rules from the database. */
+    swd::integrity_rules rules = cache_->get_integrity_rules(
+        request->get_profile()->get_id(),
+        request->get_caller()
+    );
 
-	/**
-	 * The request needs at least one rule to pass the check. Otherwise
-	 * it wouldn't be a whitelist.
-	 */
-	request->set_total_integrity_rules(rules.size());
+    /**
+     * The request needs at least one rule to pass the check. Otherwise
+     * it wouldn't be a whitelist.
+     */
+    request->set_total_integrity_rules(rules.size());
 
-	if (request->get_total_integrity_rules() == 0) {
-		request->set_threat(true);
-	}
+    if (request->get_total_integrity_rules() == 0) {
+        request->set_threat(true);
+    }
 
-	/* Iterate over all rules. */
-	for (swd::integrity_rules::iterator it_rule = rules.begin();
-	 it_rule != rules.end(); it_rule++) {
-		swd::integrity_rule_ptr rule(*it_rule);
+    /* Iterate over all rules. */
+    for (swd::integrity_rules::iterator it_rule = rules.begin();
+     it_rule != rules.end(); it_rule++) {
+        swd::integrity_rule_ptr rule(*it_rule);
 
-		try {
-			swd::hash_ptr hash = request->get_hash(rule->get_algorithm());
+        try {
+            swd::hash_ptr hash = request->get_hash(rule->get_algorithm());
 
-			/* Add pointers to all rules that do not match. */
-			if (!rule->matches(hash)) {
-				request->add_integrity_rule(rule);
-				request->set_threat(true);
-			}
-		} catch (...) {
-			swd::log::i()->send(swd::uncritical_error, "Unexpected integrity problem");
+            /* Add pointers to all rules that do not match. */
+            if (!rule->matches(hash)) {
+                request->add_integrity_rule(rule);
+                request->set_threat(true);
+            }
+        } catch (...) {
+            swd::log::i()->send(swd::uncritical_error, "Unexpected integrity problem");
 
-			/* Add the rule anyway to avoid a potential bypass. */
-			request->add_integrity_rule(rule);
-			request->set_threat(true);
-		}
-	}
+            /* Add the rule anyway to avoid a potential bypass. */
+            request->add_integrity_rule(rule);
+            request->set_threat(true);
+        }
+    }
 }

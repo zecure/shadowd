@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,66 +37,66 @@
 #include "config.h"
 
 void swd::log::open_file(const std::string& file) {
-	/* Use mutex to avoid race conditions. */
-	boost::unique_lock<boost::mutex> scoped_lock(mutex_);
+    /* Use mutex to avoid race conditions. */
+    boost::unique_lock<boost::mutex> scoped_lock(mutex_);
 
-	/* Set the file. */
-	file_ = file;
+    /* Set the file. */
+    file_ = file;
 }
 
 void swd::log::send(const swd::log_level& level, const std::string& message) {
-	/* Skip warning & notice if verbose is not enabled. */
-	if (!swd::config::i()->defined("verbose")) {
-		if ((level == warning) || (level == notice)) {
-			return;
-		}
-	}
+    /* Skip warning & notice if verbose is not enabled. */
+    if (!swd::config::i()->defined("verbose")) {
+        if ((level == warning) || (level == notice)) {
+            return;
+        }
+    }
 
-	/* Build an informative output line. */
-	std::stringstream line;
+    /* Build an informative output line. */
+    std::stringstream line;
 
-	line << this->get_current_time() << "\t";
+    line << this->get_current_time() << "\t";
 
-	switch (level) {
-		case critical_error:
-			line << "Critical error";
-			break;
-		case uncritical_error:
-			line << "Uncritical error";
-			break;
-		case warning:
-			line << "Warning";
-			break;
-		case notice:
-			line << "Notice";
-			break;
-	}
+    switch (level) {
+        case critical_error:
+            line << "Critical error";
+            break;
+        case uncritical_error:
+            line << "Uncritical error";
+            break;
+        case warning:
+            line << "Warning";
+            break;
+        case notice:
+            line << "Notice";
+            break;
+    }
 
-	line << "\t" << message << "\n";
+    line << "\t" << message << "\n";
 
-	/* Use mutex to avoid race conditions. */
-	boost::unique_lock<boost::mutex> scoped_lock(mutex_);
+    /* Use mutex to avoid race conditions. */
+    boost::unique_lock<boost::mutex> scoped_lock(mutex_);
 
-	/* Write the final line into a log file or stderr. */
-	if (!file_.empty()) {
-		std::ofstream out_file(file_.c_str(), std::ios_base::app);
+    /* Write the final line into a log file or stderr. */
+    if (!file_.empty()) {
+        std::ofstream out_file(file_.c_str(), std::ios_base::app);
 
-		if (!out_file.is_open()) {
-			return;
-		}
+        if (!out_file.is_open()) {
+            return;
+        }
 
-		out_file << line.str();
-		out_file.close();
-	} else {
-		std::cerr << line.str();
-	}
+        out_file << line.str();
+        out_file.close();
+    } else {
+        std::cerr << line.str();
+    }
 }
 
 std::string swd::log::get_current_time() const {
-	time_t now = time(0);
-	char buf[80];
-	struct tm tstruct = *localtime(&now);
+    time_t now = time(0);
+    char buf[80];
+    struct tm tstruct = *localtime(&now);
 
-	strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
-	return buf;
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+    return buf;
 }

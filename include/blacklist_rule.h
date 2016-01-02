@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -36,60 +36,60 @@
 #include <boost/shared_ptr.hpp>
 
 namespace swd {
-	/**
-	 * @brief Models a blacklist rule.
-	 */
-	class blacklist_rule {
-		public:
-			/**
-			 * @brief Set the id the rule.
-			 *
-			 * @param id The id of the rule
-			 */
-			void set_id(const int& id);
+    /**
+     * @brief Models a blacklist rule.
+     */
+    class blacklist_rule {
+        public:
+            /**
+             * @brief Set the id the rule.
+             *
+             * @param id The id of the rule
+             */
+            void set_id(const int& id);
 
-			/**
-			 * @brief Get the id the rule.
-			 *
-			 * @return The id of the rule
-			 */
-			int get_id() const;
+            /**
+             * @brief Get the id the rule.
+             *
+             * @return The id of the rule
+             */
+            int get_id() const;
 
-			/**
-			 * @brief Get the threshold of the rule.
-			 *
-			 * @param threshold The threshold of the rule
-			 */
-			void set_threshold(const int& threshold);
+            /**
+             * @brief Get the threshold of the rule.
+             *
+             * @param threshold The threshold of the rule
+             */
+            void set_threshold(const int& threshold);
 
-			/**
-			 * @brief Get the threshold of the rule.
-			 *
-			 * @return The threshold of the rule
-			 */
-			int get_threshold() const;
+            /**
+             * @brief Get the threshold of the rule.
+             *
+             * @return The threshold of the rule
+             */
+            int get_threshold() const;
 
-		private:
-			/**
-			 * @brief The database id of the rule.
-			 */
-			int id_;
+        private:
+            /**
+             * @brief The database id of the rule.
+             */
+            int id_;
 
-			/**
-			 * @brief The threshold of the rule.
-			 */
-			int threshold_;
-	};
+            /**
+             * @brief The threshold of the rule.
+             */
+            int threshold_;
+    };
 
-	/**
-	 * @brief Blacklist rule pointer.
-	 */
-	typedef boost::shared_ptr<swd::blacklist_rule> blacklist_rule_ptr;
+    /**
+     * @brief Blacklist rule pointer.
+     */
+    typedef boost::shared_ptr<swd::blacklist_rule> blacklist_rule_ptr;
 
-	/**
-	 * @brief List of blacklist rule pointers.
-	 */
-	typedef std::vector<swd::blacklist_rule_ptr> blacklist_rules;
+    /**
+     * @brief List of blacklist rule pointers.
+     */
+    typedef std::vector<swd::blacklist_rule_ptr> blacklist_rules;
 }
 
 #endif /* BLACKLIST_RULE_H */

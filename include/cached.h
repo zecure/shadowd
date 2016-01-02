@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -35,70 +35,70 @@
 #include <time.h>
 
 namespace swd {
-	/**
-	 * @brief Encapsulates cache objects to keep track of their activity.
-	 */
-	template <class T> class cached {
-		public:
-			/**
-			 * @brief Construct a cached object.
-			 *
-			 * @param value The element that is encapsulated
-			 */
-			cached(const T& value) :
-			 value_(value),
-			 counter_(0),
-			 last_(time(NULL)) {
-			}
+    /**
+     * @brief Encapsulates cache objects to keep track of their activity.
+     */
+    template <class T> class cached {
+        public:
+            /**
+             * @brief Construct a cached object.
+             *
+             * @param value The element that is encapsulated
+             */
+            cached(const T& value) :
+             value_(value),
+             counter_(0),
+             last_(time(NULL)) {
+            }
 
-			/**
-			 * @brief Update stats and return the element that is encapsulated.
-			 *
-			 * @return The element that is encapsulated
-			 */
-			const T& get_value() {
-				/* Increase counter, but do not allow overflowing. */
-				if (counter_++ > 4096) {
-					counter_ = 1024;
-				}
+            /**
+             * @brief Update stats and return the element that is encapsulated.
+             *
+             * @return The element that is encapsulated
+             */
+            const T& get_value() {
+                /* Increase counter, but do not allow overflowing. */
+                if (counter_++ > 4096) {
+                    counter_ = 1024;
+                }
 
-				/* Update the last access time. */
-				last_ = time(NULL);
+                /* Update the last access time. */
+                last_ = time(NULL);
 
-				return value_;
-			}
+                return value_;
+            }
 
-			/**
-			 * @brief Check if the last access time was too long ago.
-			 *
-			 * @return Status of the outdated check.
-			 */
-			bool is_outdated() const {
-				if (counter_ < 5) {
-					return ((time(NULL) - last_) > 300);
-				} else if (counter_ < 25) {
-					return ((time(NULL) - last_) > 600);
-				} else {
-					return ((time(NULL) - last_) > 900);
-				}
-			}
+            /**
+             * @brief Check if the last access time was too long ago.
+             *
+             * @return Status of the outdated check.
+             */
+            bool is_outdated() const {
+                if (counter_ < 5) {
+                    return ((time(NULL) - last_) > 300);
+                } else if (counter_ < 25) {
+                    return ((time(NULL) - last_) > 600);
+                } else {
+                    return ((time(NULL) - last_) > 900);
+                }
+            }
 
-		private:
-			/**
-			 * @brief The element that is encapsulated.
-			 */
-			T value_;
+        private:
+            /**
+             * @brief The element that is encapsulated.
+             */
+            T value_;
 
-			/**
-			 * @brief The access counter for the element.
-			 */
-			int counter_;
+            /**
+             * @brief The access counter for the element.
+             */
+            int counter_;
 
-			/**
-			 * @brief The last access time for the element.
-			 */
-			time_t last_;
-	};
+            /**
+             * @brief The last access time for the element.
+             */
+            time_t last_;
+    };
 }
 
 #endif /* CACHED_H */

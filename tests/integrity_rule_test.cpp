@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,40 +37,40 @@
 BOOST_AUTO_TEST_SUITE(integrity_rule_test)
 
 BOOST_AUTO_TEST_CASE(matching_integrity_rule) {
-	swd::integrity_rule_ptr rule(new swd::integrity_rule);
-	swd::hash_ptr hash(new swd::hash);
+    swd::integrity_rule_ptr rule(new swd::integrity_rule);
+    swd::hash_ptr hash(new swd::hash);
 
-	rule->set_algorithm("foo");
-	rule->set_digest("bar");
-	hash->set_algorithm("foo");
-	hash->set_digest("bar");
+    rule->set_algorithm("foo");
+    rule->set_digest("bar");
+    hash->set_algorithm("foo");
+    hash->set_digest("bar");
 
-	BOOST_CHECK(rule->matches(hash) == true);
+    BOOST_CHECK(rule->matches(hash) == true);
 }
 
 BOOST_AUTO_TEST_CASE(not_matching_integrity_rule) {
-	swd::integrity_rule_ptr rule(new swd::integrity_rule);
-	swd::hash_ptr hash(new swd::hash);
+    swd::integrity_rule_ptr rule(new swd::integrity_rule);
+    swd::hash_ptr hash(new swd::hash);
 
-	rule->set_algorithm("foo");
-	rule->set_digest("bar");
+    rule->set_algorithm("foo");
+    rule->set_digest("bar");
 
-	BOOST_CHECK(rule->matches(swd::hash_ptr()) == false);
+    BOOST_CHECK(rule->matches(swd::hash_ptr()) == false);
 
-	hash->set_algorithm("boo");
-	hash->set_digest("bar");
+    hash->set_algorithm("boo");
+    hash->set_digest("bar");
 
-	BOOST_CHECK(rule->matches(hash) == false);
+    BOOST_CHECK(rule->matches(hash) == false);
 
-	hash->set_algorithm("foo");
-	hash->set_digest("far");
+    hash->set_algorithm("foo");
+    hash->set_digest("far");
 
-	BOOST_CHECK(rule->matches(hash) == false);
+    BOOST_CHECK(rule->matches(hash) == false);
 
-	hash->set_algorithm("");
-	hash->set_digest("");
+    hash->set_algorithm("");
+    hash->set_digest("");
 
-	BOOST_CHECK(rule->matches(hash) == false);
+    BOOST_CHECK(rule->matches(hash) == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -41,25 +41,25 @@ swd::reply_handler::reply_handler(const swd::reply_ptr& reply) :
 }
 
 bool swd::reply_handler::encode() {
-	try {
-		Json::Value root;
-		Json::FastWriter writer;
+    try {
+        Json::Value root;
+        Json::FastWriter writer;
 
-		root["status"] = reply_->get_status();
-		std::vector<std::string> threats = reply_->get_threats();
+        root["status"] = reply_->get_status();
+        std::vector<std::string> threats = reply_->get_threats();
 
-		Json::Value output(Json::arrayValue);
-		for (std::vector<std::string>::iterator it = threats.begin(); it != threats.end(); ++it) {
-			output.append(*it);
-		}
+        Json::Value output(Json::arrayValue);
+        for (std::vector<std::string>::iterator it = threats.begin(); it != threats.end(); ++it) {
+            output.append(*it);
+        }
 
-		root["threats"] = output;
+        root["threats"] = output;
 
-		reply_->set_content(writer.write(root));
-	} catch (...) {
-		swd::log::i()->send(swd::uncritical_error, "Uncaught json encode exception");
-		return false;
-	}
+        reply_->set_content(writer.write(root));
+    } catch (...) {
+        swd::log::i()->send(swd::uncritical_error, "Uncaught json encode exception");
+        return false;
+    }
 
-	return true;
+    return true;
 }

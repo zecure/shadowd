@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -40,168 +40,168 @@
 #include "whitelist_rule.h"
 
 namespace swd {
-	/**
-	 * @brief Models a parameter.
-	 */
-	class parameter {
-		public:
-			/**
-			 * @brief Construct a parameter.
-			 */
-			parameter();
+    /**
+     * @brief Models a parameter.
+     */
+    class parameter {
+        public:
+            /**
+             * @brief Construct a parameter.
+             */
+            parameter();
 
-			/**
-			 * @brief Set the path of the parameter.
-			 *
-			 * @param path The path of the parameter
-			 */
-			void set_path(const std::string& path);
+            /**
+             * @brief Set the path of the parameter.
+             *
+             * @param path The path of the parameter
+             */
+            void set_path(const std::string& path);
 
-			/**
-			 * @brief Get the path of the parameter.
-			 *
-			 * @return The path of the parameter
-			 */
-			std::string get_path() const;
+            /**
+             * @brief Get the path of the parameter.
+             *
+             * @return The path of the parameter
+             */
+            std::string get_path() const;
 
-			/**
-			 * @brief Get the value of the parameter.
-			 *
-			 * @param value The raw value of the parameter
-			 */
-			void set_value(const std::string& value);
+            /**
+             * @brief Get the value of the parameter.
+             *
+             * @param value The raw value of the parameter
+             */
+            void set_value(const std::string& value);
 
-			/**
-			 * @brief Get the value of the parameter.
-			 *
-			 * @return The raw value of the parameter
-			 */
-			std::string get_value() const;
+            /**
+             * @brief Get the value of the parameter.
+             *
+             * @return The raw value of the parameter
+             */
+            std::string get_value() const;
 
-			/**
-			 * @brief Add a (matching) blacklist filter to this parameter.
-			 *
-			 * @param filter The pointer to the blacklist filter object
-			 */
-			void add_blacklist_filter(const swd::blacklist_filter_ptr& filter);
+            /**
+             * @brief Add a (matching) blacklist filter to this parameter.
+             *
+             * @param filter The pointer to the blacklist filter object
+             */
+            void add_blacklist_filter(const swd::blacklist_filter_ptr& filter);
 
-			/**
-			 * @brief Get all (matching) blacklist filters.
-			 *
-			 * @return The list of saved blacklist filters
-			 */
-			const swd::blacklist_filters& get_blacklist_filters() const;
+            /**
+             * @brief Get all (matching) blacklist filters.
+             *
+             * @return The list of saved blacklist filters
+             */
+            const swd::blacklist_filters& get_blacklist_filters() const;
 
-			/**
-			 * @brief Add a (broken) whitelist rule to this parameter.
-			 *
-			 * @param rule The pointer to the whitelist rule object
-			 */
-			void add_whitelist_rule(const swd::whitelist_rule_ptr& rule);
+            /**
+             * @brief Add a (broken) whitelist rule to this parameter.
+             *
+             * @param rule The pointer to the whitelist rule object
+             */
+            void add_whitelist_rule(const swd::whitelist_rule_ptr& rule);
 
-			/**
-			 * @brief Get all (broken) whitelist rules.
-			 *
-			 * @return The list of saved whitelist rules
-			 */
-			const swd::whitelist_rules& get_whitelist_rules() const;
+            /**
+             * @brief Get all (broken) whitelist rules.
+             *
+             * @return The list of saved whitelist rules
+             */
+            const swd::whitelist_rules& get_whitelist_rules() const;
 
-			/**
-			 * @brief Get the total impact of all broken blacklist filters.
-			 *
-			 * @return The total impact of all broken blacklist filters.
-			 */
-			int get_impact() const;
+            /**
+             * @brief Get the total impact of all broken blacklist filters.
+             *
+             * @return The total impact of all broken blacklist filters.
+             */
+            int get_impact() const;
 
-			/**
-			 * @brief Define if this parameter is a threat or not.
-			 *
-			 * @param threat Threat status of this parameter
-			 */
-			void set_threat(const bool& threat);
+            /**
+             * @brief Define if this parameter is a threat or not.
+             *
+             * @param threat Threat status of this parameter
+             */
+            void set_threat(const bool& threat);
 
-			/**
-			 * @brief Check if the parameter is a threat.
-			 *
-			 * @return True if the parameter is a threat
-			 */
-			bool is_threat() const;
+            /**
+             * @brief Check if the parameter is a threat.
+             *
+             * @return True if the parameter is a threat
+             */
+            bool is_threat() const;
 
-			/**
-			 * @brief Define if this parameter has a critical blacklist impact or not.
-			 *
-			 * @param critical Critical impact status of this parameter
-			 */
-			void set_critical_blacklist_impact(const bool& critical);
+            /**
+             * @brief Define if this parameter has a critical blacklist impact or not.
+             *
+             * @param critical Critical impact status of this parameter
+             */
+            void set_critical_blacklist_impact(const bool& critical);
 
-			/**
-			 *@brief  Check if the parameter has a critical blacklist impact.
-			 *
-			 * @return True if the parameter has a critical blacklist impact
-			 */
-			bool has_critical_blacklist_impact() const;
+            /**
+             *@brief  Check if the parameter has a critical blacklist impact.
+             *
+             * @return True if the parameter has a critical blacklist impact
+             */
+            bool has_critical_blacklist_impact() const;
 
-			/**
-			 * @brief Set the number of whitelist rules.
-			 *
-			 * Parameters with not whitelist rule are also classified as an
-			 * attack, so we have to keep track of the responsible rules.
-			 */
-			void set_total_whitelist_rules(const int& total_whitelist_rules);
+            /**
+             * @brief Set the number of whitelist rules.
+             *
+             * Parameters with not whitelist rule are also classified as an
+             * attack, so we have to keep track of the responsible rules.
+             */
+            void set_total_whitelist_rules(const int& total_whitelist_rules);
 
-			/**
-			 * @brief Get the total number of responsible whitelist rules.
-			 *
-			 * @return The total number of checked whitelist rules
-			 */
-			int get_total_whitelist_rules() const;
+            /**
+             * @brief Get the total number of responsible whitelist rules.
+             *
+             * @return The total number of checked whitelist rules
+             */
+            int get_total_whitelist_rules() const;
 
-		private:
-			/**
-			 * @brief The path/key of the parameter.
-			 */
-			std::string path_;
+        private:
+            /**
+             * @brief The path/key of the parameter.
+             */
+            std::string path_;
 
-			/**
-			 * @brief The value of the parameter.
-			 */
-			std::string value_;
+            /**
+             * @brief The value of the parameter.
+             */
+            std::string value_;
 
-			/**
-			 * @brief Matching blacklist filters for the value of the parameter.
-			 */
-			swd::blacklist_filters blacklist_filters_;
+            /**
+             * @brief Matching blacklist filters for the value of the parameter.
+             */
+            swd::blacklist_filters blacklist_filters_;
 
-			/**
-			 * @brief Broken whitelist rules for they path of the parameter.
-			 */
-			swd::whitelist_rules whitelist_rules_;
+            /**
+             * @brief Broken whitelist rules for they path of the parameter.
+             */
+            swd::whitelist_rules whitelist_rules_;
 
-			/**
-			 * @brief The threat status of the parameter.
-			 */
-			bool threat_;
+            /**
+             * @brief The threat status of the parameter.
+             */
+            bool threat_;
 
-			/**
-			 * @brief The status of the impact compared to the threshold.
-			 */
-			bool critical_blacklist_impact_;
+            /**
+             * @brief The status of the impact compared to the threshold.
+             */
+            bool critical_blacklist_impact_;
 
-			/**
-			 * @brief The total number of matching whitelist rules.
-			 */
-			int total_whitelist_rules_;
-	};
+            /**
+             * @brief The total number of matching whitelist rules.
+             */
+            int total_whitelist_rules_;
+    };
 
-	/**
-	 * @brief Parameter pointer.
-	 */
-	typedef boost::shared_ptr<swd::parameter> parameter_ptr;
+    /**
+     * @brief Parameter pointer.
+     */
+    typedef boost::shared_ptr<swd::parameter> parameter_ptr;
 
-	/**
-	 * @brief Map of parameter pointers. The key is the path.
-	 */
-	typedef std::vector<swd::parameter_ptr> parameters;
+    /**
+     * @brief Map of parameter pointers. The key is the path.
+     */
+    typedef std::vector<swd::parameter_ptr> parameters;
 }
 
 #endif /* PARAMETER_H */

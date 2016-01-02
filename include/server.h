@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -42,105 +42,105 @@
 #include "cache.h"
 
 namespace swd {
-	/**
-	 * @brief Initializes the network server and adds threads to a thread pool.
-	 */
-	class server :
-	 private boost::noncopyable {
-		public:
-			/**
-			 * @brief Construct an object and connect the attributes.
-			 *
-			 * @param storage The pointer to the storage object
-			 * @param cache The pointer to the cache object
-			 */
-			server(const swd::storage_ptr& storage,
-			 const swd::database_ptr& database, const swd::cache_ptr& cache);
+    /**
+     * @brief Initializes the network server and adds threads to a thread pool.
+     */
+    class server :
+     private boost::noncopyable {
+        public:
+            /**
+             * @brief Construct an object and connect the attributes.
+             *
+             * @param storage The pointer to the storage object
+             * @param cache The pointer to the cache object
+             */
+            server(const swd::storage_ptr& storage,
+             const swd::database_ptr& database, const swd::cache_ptr& cache);
 
-			/**
-			 * @brief Initialize the server.
-			 *
-			 * This method opens the tcp port. It is called before root
-			 * privileges are dropped, so every free port can be used.
-			 */
-			void init();
+            /**
+             * @brief Initialize the server.
+             *
+             * This method opens the tcp port. It is called before root
+             * privileges are dropped, so every free port can be used.
+             */
+            void init();
 
-			/**
-			 * @brief Add threads to the thread pool and start accepting connections.
-			 *
-			 * @param thread_pool_size The number of threads that should be
-			 *  added to the thread pool
-			 */
-			void start(std::size_t thread_pool_size);
+            /**
+             * @brief Add threads to the thread pool and start accepting connections.
+             *
+             * @param thread_pool_size The number of threads that should be
+             *  added to the thread pool
+             */
+            void start(std::size_t thread_pool_size);
 
-		private:
-			/**
-			 * @brief Initiate an asynchronous accept operation.
-			 */
-			void start_accept();
+        private:
+            /**
+             * @brief Initiate an asynchronous accept operation.
+             */
+            void start_accept();
 
-			/**
-			 * @brief Handle completion of an asynchronous accept operation.
-			 */
-			void handle_accept(const boost::system::error_code& e);
+            /**
+             * @brief Handle completion of an asynchronous accept operation.
+             */
+            void handle_accept(const boost::system::error_code& e);
 
-			/**
-			 * @brief Handle a request to stop the server.
-			 */
-			void handle_stop();
+            /**
+             * @brief Handle a request to stop the server.
+             */
+            void handle_stop();
 
-			/**
-			 * @brief Handle a request to reload internal data.
-			 */
-			void handle_reload();
+            /**
+             * @brief Handle a request to reload internal data.
+             */
+            void handle_reload();
 
-			/**
-			 * @brief The io_service used to perform asynchronous operations.
-			 */
-			boost::asio::io_service io_service_;
+            /**
+             * @brief The io_service used to perform asynchronous operations.
+             */
+            boost::asio::io_service io_service_;
 
-			/**
-			 * @brief The signal_set is used to register for process termination
-			 *  notifications.
-			 */
-			boost::asio::signal_set signals_stop_;
+            /**
+             * @brief The signal_set is used to register for process termination
+             *  notifications.
+             */
+            boost::asio::signal_set signals_stop_;
 
-			/**
-			 * @brief The signal_set is used to register for process reload
-			 *  notifications.
-			 */
-			boost::asio::signal_set signals_reload_;
+            /**
+             * @brief The signal_set is used to register for process reload
+             *  notifications.
+             */
+            boost::asio::signal_set signals_reload_;
 
-			/**
-			 * @brief Acceptor used to listen for incoming connections.
-			 */
-			swd::acceptor acceptor_;
+            /**
+             * @brief Acceptor used to listen for incoming connections.
+             */
+            swd::acceptor acceptor_;
 
-			/**
-			 * @brief The ssl context that contains the settings if ssl is activated.
-			 */
-			swd::context context_;
+            /**
+             * @brief The ssl context that contains the settings if ssl is activated.
+             */
+            swd::context context_;
 
-			/**
-			 * @brief The next connection to be accepted.
-			 */
-			swd::connection_ptr new_connection_;
+            /**
+             * @brief The next connection to be accepted.
+             */
+            swd::connection_ptr new_connection_;
 
-			/**
-			 * @brief The pointer to the storage object.
-			 */
-			swd::storage_ptr storage_;
+            /**
+             * @brief The pointer to the storage object.
+             */
+            swd::storage_ptr storage_;
 
-			/**
-			 * @brief The pointer to the database object.
-			 */
-			swd::database_ptr database_;
+            /**
+             * @brief The pointer to the database object.
+             */
+            swd::database_ptr database_;
 
-			/**
-			 * @brief The pointer to the cache object.
-			 */
-			swd::cache_ptr cache_;
-	};
+            /**
+             * @brief The pointer to the cache object.
+             */
+            swd::cache_ptr cache_;
+    };
 }
 
 #endif /* SERVER_H */

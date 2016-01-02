@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -32,53 +32,53 @@
 #include "integrity_rule.h"
 
 void swd::integrity_rule::set_id(const int& id) {
-	id_ = id;
+    id_ = id;
 }
 
 int swd::integrity_rule::get_id() const {
-	return id_;
+    return id_;
 }
 
 void swd::integrity_rule::set_algorithm(const std::string& algorithm) {
-	algorithm_ = algorithm;
+    algorithm_ = algorithm;
 }
 
 std::string swd::integrity_rule::get_algorithm() const {
-	return algorithm_;
+    return algorithm_;
 }
 
 void swd::integrity_rule::set_digest(const std::string& digest) {
-	digest_ = digest;
+    digest_ = digest;
 }
 
 std::string swd::integrity_rule::get_digest() const {
-	return digest_;
+    return digest_;
 }
 
 bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
-	/* Stop if there is no hash (for this algorithm). */
-	if (!hash) {
-		return false;
-	}
+    /* Stop if there is no hash (for this algorithm). */
+    if (!hash) {
+        return false;
+    }
 
-	/* The algorithms should always match, but better safe than sorry. */
-	if (algorithm_ != hash->get_algorithm()) {
-		return false;
-	}
+    /* The algorithms should always match, but better safe than sorry. */
+    if (algorithm_ != hash->get_algorithm()) {
+        return false;
+    }
 
-	/* No need to compare the digests if the length is different. */
-	std::string user_digest = hash->get_digest();
+    /* No need to compare the digests if the length is different. */
+    std::string user_digest = hash->get_digest();
 
-	if (digest_.length() != user_digest.length()) {
-		return false;
-	}
+    if (digest_.length() != user_digest.length()) {
+        return false;
+    }
 
-	/* Use constant-time comparison for the digests to avoid timing attacks. */
-	unsigned char result = 0;
+    /* Use constant-time comparison for the digests to avoid timing attacks. */
+    unsigned char result = 0;
 
-	for (int i = 0; i < digest_.length(); i++) {
-		result |= digest_.at(i) ^ user_digest.at(i);
-	}
+    for (int i = 0; i < digest_.length(); i++) {
+        result |= digest_.at(i) ^ user_digest.at(i);
+    }
 
-	return (result == 0);
+    return (result == 0);
 }

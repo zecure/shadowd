@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -52,107 +52,107 @@
 #define MODE_LEARNING 3
 
 namespace swd {
-	namespace exceptions {
-		/**
-		 * @brief Critical exception in one of the core components.
-		 */
-		struct core_exception : public std::exception {
-			/**
-			 * @brief Information about the exception.
-			 */
-			std::string s;
+    namespace exceptions {
+        /**
+         * @brief Critical exception in one of the core components.
+         */
+        struct core_exception : public std::exception {
+            /**
+             * @brief Information about the exception.
+             */
+            std::string s;
 
-			/**
-			 * @brief Constructs an exception.
-			 */
-			core_exception(const std::string& ss) : s(ss) {}
+            /**
+             * @brief Constructs an exception.
+             */
+            core_exception(const std::string& ss) : s(ss) {}
 
-			/**
-			 * @brief Destroys the exception.
-			 */
-			~core_exception() throw () {}
+            /**
+             * @brief Destroys the exception.
+             */
+            ~core_exception() throw () {}
 
-			/**
-			 * @brief Return the information.
-			 */
-			const char* what() const throw() { return s.c_str(); }
-		};
+            /**
+             * @brief Return the information.
+             */
+            const char* what() const throw() { return s.c_str(); }
+        };
 
-		/**
-		 * @brief Critical exception in the configuration.
-		 */
-		struct config_exception : public std::exception {
-			/**
-			 * @brief Information about the exception.
-			 */
-			std::string s;
+        /**
+         * @brief Critical exception in the configuration.
+         */
+        struct config_exception : public std::exception {
+            /**
+             * @brief Information about the exception.
+             */
+            std::string s;
 
-			/**
-			 * @brief Constructs an exception.
-			 */
-			config_exception(const std::string& ss) : s(ss) {}
+            /**
+             * @brief Constructs an exception.
+             */
+            config_exception(const std::string& ss) : s(ss) {}
 
-			/**
-			 * @brief Destroys the exception.
-			 */
-			~config_exception() throw () {}
+            /**
+             * @brief Destroys the exception.
+             */
+            ~config_exception() throw () {}
 
-			/**
-			 * @brief Return the information.
-			 */
-			const char* what() const throw() { return s.c_str(); }
-		};
+            /**
+             * @brief Return the information.
+             */
+            const char* what() const throw() { return s.c_str(); }
+        };
 
-		/**
-		 * @brief Uncritical database exception.
-		 */
-		struct database_exception : public std::exception {
-			/**
-			 * @brief Information about the exception.
-			 */
-			std::string s;
+        /**
+         * @brief Uncritical database exception.
+         */
+        struct database_exception : public std::exception {
+            /**
+             * @brief Information about the exception.
+             */
+            std::string s;
 
-			/**
-			 * @brief Constructs an exception.
-			 */
-			database_exception(const std::string& ss) : s(ss) {}
+            /**
+             * @brief Constructs an exception.
+             */
+            database_exception(const std::string& ss) : s(ss) {}
 
-			/**
-			 * @brief Destroys the exception.
-			 */
-			~database_exception() throw () {}
+            /**
+             * @brief Destroys the exception.
+             */
+            ~database_exception() throw () {}
 
-			/**
-			 * @brief Return the information.
-			 */
-			const char* what() const throw() { return s.c_str(); }
-		};
+            /**
+             * @brief Return the information.
+             */
+            const char* what() const throw() { return s.c_str(); }
+        };
 
-		/**
-		 * @brief Uncritical connection exception.
-		 */
-		struct connection_exception : public std::exception {
-			/**
-			 * @brief Information about the exception.
-			 */
-			int code_;
+        /**
+         * @brief Uncritical connection exception.
+         */
+        struct connection_exception : public std::exception {
+            /**
+             * @brief Information about the exception.
+             */
+            int code_;
 
-			/**
-			 * @brief Constructs an exception.
-			 */
-			connection_exception(const int& code) : code_(code) {}
+            /**
+             * @brief Constructs an exception.
+             */
+            connection_exception(const int& code) : code_(code) {}
 
-			/**
-			 * @brief Destroys the exception.
-			 */
-			~connection_exception() throw () {}
+            /**
+             * @brief Destroys the exception.
+             */
+            ~connection_exception() throw () {}
 
-			/**
-			 * @brief Return the information.
-			 */
-			int code() const throw() { return code_; }
-		};
-	}
+            /**
+             * @brief Return the information.
+             */
+            int code() const throw() { return code_; }
+        };
+    }
 }
 
 #endif /* SHARED_H */
