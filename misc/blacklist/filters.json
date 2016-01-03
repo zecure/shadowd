@@ -1,0 +1,1347 @@
+[
+    {
+        "id": "1",
+        "rule": "\\(\\)\\s*\\{.*?;\\s*\\}\\s*;",
+        "impact": "9",
+        "tags": ["rce", "bash"],
+        "description": "Shellshock (CVE-2014-6271)",
+        "examples":
+        [
+            "env x='() { :;}; echo vulnerable' bash -c \"echo this is a test\""
+        ]
+    },
+    {
+        "id": "2",
+        "rule": "\\(\\)\\s*\\{.*?\\(.*?\\).*?=>.*?\\\\'",
+        "impact": "9",
+        "tags": ["rce", "bash"],
+        "description": "Shellshock (CVE-2014-7169)",
+        "examples":
+        [
+            "env X='() { (a)=>\\' bash -c \"echo date\"; cat echo"
+        ]
+    },
+    {
+        "id": "3",
+        "rule": "\\{\\{.*?\\}\\}",
+        "impact": "4",
+        "tags": ["rce", "id"],
+        "description": "Flask curly syntax",
+        "examples":
+        [
+            "{{foo.bar}}"
+        ]
+    },
+    {
+        "id": "4",
+        "rule": "\\bfind_in_set\\b.*?\\(.+?,.+?\\)",
+        "impact": "6",
+        "tags": ["sqli", "mysql"],
+        "description": "Common MySQL function \"find_in_set\"",
+        "examples":
+        [
+            "SELECT FIND_IN_SET('b','a,b,c,d')"
+        ]
+    },
+    {
+        "id": "5",
+        "rule": "[\"'].*?>",
+        "impact": "3",
+        "tags": ["xss"],
+        "description": "HTML breaking",
+        "examples":
+        [
+            "\">"
+        ]
+    },
+    {
+        "id": "6",
+        "rule": "\\bsqlite_master\\b",
+        "impact": "7",
+        "tags": ["sqli", "sqlite"],
+        "description": "SQLite information disclosure \"sqlite_master\"",
+        "examples":
+        [
+            "SELECT name FROM sqlite_master"
+        ]
+    },
+    {
+        "id": "7",
+        "rule": "\\bmysql.*?\\..*?user\\b",
+        "impact": "7",
+        "tags": ["sqli", "mysql"],
+        "description": "MySQL information disclosure \"mysql.user\"",
+        "examples":
+        [
+            "SELECT user FROM mysql.user"
+        ]
+    },
+    {
+        "id": "8",
+        "rule": "#.+?\\)[\"\\s]*>",
+        "impact": "5",
+        "tags": ["xss"],
+        "description": "HTML breaking",
+        "examples":
+        [
+            "#foo)\">"
+        ]
+    },
+    {
+        "id": "9",
+        "rule": "['\"][,;\\s]+\\w*[\\[\\(]",
+        "impact": "3",
+        "tags": ["xss"],
+        "description": "HTML breaking",
+        "examples":
+        [
+            "\"; foo("
+        ]
+    },
+    {
+        "id": "10",
+        "rule": ">.*?<\\s*\\\/?[\\w\\s]+>",
+        "impact": "3",
+        "tags": ["xss"],
+        "description": "Unquoted HTML breaking with closing tag",
+        "examples":
+        [
+            "></foo>"
+        ]
+    },
+    {
+        "id": "11",
+        "rule": "\\blocation\\b.*?\\..*?\\bhash\\b",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "JavaScript \"location.hash\"",
+        "examples":
+        [
+            "location.hash.slice(1)"
+        ]
+    },
+    {
+        "id": "12",
+        "rule": "\\bwith\\b\\s*\\(.+?\\)[\\s\\w]+\\(",
+        "impact": "6",
+        "tags": ["xss"],
+        "description": "Self-contained payload",
+        "examples":
+        [
+            "with(location)with(hash)eval(substring(1))"
+        ]
+    },
+    {
+        "id": "13",
+        "rule": "(\\b(do|while|for)\\b.*?\\([^)]*\\).*?\\{)|(\\}.*?\\b(do|while|for)\\b.*?\\([^)]*\\))",
+        "impact": "4",
+        "tags": ["rce", "xss", "dos"],
+        "description": "C-style loops",
+        "examples":
+        [
+            "while (true) {fork();}",
+            "{fork();} while (true);"
+        ]
+    },
+    {
+        "id": "14",
+        "rule": "[=(].+?\\?.+?:",
+        "impact": "2",
+        "tags": ["rce", "xss"],
+        "description": "C-style ternary operator",
+        "examples":
+        [
+            "1=1 ? true : false"
+        ]
+    },
+    {
+        "id": "15",
+        "rule": "\\\\u00[a-f0-9]{2}",
+        "impact": "1",
+        "tags": ["rce", "xss"],
+        "description": "Octal entity",
+        "examples":
+        [
+            "\\u00ff"
+        ]
+    },
+    {
+        "id": "16",
+        "rule": "\\\\x0*[a-f0-9]{2}",
+        "impact": "1",
+        "tags": ["rce", "xss"],
+        "description": "Hex entity",
+        "examples":
+        [
+            "\\x0ff"
+        ]
+    },
+    {
+        "id": "17",
+        "rule": "\\\\\\d{2,3}",
+        "impact": "1",
+        "tags": ["rce", "xss"],
+        "description": "Unicode entity",
+        "examples":
+        [
+            "\\01"
+        ]
+    },
+    {
+        "id": "18",
+        "rule": "\\.\\.[\\\/\\\\]",
+        "impact": "4",
+        "tags": ["lfi"],
+        "description": "Directory traversal",
+        "examples":
+        [
+            "../../etc/passwd"
+        ]
+    },
+    {
+        "id": "19",
+        "rule": "%(c0\\.|af\\.|5c\\.)",
+        "impact": "4",
+        "tags": ["lfi"],
+        "description": "Directory traversal unicode + urlencoding",
+        "examples":
+        [
+            "%c0.",
+            "%af.",
+            "%5c."
+        ]
+    },
+    {
+        "id": "20",
+        "rule": "%2e%2e[\\\/\\\\]",
+        "impact": "4",
+        "tags": ["lfi"],
+        "description": "Directory traversal urlencoding",
+        "examples":
+        [
+            "%2e%2e/%2e%2e/etc/passwd"
+        ]
+    },
+    {
+        "id": "21",
+        "rule": "%c0%ae[\\\/\\\\]",
+        "impact": "4",
+        "tags": ["lfi"],
+        "description": "Directory traversal unicode + urlencoding",
+        "examples":
+        [
+            "%c0%ae/%c0%ae/etc/passwd"
+        ]
+    },
+    {
+        "id": "22",
+        "rule": "\\.(ht(access|passwd|group))|(apache|httpd)\\d?\\.conf",
+        "impact": "4",
+        "tags": ["lfi"],
+        "description": "Common Apache files",
+        "examples":
+        [
+            "../.htaccess",
+            "/etc/apache/httpd.conf",
+            "/etc/apache2/apache2.conf"
+        ]
+    },
+    {
+        "id": "23",
+        "rule": "\\\/etc\\\/[.\\\/]*(passwd|shadow|master\\.passwd)",
+        "impact": "4",
+        "tags": ["lfi", "unix"],
+        "description": "Common Unix files",
+        "examples":
+        [
+            "/etc/shadow",
+            "/etc/./passwd"
+        ]
+    },
+    {
+        "id": "24",
+        "rule": "\\bdata:.*?,",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "Data URI scheme",
+        "examples":
+        [
+            "data:image/png;base64,foo"
+        ]
+    },
+    {
+        "id": "25",
+        "rule": ";base64|base64,",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "Data URI scheme \"base64\"",
+        "examples":
+        [
+            "data:image/png;base64,foo"
+        ]
+    },
+    {
+        "id": "26",
+        "rule": "php:\\\/\\\/filter",
+        "impact": "6",
+        "tags": ["lfi", "rce", "php"],
+        "description": "PHP input\/output stream filter",
+        "examples":
+        [
+            "php://filter/convert.base64-encode/resource=config.php"
+        ]
+    },
+    {
+        "id": "27",
+        "rule": "php:\\\/\\\/input",
+        "impact": "6",
+        "tags": ["rce", "php"],
+        "description": "PHP input stream",
+        "examples":
+        [
+            "include('php://input');"
+        ]
+    },
+    {
+        "id": "28",
+        "rule": "php:\\\/\\\/output",
+        "impact": "6",
+        "tags": ["xss", "php"],
+        "description": "PHP output stream",
+        "examples":
+        [
+            "file_put_contents('php://output', 'foo');"
+        ]
+    },
+    {
+        "id": "29",
+        "rule": "convert\\.base64-(de|en)code",
+        "impact": "6",
+        "tags": ["lfi", "rce", "php"],
+        "description": "PHP input\/output stream filter \"base64\"",
+        "examples":
+        [
+            "php://filter/convert.base64-encode/resource=config.php"
+        ]
+    },
+    {
+        "id": "30",
+        "rule": "zlib\\.(de|in)flate",
+        "impact": "6",
+        "tags": ["lfi", "rce", "php"],
+        "description": "PHP input\/output stream filter \"zlib\"",
+        "examples":
+        [
+            "php://filter/zlib.deflate/resource=config.php"
+        ]
+    },
+    {
+        "id": "31",
+        "rule": "@import\\b",
+        "impact": "3",
+        "tags": ["xss", "css"],
+        "description": "CSS \"import\"",
+        "examples":
+        [
+            "@import url(http://foo/bar);"
+        ]
+    },
+    {
+        "id": "32",
+        "rule": "\\burl\\s*\\(.+?\\)",
+        "impact": "2",
+        "tags": ["xss", "css", "rfi"],
+        "description": "CSS pointer to resource",
+        "examples":
+        [
+            "@import url(http://foo/bar);"
+        ]
+    },
+    {
+        "id": "33",
+        "rule": "\\\/\\\/.+?\\\/",
+        "impact": "1",
+        "tags": ["rfi"],
+        "description": "URL",
+        "examples":
+        [
+            "http://foobar.org/"
+        ]
+    },
+    {
+        "id": "34",
+        "rule": "\\)\\s*\\[",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "JavaScript language construct",
+        "examples":
+        [
+            ") ["
+        ]
+    },
+    {
+        "id": "35",
+        "rule": "<\\?(?!xml\\s)",
+        "impact": "3",
+        "tags": ["rce", "php"],
+        "description": "PHP opening tag",
+        "examples":
+        [
+            "<?php",
+            "<?"
+        ]
+    },
+    {
+        "id": "36",
+        "rule": "%(HOME(DRIVE|PATH)|SYSTEM(DRIVE|ROOT)|WINDIR|USER(DOMAIN|PROFILE|NAME)|((LOCAL)?APP|PROGRAM)DATA)%",
+        "impact": "2",
+        "tags": ["lfi", "win"],
+        "description": "Common Windows environment variable",
+        "examples":
+        [
+            "%WINDIR%\\\\cmd.exe"
+        ]
+    },
+    {
+        "id": "37",
+        "rule": "%\\w+%",
+        "impact": "2",
+        "tags": ["lfi", "win"],
+        "description": "Windows environment variable pattern",
+        "examples":
+        [
+            "%FOO%"
+        ]
+    },
+    {
+        "id": "38",
+        "rule": "\\bunion\\b.+?\\bselect\\b",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL command \"union select\"",
+        "examples":
+        [
+            "' UNION SELECT user()-- -"
+        ]
+    },
+    {
+        "id": "39",
+        "rule": "\\bupdate\\b.+?\\bset\\b",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL command \"update\"",
+        "examples":
+        [
+            "UPDATE users SET permissions='admin'"
+        ]
+    },
+    {
+        "id": "40",
+        "rule": "\\bdrop\\b.+?\\b(database|table)\\b",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL command \"drop\"",
+        "examples":
+        [
+            "DROP TABLE users",
+            "DROP DATABASE blog"
+        ]
+    },
+    {
+        "id": "41",
+        "rule": "\\bdelete\\b.+?\\bfrom\\b",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL command \"delete\"",
+        "examples":
+        [
+            "DELETE FROM users"
+        ]
+    },
+    {
+        "id": "42",
+        "rule": "--.+?",
+        "impact": "1",
+        "tags": ["sqli"],
+        "description": "Common SQL comment syntax",
+        "examples":
+        [
+            "' OR 1-- -"
+        ]
+    },
+    {
+        "id": "43",
+        "rule": "\\[\\$(ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|or)\\]",
+        "impact": "5",
+        "tags": ["sqli", "mongo"],
+        "description": "MongoDB SQL commands",
+        "examples":
+        [
+            "[$ne]"
+        ]
+    },
+    {
+        "id": "44",
+        "rule": "\\$\\(.+?\\)",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "jQuery selector",
+        "examples":
+        [
+            "$('#login')"
+        ]
+    },
+    {
+        "id": "45",
+        "rule": "\\\/\\*.*?\\*\\\/",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "C-style comment syntax",
+        "examples":
+        [
+            "/**/"
+        ]
+    },
+    {
+        "id": "46",
+        "rule": "<!-.+?-->",
+        "impact": "3",
+        "tags": ["xss", "xxe"],
+        "description": "XML comment syntax",
+        "examples":
+        [
+            "<!- -->"
+        ]
+    },
+    {
+        "id": "47",
+        "rule": "<base\\b.+?\\bhref\\b.+?>",
+        "impact": "6",
+        "tags": ["xss"],
+        "description": "Base URL",
+        "examples":
+        [
+            "<base href=\"http://foo/\">"
+        ]
+    },
+    {
+        "id": "48",
+        "rule": "<!(element|entity|\\[CDATA)",
+        "impact": "6",
+        "tags": ["xss", "xxe"],
+        "description": "XML entity injections",
+        "examples":
+        [
+            "<![CDATA[<]]>script<![CDATA[>]]>",
+            "<!ENTITY xxe SYSTEM \"file:///dev/random\" >]>"
+        ]
+    },
+    {
+        "id": "49",
+        "rule": "<(applet|object|embed|audio|video|img|svg)",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "Common JavaScript injection points (media)",
+        "examples":
+        [
+            "<img onerror=\"\" />"
+        ]
+    },
+    {
+        "id": "50",
+        "rule": "<a\\b.+?\\bhref\\b",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "Common JavaScript injection points (links)",
+        "examples":
+        [
+            "<a href=\"\"></a>"
+        ]
+    },
+    {
+        "id": "51",
+        "rule": "<(form|button|input|keygen|textarea|select|option)",
+        "impact": "4",
+        "tags": ["xss"],
+        "description": "Common JavaScript injection points (forms)",
+        "examples":
+        [
+            "<form></form>"
+        ]
+    },
+    {
+        "id": "52",
+        "rule": "<(html|body|meta|link|i?frame|script|map)",
+        "impact": "4",
+        "tags": ["xss"],
+        "description": "Common JavaScript injection points",
+        "examples":
+        [
+            "<script></script>"
+        ]
+    },
+    {
+        "id": "53",
+        "rule": "(?<!\\w)(boot\\.ini|global\\.asa|sam)\\b",
+        "impact": "4",
+        "tags": ["lfi", "win"],
+        "description": "Common Windows files",
+        "examples":
+        [
+            "C:\\boot.ini"
+        ]
+    },
+    {
+        "id": "54",
+        "rule": "\\bon\\w+\\s*=",
+        "impact": "3",
+        "tags": ["xss"],
+        "description": "HTML event handler",
+        "examples":
+        [
+            "<img onerror=\"\" />"
+        ]
+    },
+    {
+        "id": "55",
+        "rule": "\\b(chrome|file):\\\/\\\/",
+        "impact": "3",
+        "tags": ["xss", "lfi"],
+        "description": "Local file inclusion",
+        "examples":
+        [
+            "file:///etc/passwd"
+        ]
+    },
+    {
+        "id": "56",
+        "rule": "&#?(\\w+);",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "HTML escaped character",
+        "examples":
+        [
+            "&amp;"
+        ]
+    },
+    {
+        "id": "57",
+        "rule": "^(\\s*)\\||\\|(\\s*)$",
+        "impact": "5",
+        "tags": ["rce", "perl"],
+        "description": "Perl command injection",
+        "examples":
+        [
+            "|id",
+            "id|"
+        ]
+    },
+    {
+        "id": "58",
+        "rule": "<!--\\W*?#\\W*?(cmd|echo|exec|include|printenv)\\b",
+        "impact": "6",
+        "tags": ["rce", "xss", "lfi"],
+        "description": "Apache server-side include",
+        "examples":
+        [
+            "<!--#include"
+        ]
+    },
+    {
+        "id": "59",
+        "rule": "\\{\\s*\\w+\\s*:\\s*[+-]?\\s*\\d+\\s*:.*?\\}",
+        "impact": "5",
+        "tags": ["php"],
+        "description": "Serialized PHP objects",
+        "examples":
+        [
+            "O:3:\"foo\":1:{s:8:\"foobar\";s:3:\"quz\";}"
+        ]
+    },
+    {
+        "id": "60",
+        "rule": "[\\n\\r]\\s*\\b(?:to|b?cc)\\b\\s*:.*?\\@",
+        "impact": "5",
+        "tags": ["spam"],
+        "description": "Email injection",
+        "examples":
+        [
+            "\nto: foo@bar.de"
+        ]
+    },
+    {
+        "id": "61",
+        "rule": "\\bcall_user_func\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"call_user_func\"",
+        "examples":
+        [
+            "call_user_func('foo', $a);"
+        ]
+    },
+    {
+        "id": "62",
+        "rule": "\\bcreate_function\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"create_function\"",
+        "examples":
+        [
+            "create_function('$a', 'return $a;');"
+        ]
+    },
+    {
+        "id": "63",
+        "rule": "\\beval\\b.*?(\\(.+?\\)|\\{.+?\\})",
+        "impact": "4",
+        "tags": ["rce", "php", "perl"],
+        "description": "Critical function \"eval\"",
+        "examples":
+        [
+            "eval('foo');",
+            "eval { foo(); }"
+        ]
+    },
+    {
+        "id": "64",
+        "rule": "\\bexec\\b.*?\\(.+?\\)",
+        "impact": "4",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"exec\"",
+        "examples":
+        [
+            "exec('cat /etc/passwd');"
+        ]
+    },
+    {
+        "id": "65",
+        "rule": "\\bf(get|open|read|write)\\b.*?\\(.+?\\)",
+        "impact": "5",
+        "tags": ["rce", "lfi", "php"],
+        "description": "Critical PHP function \"fopen\/fget\/fread\/fwrite\"",
+        "examples":
+        [
+            "fopen('/etc/passwd', 'r');"
+        ]
+    },
+    {
+        "id": "66",
+        "rule": "\\bfile_(get|put)_contents\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["rce", "lfi", "php"],
+        "description": "Critical PHP function \"file_get_contents\/file_put_contents\"",
+        "examples":
+        [
+            "file_get_contents('/etc/passwd');",
+            "file_put_contents('/etc/passwd', 'foo');"
+        ]
+    },
+    {
+        "id": "67",
+        "rule": "\\bmove_uploaded_file\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"move_uploaded_file\"",
+        "examples":
+        [
+            "move_uploaded_file($tmp_name, $name);"
+        ]
+    },
+    {
+        "id": "68",
+        "rule": "\\bpassthru\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"passthru\"",
+        "examples":
+        [
+            "passthru('cat /etc/passwd');"
+        ]
+    },
+    {
+        "id": "69",
+        "rule": "\\bp(roc_)?open\\b.*?\\(.+?\\)",
+        "impact": "6",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"popen\/proc_open\"",
+        "examples":
+        [
+            "proc_open('cat', $descriptorspec, $pipes, $cwd, $env);"
+        ]
+    },
+    {
+        "id": "70",
+        "rule": "\\breadfile\\b.*?\\(.+?\\)",
+        "impact": "5",
+        "tags": ["lfi", "php"],
+        "description": "Critical PHP function \"readfile\"",
+        "examples":
+        [
+            "readfile('/etc/passwd');"
+        ]
+    },
+    {
+        "id": "71",
+        "rule": "\\bshell_exec\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"shell_exec\"",
+        "examples":
+        [
+            "shell_exec('cat /etc/passwd');"
+        ]
+    },
+    {
+        "id": "72",
+        "rule": "\\bsystem\\b.*?\\(.+?\\)",
+        "impact": "5",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"system\"",
+        "examples":
+        [
+            "system('cat /etc/passwd');"
+        ]
+    },
+    {
+        "id": "73",
+        "rule": "\\bpreg_(replace|match)\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["rce", "php"],
+        "description": "Critical PHP function \"preg_match\/preg_replace\"",
+        "examples":
+        [
+            "preg_replace('//e', 'phpinfo()', $x);"
+        ]
+    },
+    {
+        "id": "74",
+        "rule": "\\binclude(_once)?\\b.*?;",
+        "impact": "4",
+        "tags": ["rce", "lfi", "php"],
+        "description": "Critical PHP function \"include\"",
+        "examples":
+        [
+            "include('/etc/passwd');",
+            "include_once '/etc/passwd';"
+        ]
+    },
+    {
+        "id": "75",
+        "rule": "\\brequire(_once)?\\b.*?;",
+        "impact": "4",
+        "tags": ["rce", "lfi", "php"],
+        "description": "Critical PHP function \"require\"",
+        "examples":
+        [
+            "require('/etc/passwd');",
+            "require_once '/etc/passwd';"
+        ]
+    },
+    {
+        "id": "76",
+        "rule": "\\{\\s*\\$\\s*\\{.+?\\}\\s*\\}",
+        "impact": "8",
+        "tags": ["rce", "php"],
+        "description": "PHP complex curly syntax",
+        "examples":
+        [
+            "{${phpinfo()}}"
+        ]
+    },
+    {
+        "id": "77",
+        "rule": "@(cc_on|set)\\b",
+        "impact": "3",
+        "tags": ["xss"],
+        "description": "Conditional compilation token",
+        "examples":
+        [
+            "@cc_on"
+        ]
+    },
+    {
+        "id": "78",
+        "rule": "\\bfirefoxurl\\s*:",
+        "impact": "3",
+        "tags": ["xss"],
+        "description": "Firefox \"firefoxurl\" URI handler",
+        "examples":
+        [
+            "firefoxurl://"
+        ]
+    },
+    {
+        "id": "79",
+        "rule": "\\bwyciwyg\\s*:",
+        "impact": "3",
+        "tags": ["xss"],
+        "description": "Firefox \"wyciwyg\" URI handler",
+        "examples":
+        [
+            "wyciwyg://"
+        ]
+    },
+    {
+        "id": "80",
+        "rule": "\\bdocument\\b.*?\\.",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "JavaScript attribute \"document\"",
+        "examples":
+        [
+            "document.cookie"
+        ]
+    },
+    {
+        "id": "81",
+        "rule": "\\bwindow\\b.*?\\.",
+        "impact": "2",
+        "tags": ["xss"],
+        "description": "JavaScript attribute \"window\"",
+        "examples":
+        [
+            "window.content"
+        ]
+    },
+    {
+        "id": "82",
+        "rule": "=\\s*\\w+\\s*\\+\\s*['\"]",
+        "impact": "1",
+        "tags": ["xss"],
+        "description": "Common concatenation pattern",
+        "examples":
+        [
+            "= foo + '"
+        ]
+    },
+    {
+        "id": "83",
+        "rule": "\\+=\\s*\\(\\s*['\"]",
+        "impact": "1",
+        "tags": ["xss"],
+        "description": "Common concatenation pattern",
+        "examples":
+        [
+            "+= ('"
+        ]
+    },
+    {
+        "id": "84",
+        "rule": "['\"]\\s*\\+\\s*['\"]",
+        "impact": "1",
+        "tags": ["xss"],
+        "description": "Common concatenation pattern",
+        "examples":
+        [
+            "' + '"
+        ]
+    },
+    {
+        "id": "85",
+        "rule": "\\|\\(\\w+=",
+        "impact": "3",
+        "tags": ["ldap"],
+        "description": "LDAP",
+        "examples":
+        [
+            "|(foo="
+        ]
+    },
+    {
+        "id": "86",
+        "rule": "\\bfunction\\b[^(]*\\([^)]*\\)",
+        "impact": "3",
+        "tags": ["xss", "rce"],
+        "description": "Common function declaration",
+        "examples":
+        [
+            "function foo() {}"
+        ]
+    },
+    {
+        "id": "87",
+        "rule": "\\bbenchmark\\b.*?\\(.+?,.+?\\)",
+        "impact": "8",
+        "tags": ["sqli", "mysql"],
+        "description": "Blind MySQL \"benchmark\"",
+        "examples":
+        [
+            "SELECT BENCHMARK(1000000,ENCODE('hello','goodbye'))"
+        ]
+    },
+    {
+        "id": "88",
+        "rule": "\\bsleep\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli", "dos"],
+        "description": "Blind SQL \"sleep\"",
+        "examples":
+        [
+            "SELECT SLEEP(1000)"
+        ]
+    },
+    {
+        "id": "89",
+        "rule": "\\bload_file\\b.*?\\(.+?\\)",
+        "impact": "7",
+        "tags": ["sqli", "mysql"],
+        "description": "MySQL file disclosure \"load_file\"",
+        "examples":
+        [
+            "SELECT LOAD_FILE('/etc/passwd')"
+        ]
+    },
+    {
+        "id": "90",
+        "rule": "\\bload\\b.*?\\bdata\\b.*?\\binfile\\b.*?\\binto\\b.*?\\btable\\b",
+        "impact": "7",
+        "tags": ["sqli", "mysql"],
+        "description": "MySQL file disclosure \"load data\"",
+        "examples":
+        [
+            "LOAD DATA INFILE 'foo' INTO TABLE bar"
+        ]
+    },
+    {
+        "id": "91",
+        "rule": "\\bselect\\b.*?\\binto\\b.*?\\b(out|dump)file\\b",
+        "impact": "8",
+        "tags": ["sqli", "mysql"],
+        "description": "MySQL file write \"into outfile\"",
+        "examples":
+        [
+            "SELECT 'foo' INTO OUTFILE 'bar'",
+            "SELECT 'foo' INTO DUMPFILE 'bar'"
+        ]
+    },
+    {
+        "id": "92",
+        "rule": "\\b(group_)?concat(_ws)?\\b.*?\\(.+?\\)",
+        "impact": "3",
+        "tags": ["sqli", "mysql"],
+        "description": "MySQL function \"concat\"",
+        "examples":
+        [
+            "SELECT CONCAT(foo, ':', bar)",
+            "SELECT GROUP_CONCAT(foo)"
+        ]
+    },
+    {
+        "id": "93",
+        "rule": "\\binformation_schema\\b",
+        "impact": "5",
+        "tags": ["sqli", "mysql"],
+        "description": "MySQL information disclosure",
+        "examples":
+        [
+            "SELECT schema_name FROM information_schema.schemata"
+        ]
+    },
+    {
+        "id": "94",
+        "rule": "\\bpg_sleep\\b.*?\\(.+?\\)",
+        "impact": "6",
+        "tags": ["sqli", "pgsql"],
+        "description": "Blind PgSQL \"pg_sleep\"",
+        "examples":
+        [
+            "SELECT pg_sleep(1.5)"
+        ]
+    },
+    {
+        "id": "95",
+        "rule": "\\bwaitfor\\b.*?\\b(delay|time(out)?)\\b",
+        "impact": "4",
+        "tags": ["sqli", "dos", "tsql"],
+        "description": "Blind TSQL \"waitfor\"",
+        "examples":
+        [
+            "WAITFOR { DELAY '1000' }",
+            "WAITFOR { TIME '1000' }"
+        ]
+    },
+    {
+        "id": "96",
+        "rule": "\\b(char_|bit_)?length\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"length\"",
+        "examples":
+        [
+            "SELECT LENGTH('foo')",
+            "SELECT CHAR_LENGTH('foo')",
+            "SELECT BIT_LENGTH('foo')"
+        ]
+    },
+    {
+        "id": "97",
+        "rule": "\\b(un)?hex\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"hex\/unhex\"",
+        "examples":
+        [
+            "SELECT HEX('foo')"
+        ]
+    },
+    {
+        "id": "98",
+        "rule": "\\b(from|to)_base64\\b.*?\\(.+?\\)",
+        "impact": "4",
+        "tags": ["sqli"],
+        "description": "Common MySQL function \"from_base64\/to_base64\"",
+        "examples":
+        [
+            "SELECT TO_BASE64('foo')",
+            "SELECT FROM_BASE64('foo')"
+        ]
+    },
+    {
+        "id": "99",
+        "rule": "\\bsubstr(ing(_index)?)?\\b.*?\\(.+?,.+?\\)",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"substr\"",
+        "examples":
+        [
+            "SELECT SUBSTR('foo',1)",
+            "SELECT SUBSTRING('foo',1)",
+            "SELECT SUBSTRING_INDEX('foo',1)"
+        ]
+    },
+    {
+        "id": "100",
+        "rule": "\\b(current_)?user\\b.*?\\(.*?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"user\"",
+        "examples":
+        [
+            "SELECT user()",
+            "SELECT current_user()"
+        ]
+    },
+    {
+        "id": "101",
+        "rule": "\\bversion\\b.*?\\(.*?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"version\"",
+        "examples":
+        [
+            "SELECT version()"
+        ]
+    },
+    {
+        "id": "102",
+        "rule": "@@.+?",
+        "impact": "1",
+        "tags": ["sqli"],
+        "description": "SQL system variable",
+        "examples":
+        [
+            "SELECT @@user"
+        ]
+    },
+    {
+        "id": "103",
+        "rule": "\\boct\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"oct\"",
+        "examples":
+        [
+            "SELECT OCT(12)"
+        ]
+    },
+    {
+        "id": "104",
+        "rule": "\\bord\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"ord\"",
+        "examples":
+        [
+            "SELECT ORD('2')"
+        ]
+    },
+    {
+        "id": "105",
+        "rule": "\\bascii\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"ascii\"",
+        "examples":
+        [
+            "SELECT ASCII('2')"
+        ]
+    },
+    {
+        "id": "106",
+        "rule": "\\bbin\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"bin\"",
+        "examples":
+        [
+            "SELECT BIN(12)"
+        ]
+    },
+    {
+        "id": "107",
+        "rule": "\\bcha?r\\b.*?\\(.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"char\"",
+        "examples":
+        [
+            "SELECT CHAR(77,121,83,81,76)"
+        ]
+    },
+    {
+        "id": "108",
+        "rule": "\\bwhere\\b.+?(\\b(not_)?(like|regexp)\\b|[=<>])",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL comparison \"where\"",
+        "examples":
+        [
+            "SELECT foo FROM bar WHERE name LIKE '%admin%'"
+        ]
+    },
+    {
+        "id": "109",
+        "rule": "\\bif\\b.*?\\(.+?,.+?,.+?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL comparison \"if\"",
+        "examples":
+        [
+            "SELECT IF(1>2,2,3)"
+        ]
+    },
+    {
+        "id": "110",
+        "rule": "\\b(ifnull|nullif)\\b.*?\\(.+?,.+?\\)",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL comparison \"ifnull\"",
+        "examples":
+        [
+            "SELECT IFNULL(1,0)",
+            "SELECT NULLIF(1,1)"
+        ]
+    },
+    {
+        "id": "111",
+        "rule": "\\bwhere\\b.+?(\\b(n?and|x?or|not)\\b|(\\&\\&|\\|\\|))",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL comparison \"where\"",
+        "examples":
+        [
+            "SELECT foo FROM bar WHERE id = 1 OR id = 2"
+        ]
+    },
+    {
+        "id": "112",
+        "rule": "\\bcase\\b.+?\\bwhen\\b.+?\\bend\\b",
+        "impact": "4",
+        "tags": ["sqli"],
+        "description": "Common SQL comparison \"case\"",
+        "examples":
+        [
+            "CASE case_value WHEN when_value THEN statement_list END CASE"
+        ]
+    },
+    {
+        "id": "113",
+        "rule": "\\bexec\\b.+?\\bxp_cmdshell\\b",
+        "impact": "9",
+        "tags": ["sqli", "rce", "mssql"],
+        "description": "MSSQL code execution \"xp_cmdshell\"",
+        "examples":
+        [
+            "exec master..xp_cmdshell 'echo foo'"
+        ]
+    },
+    {
+        "id": "114",
+        "rule": "\\bcreate\\b.+?\\b(procedure|function)\\b.*?\\(.*?\\)",
+        "impact": "4",
+        "tags": ["sqli"],
+        "description": "Common SQL command \"create\"",
+        "examples":
+        [
+            "CREATE PROCEDURE foo()"
+        ]
+    },
+    {
+        "id": "115",
+        "rule": "\\binsert\\b.+?\\binto\\b.*?\\bvalues\\b.*?\\(.+?\\)",
+        "impact": "5",
+        "tags": ["sqli"],
+        "description": "Common SQL command \"insert\"",
+        "examples":
+        [
+            "INSERT INTO table (col1,col2) VALUES('foo','bar')"
+        ]
+    },
+    {
+        "id": "116",
+        "rule": "\\bselect\\b.+?\\bfrom\\b",
+        "impact": "3",
+        "tags": ["sqli"],
+        "description": "Common SQL command \"select\"",
+        "examples":
+        [
+            "SELECT foo FROM bar"
+        ]
+    },
+    {
+        "id": "117",
+        "rule": "\\bpg_user\\b",
+        "impact": "7",
+        "tags": ["sqli", "pgsql"],
+        "description": "PgSQL information disclosure \"pg_user\"",
+        "examples":
+        [
+            "SELECT * FROM pg_user"
+        ]
+    },
+    {
+        "id": "118",
+        "rule": "\\bpg_database\\b",
+        "impact": "7",
+        "tags": ["sqli", "pgsql"],
+        "description": "PgSQL information disclosure \"pg_database\"",
+        "examples":
+        [
+            "SELECT * FROM pg_database"
+        ]
+    },
+    {
+        "id": "119",
+        "rule": "\\bpg_shadow\\b",
+        "impact": "7",
+        "tags": ["sqli", "pgsql"],
+        "description": "PgSQL information disclosure \"pg_shadow\"",
+        "examples":
+        [
+            "SELECT * FROM pg_shadow"
+        ]
+    },
+    {
+        "id": "120",
+        "rule": "\\b(current_)?database\\b.*?\\(.*?\\)",
+        "impact": "2",
+        "tags": ["sqli"],
+        "description": "Common SQL function \"database\"",
+        "examples":
+        [
+            "SELECT database()",
+            "SELECT current_database()"
+        ]
+    }
+]
