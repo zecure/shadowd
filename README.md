@@ -27,7 +27,7 @@ If cmake is successful it creates a makefile. Use it to compile and install the 
 
 ## Database
 Install and configure a database server. At the moment shadowd officially supports PostgreSQL and MySQL.
-You should create a new user and database for shadowd and import the correct layout.
+Afterwards create a new user and database for shadowd and import the correct layout.
 
 If you are using PostgreSQL you can use `psql` to import the layout.
 
