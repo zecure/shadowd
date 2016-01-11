@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -32,85 +32,95 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-#include <vector>
 #include <queue>
 #include <boost/thread.hpp>
 
 #include "request.h"
-#include "singleton.h"
+#include "database.h"
 
 namespace swd {
-	/**
-	 * @brief Manages the storage of a request.
-	 */
-	class storage :
-	 public swd::singleton<swd::storage> {
-		public:
-			/**
-			 * @brief Initialize the storage object.
-			 */
-			storage();
+    /**
+     * @brief Manages the storage of a request.
+     */
+    class storage {
+        public:
+            /**
+             * @brief Initialize the storage object.
+             *
+             * @param database The pointer to the database object
+             */
+            storage(const swd::database_ptr& database);
 
-			/**
-			 * @brief Start insert thread.
-			 */
-			void start();
+            /**
+             * @brief Start insert thread.
+             */
+            void start();
 
-			/**
-			 * @brief Gracefully stop process_next.
-			 */
-			void stop();
+            /**
+             * @brief Gracefully stop process_next.
+             */
+            void stop();
 
-			/**
-			 * @brief Add request to insert queue.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			void add(swd::request_ptr request);
+            /**
+             * @brief Add request to insert queue.
+             *
+             * @param request The pointer to the request object
+             */
+            void add(const swd::request_ptr& request);
 
-		private:
-			/**
-			 * @brief Process next request in queue in recursive manner.
-			 */
-			void process_next();
+        private:
+            /**
+             * @brief Process the next request in the queue.
+             */
+            void process_next();
 
-			/**
-			 * @brief Save a complete request in the database.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			void save(swd::request_ptr request);
+            /**
+             * @brief Save a complete request in the database.
+             *
+             * @param request The pointer to the request object
+             */
+            void save(const swd::request_ptr& request);
 
-			/**
-			 * @brief Request queue for performance improvements.
-			 */
-			std::queue<swd::request_ptr> queue_;
+            /**
+             * @brief Request queue for performance improvements.
+             */
+            std::queue<swd::request_ptr> queue_;
 
-			/**
-			 * @brief Mutex for queue to avoid race conditions.
-			 */
-			boost::mutex queue_mutex_;
+            /**
+             * @brief Mutex for queue to avoid race conditions.
+             */
+            boost::mutex queue_mutex_;
 
-			/**
-			 * @brief Thread that constantly checks queue for new entries.
-			 */
-			boost::thread worker_thread_;
+            /**
+             * @brief Thread that constantly checks queue for new entries.
+             */
+            boost::thread worker_thread_;
 
-			/**
-			 * @brief Switch to exit process_next loop.
-			 */
-			bool stop_;
+            /**
+             * @brief Switch to exit process_next loop.
+             */
+            bool stop_;
 
-			/**
-			 * @brief Notify consumer threads on new requests in the queue.
-			 */
-			boost::condition_variable cond_;
+            /**
+             * @brief Notify consumer threads on new requests in the queue.
+             */
+            boost::condition_variable cond_;
 
-			/**
-			 * @brief Mutex required for condition variable.
-			 */
-			boost::mutex consumer_mutex_;
-	};
+            /**
+             * @brief Mutex required for condition variable.
+             */
+            boost::mutex consumer_mutex_;
+
+            /**
+             * @brief The pointer to the database object.
+             */
+            swd::database_ptr database_;
+    };
+
+    /**
+     * @brief Storage pointer.
+     */
+    typedef boost::shared_ptr<swd::storage> storage_ptr;
 }
 
 #endif /* STORAGE_H */

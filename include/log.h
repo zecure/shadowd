@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,59 +33,61 @@
 #define LOG_H
 
 #include <string>
-#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "singleton.h"
 #include "shared.h"
 
 namespace swd {
-	/**
-	 * @brief Criticality of log message.
-	 */
-	enum log_level {
-		critical_error,
-		uncritical_error,
-		warning,
-		notice
-	};
+    /**
+     * @brief Criticality of log message.
+     */
+    enum log_level {
+        critical_error,
+        uncritical_error,
+        warning,
+        notice
+    };
 
-	/**
-	 * @brief Handles the logging.
-	 */
-	class log :
-	 public swd::singleton<log> {
-		public:
-			/**
-			 * @brief Set a file where the logs get written too.
-			 *
-			 * @param file The file that the logs get written to
-			 */
-			void open_file(std::string file);
+    /**
+     * @brief Handles the logging.
+     */
+    class log :
+     public swd::singleton<log> {
+        public:
+            /**
+             * @brief Set a file where the logs get written too.
+             *
+             * @param file The file that the logs get written to
+             */
+            void open_file(const std::string& file);
 
-			/**
-			 * @brief Log a message.
-			 *
-			 * @param level The severity of the log
-			 * @param message The message of the log
-			 */
-			void send(swd::log_level level, std::string message);
+            /**
+             * @brief Log a message.
+             *
+             * @param level The severity of the log
+             * @param message The message of the log
+             */
+            void send(const swd::log_level& level, const std::string& message);
 
-		private:
-			/**
-			 * @brief Get the current date and time as string.
-			 */
-			std::string get_current_time();
+        private:
+            /**
+             * @brief Get the current date and time as string.
+             *
+             * @return The current date and time in a readable format
+             */
+            std::string get_current_time() const;
 
-			/**
-			 * @brief The log file. If empty stderr is used instead.
-			 */
-			std::string file_;
+            /**
+             * @brief The log file. If empty stderr is used instead.
+             */
+            std::string file_;
 
-			/**
-			 * @brief Mutex for output.
-			 */
-			boost::mutex mutex_;
-	};
+            /**
+             * @brief The mutex for the output.
+             */
+            boost::mutex mutex_;
+    };
 }
 
 #endif /* LOG_H */

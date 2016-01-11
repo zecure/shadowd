@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,28 +31,36 @@
 
 #include "whitelist_rule.h"
 
-swd::whitelist_rule::whitelist_rule(int id, swd::whitelist_filter_ptr filter,
- int min_length, int max_length) :
- id_(id),
- filter_(filter),
- min_length_(min_length),
- max_length_(max_length) {
+void swd::whitelist_rule::set_id(const int& id) {
+    id_ = id;
 }
 
-int swd::whitelist_rule::get_id() {
-	return id_;
+int swd::whitelist_rule::get_id() const {
+    return id_;
 }
 
-bool swd::whitelist_rule::is_adhered_to(std::string value) {
-	int length = value.length();
+void swd::whitelist_rule::set_filter(const swd::whitelist_filter_ptr& filter) {
+    filter_ = filter;
+}
 
-	if ((min_length_ > 0) && (length < min_length_)) {
-		return false;
-	}
+void swd::whitelist_rule::set_min_length(const int& min_length) {
+    min_length_ = min_length;
+}
 
-	if ((max_length_ > 0) && (length > max_length_)) {
-		return false;
-	}
+void swd::whitelist_rule::set_max_length(const int& max_length) {
+    max_length_ = max_length;
+}
 
-	return filter_->match(value);
+bool swd::whitelist_rule::is_adhered_to(const std::string& value) const {
+    int length = value.length();
+
+    if ((min_length_ > 0) && (length < min_length_)) {
+        return false;
+    }
+
+    if ((max_length_ > 0) && (length > max_length_)) {
+        return false;
+    }
+
+    return filter_->matches(value);
 }

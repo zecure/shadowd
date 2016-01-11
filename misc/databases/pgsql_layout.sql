@@ -1,3 +1,35 @@
+-- Functions
+
+CREATE FUNCTION prepare_wildcard(input text) RETURNS text AS $$
+DECLARE
+	escape_us   text;
+	escape_pc   text;
+	wildcard1   text;
+	unescape_ar text;
+	wildcard2   text;
+BEGIN
+	escape_us   := REPLACE(input, '_', '\_');
+	escape_pc   := REPLACE(escape_us, '%', '\%');
+	wildcard1   := REPLACE(escape_pc, '*', '{WILDCARD}');
+	unescape_ar := REPLACE(wildcard1, '\{WILDCARD}', '*');
+	wildcard2   := REPLACE(unescape_ar, '{WILDCARD}', '%');
+
+	RETURN wildcard2;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION is_flooding(input_profile_id int, input_client_ip text) RETURNS int AS $$
+BEGIN
+	RETURN (SELECT 1 FROM
+		(SELECT COUNT(requests.id) AS request_count FROM requests WHERE
+		requests.mode != 3 AND requests.client_ip = input_client_ip AND requests.profile_id
+		= input_profile_id AND requests.date > NOW() - ((SELECT profiles.flooding_timeframe
+		FROM profiles WHERE profiles.id = input_profile_id) || ' second')::INTERVAL) r WHERE
+		r.request_count >= (SELECT profiles.flooding_threshold FROM profiles WHERE
+		profiles.id = input_profile_id));
+END;
+$$ LANGUAGE plpgsql;
+
 -- Tables
 
 CREATE TABLE tags (
@@ -31,34 +63,39 @@ CREATE TABLE profiles (
 	server_ip			text NOT NULL,
 	name				text NOT NULL,
 	hmac_key			text NOT NULL,
-	learning_enabled	smallint NOT NULL,
+	mode				int NOT NULL,
 	whitelist_enabled	smallint NOT NULL,
 	blacklist_enabled	smallint NOT NULL,
-	threshold			int NOT NULL,
-	flooding_time		int NOT NULL,
-	flooding_threshold	int NOT NULL
+	integrity_enabled	smallint NOT NULL,
+	flooding_enabled	smallint NOT NULL,
+	blacklist_threshold	int NOT NULL,
+	flooding_timeframe	int NOT NULL,
+	flooding_threshold	int NOT NULL,
+	cache_outdated		smallint NOT NULL
 );
 
 CREATE INDEX ON profiles (server_ip);
 
 CREATE TABLE requests (
-	id			SERIAL primary key,
-	profile_id	int NOT NULL,
-	caller		text NOT NULL,
-	learning	smallint NOT NULL,
-	client_ip	text NOT NULL,
-	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
+	id						SERIAL primary key,
+	profile_id				int NOT NULL,
+	caller					text NOT NULL,
+	resource				text NOT NULL,
+	mode					int NOT NULL,
+	client_ip				text NOT NULL,
+	total_integrity_rules	int NOT NULL,
+	date					timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
 	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
 );
 
 CREATE TABLE parameters (
-	id				SERIAL primary key,
-	request_id		int NOT NULL,
-	path			text NOT NULL,
-	value			text NOT NULL,
-	total_rules		int NOT NULL,
-	critical_impact	smallint NOT NULL,
-	threat			smallint NOT NULL,
+	id						SERIAL primary key,
+	request_id				int NOT NULL,
+	path					text NOT NULL,
+	value					text NOT NULL,
+	total_whitelist_rules	int NOT NULL,
+	critical_impact			smallint NOT NULL,
+	threat					smallint NOT NULL,
 	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
 );
 
@@ -126,6 +163,40 @@ CREATE TABLE whitelist_parameters (
 	PRIMARY KEY (rule_id, parameter_id)
 );
 
+CREATE TABLE integrity_rules (
+	id			SERIAL primary key,
+	profile_id	integer NOT NULL,
+	caller		text NOT NULL,
+	algorithm	text NOT NULL,
+	digest		text NOT NULL,
+	date		timestamp NOT NULL DEFAULT date_trunc('seconds', now()::timestamp),
+	status		smallint NOT NULL,
+	FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ON integrity_rules (profile_id);
+CREATE INDEX ON integrity_rules (caller);
+CREATE INDEX ON integrity_rules (algorithm);
+CREATE INDEX ON integrity_rules (digest);
+CREATE INDEX ON integrity_rules (date);
+CREATE INDEX ON integrity_rules (status);
+
+CREATE TABLE hashes (
+	id			SERIAL primary key,
+	request_id	integer NOT NULL,
+	algorithm	text NOT NULL,
+	digest		text NOT NULL,
+	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
+);
+
+CREATE TABLE integrity_requests (
+	rule_id		int NOT NULL,
+	request_id	int NOT NULL,
+	FOREIGN KEY (rule_id) REFERENCES integrity_rules (id) ON DELETE CASCADE,
+	FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE,
+	PRIMARY KEY (rule_id, request_id)
+);
+
 -- Tables UI
 
 CREATE TABLE users (
@@ -145,6 +216,7 @@ CREATE TABLE settings (
 	page_limit	integer NOT NULL,
 	sort_order	smallint NOT NULL,
 	theme		text NOT NULL,
+	locale		text NOT NULL,
 	open_filter	boolean,
 	user_id		integer NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -152,314 +224,346 @@ CREATE TABLE settings (
 
 -- Data
 
-INSERT INTO blacklist_filters VALUES (1, '(?:"[^"]*[^-]?>)|(?:[^\w\s]\s*\/>)|(?:>")', 4, 'Finds html breaking injections including whitespace attacks');
-INSERT INTO blacklist_filters VALUES (2, '(?:"+.*[<=]\s*"[^"]+")|(?:"\s*\w+\s*=)|(?:>\w=\/)|(?:#.+\)["\s]*>)|(?:"\s*(?:src|style|on\w+)\s*=\s*")|(?:[^"]?"[,;\s]+\w*[\[\(])', 4, 'Finds attribute breaking injections including whitespace attacks');
-INSERT INTO blacklist_filters VALUES (3, '(?:^>[\w\s]*<\/?\w{2,}>)', 2, 'Finds unquoted attribute breaking injections');
-INSERT INTO blacklist_filters VALUES (4, '(?:[+\/]\s*name[\W\d]*[)+])|(?:;\W*url\s*=)|(?:[^\w\s\/?:>]\s*(?:location|referrer|name)\s*[^\/\w\s-])', 5, 'Detects url-, name-, JSON, and referrer-contained payload attacks');
-INSERT INTO blacklist_filters VALUES (5, '(?:\W\s*hash\s*[^\w\s-])|(?:\w+=\W*[^,]*,[^\s(]\s*\()|(?:\?"[^\s"]":)|(?:(?<!\/)__[a-z]+__)|(?:(?:^|[\s)\]\}])(?:s|g)etter\s*=)', 5, 'Detects hash-contained xss payload attacks, setter usage and property overloading');
-INSERT INTO blacklist_filters VALUES (6, '(?:with\s*\(\s*.+\s*\)\s*\w+\s*\()|(?:(?:do|while|for)\s*\([^)]*\)\s*\{)|(?:\/[\w\s]*\[\W*\w)', 5, 'Detects self contained xss via with(), common loops and regex to string conversion');
-INSERT INTO blacklist_filters VALUES (7, '(?:[=(].+\?.+:)|(?:with\([^)]*\)\))|(?:\.\s*source\W)', 5, 'Detects JavaScript with(), ternary operators and XML predicate attacks');
-INSERT INTO blacklist_filters VALUES (8, '(?:\/\w*\s*\)\s*\()|(?:\([\w\s]+\([\w\s]+\)[\w\s]+\))|(?:(?<!(?:mozilla\/\d\.\d\s))\([^)[]+\[[^\]]+\][^)]*\))|(?:[^\s!][{([][^({[]+[{([][^}\])]+[}\])][\s+",\d]*[}\])])|(?:"\)?\]\W*\[)|(?:=\s*[^\s:;]+\s*[{([][^}\])]+[}\])];)', 5, 'Detects self-executing JavaScript functions');
-INSERT INTO blacklist_filters VALUES (9, '(?:\\u00[a-f0-9]{2})|(?:\\x0*[a-f0-9]{2})|(?:\\\d{2,3})', 2, 'Detects the IE octal, hex and unicode entities');
-INSERT INTO blacklist_filters VALUES (10, '(?:(?:\/|\\)?\.+(\/|\\)(?:\.+)?)|(?:\w+\.exe\??\s)|(?:;\s*\w+\s*\/[\w*-]+\/)|(?:\d\.\dx\|)|(?:%(?:c0\.|af\.|5c\.))|(?:\/(?:%2e){2})', 5, 'Detects basic directory traversal');
-INSERT INTO blacklist_filters VALUES (11, '(?:%c0%ae\/)|(?:(?:\/|\\)(home|conf|usr|etc|proc|opt|s?bin|local|dev|tmp|kern|[br]oot|sys|system|windows|winnt|program|%[a-z_-]{3,}%)(?:\/|\\))|(?:(?:\/|\\)inetpub|localstart\.asp|boot\.ini)', 5, 'Detects specific directory and path traversal');
-INSERT INTO blacklist_filters VALUES (12, '(?:etc\/\W*passwd)', 5, 'Detects etc/passwd inclusion attempts');
-INSERT INTO blacklist_filters VALUES (13, '(?:%u(?:ff|00|e\d)\w\w)|(?:(?:%(?:e\w|c[^3\W]|))(?:%\w\w)(?:%\w\w)?)', 3, 'Detects halfwidth/fullwidth encoded unicode HTML breaking attempts');
-INSERT INTO blacklist_filters VALUES (14, '(?:#@~\^\w+)|(?:\w+script:|@import[^\w]|;base64|base64,)|(?:\w+\s*\([\w\s]+,[\w\s]+,[\w\s]+,[\w\s]+,[\w\s]+,[\w\s]+\))', 5, 'Detects possible includes, VBSCript/JScript encoded and packed functions');
-INSERT INTO blacklist_filters VALUES (15, '([^*:\s\w,.\/?+-]\s*)?(?<![a-z]\s)(?<![a-z\/_@\-\|])(\s*return\s*)?(?:create(?:element|attribute|textnode)|[a-z]+events?|setattribute|getelement\w+|appendchild|createrange|createcontextualfragment|removenode|parentnode|decodeuricomponent|\wettimeout|(?:ms)?setimmediate|option|useragent)(?(1)[^\w%"]|(?:\s*[^@\s\w%",.+\-]))', 6, 'Detects JavaScript DOM/miscellaneous properties and methods');
-INSERT INTO blacklist_filters VALUES (16, '([^*\s\w,.\/?+-]\s*)?(?<![a-mo-z]\s)(?<![a-z\/_@])(\s*return\s*)?(?:alert|inputbox|showmod(?:al|eless)dialog|showhelp|infinity|isnan|isnull|iterator|msgbox|executeglobal|expression|prompt|write(?:ln)?|confirm|dialog|urn|(?:un)?eval|exec|execscript|tostring|status|execute|window|unescape|navigate|jquery|getscript|extend|prototype)(?(1)[^\w%"]|(?:\s*[^@\s\w%",.:\/+\-]))', 5, 'Detects possible includes and typical script methods');
-INSERT INTO blacklist_filters VALUES (17, '([^*:\s\w,.\/?+-]\s*)?(?<![a-z]\s)(?<![a-z\/_@])(\s*return\s*)?(?:hash|name|href|navigateandfind|source|pathname|close|constructor|port|protocol|assign|replace|back|forward|document|ownerdocument|window|top|this|self|parent|frames|_?content|date|cookie|innerhtml|innertext|csstext+?|outerhtml|print|moveby|resizeto|createstylesheet|stylesheets)(?(1)[^\w%"]|(?:\s*[^@\/\s\w%.+\-]))', 4, 'Detects JavaScript object properties and methods');
-INSERT INTO blacklist_filters VALUES (18, '([^*:\s\w,.\/?+-]\s*)?(?<![a-z]\s)(?<![a-z\/_@\-\|])(\s*return\s*)?(?:join|pop|push|reverse|reduce|concat|map|shift|sp?lice|sort|unshift)(?(1)[^\w%"]|(?:\s*[^@\s\w%,.+\-]))', 4, 'Detects JavaScript array properties and methods');
-INSERT INTO blacklist_filters VALUES (19, '([^*:\s\w,.\/?+-]\s*)?(?<![a-z]\s)(?<![a-z\/_@\-\|])(\s*return\s*)?(?:set|atob|btoa|charat|charcodeat|charset|concat|crypto|frames|fromcharcode|indexof|lastindexof|match|navigator|toolbar|menubar|replace|regexp|slice|split|substr|substring|escape|\w+codeuri\w*)(?(1)[^\w%"]|(?:\s*[^@\s\w%,.+\-]))', 4, 'Detects JavaScript string properties and methods');
-INSERT INTO blacklist_filters VALUES (20, '(?:\)\s*\[)|([^*":\s\w,.\/?+-]\s*)?(?<![a-z]\s)(?<![a-z_@\|])(\s*return\s*)?(?:globalstorage|sessionstorage|postmessage|callee|constructor|content|domain|prototype|try|catch|top|call|apply|url|function|object|array|string|math|if|for\s*(?:each)?|elseif|case|switch|regex|boolean|location|(?:ms)?setimmediate|settimeout|setinterval|void|setexpression|namespace|while)(?(1)[^\w%"]|(?:\s*[^@\s\w%".+\-\/]))', 4, 'Detects JavaScript language constructs');
-INSERT INTO blacklist_filters VALUES (21, '(?:,\s*(?:alert|showmodaldialog|eval)\s*,)|(?::\s*eval\s*[^\s])|([^:\s\w,.\/?+-]\s*)?(?<![a-z\/_@])(\s*return\s*)?(?:(?:document\s*\.)?(?:.+\/)?(?:alert|eval|msgbox|showmod(?:al|eless)dialog|showhelp|prompt|write(?:ln)?|confirm|dialog|open))\s*(?:[^.a-z\s\-]|(?:\s*[^\s\w,.@\/+-]))|(?:java[\s\/]*\.[\s\/]*lang)|(?:\w\s*=\s*new\s+\w+)|(?:&\s*\w+\s*\)[^,])|(?:\+[\W\d]*new\s+\w+[\W\d]*\+)|(?:document\.\w)', 3, 'Detects very basic XSS probings');
-INSERT INTO blacklist_filters VALUES (22, '(?:=\s*(?:top|this|window|content|self|frames|_content))|(?:\/\s*[gimx]*\s*[)}])|(?:[^\s]\s*=\s*script)|(?:\.\s*constructor)|(?:default\s+xml\s+namespace\s*=)|(?:\/\s*\+[^+]+\s*\+\s*\/)', 5, 'Detects advanced XSS probings via Script(), RexExp, constructors and XML namespaces');
-INSERT INTO blacklist_filters VALUES (23, '(?:\.\s*\w+\W*=)|(?:\W\s*(?:location|document)\s*\W[^({[;]+[({[;])|(?:\(\w+\?[:\w]+\))|(?:\w{2,}\s*=\s*\d+[^&\w]\w+)|(?:\]\s*\(\s*\w+)', 5, 'Detects JavaScript location/document property access and window access obfuscation');
-INSERT INTO blacklist_filters VALUES (24, '(?:[".]script\s*\()|(?:\$\$?\s*\(\s*[\w"])|(?:\/[\w\s]+\/\.)|(?:=\s*\/\w+\/\s*\.)|(?:(?:this|window|top|parent|frames|self|content)\[\s*[(,"]*\s*[\w\$])|(?:,\s*new\s+\w+\s*[,;)])', 5, 'Detects basic obfuscated JavaScript script injections');
-INSERT INTO blacklist_filters VALUES (25, '(?:=\s*[$\w]\s*[\(\[])|(?:\(\s*(?:this|top|window|self|parent|_?content)\s*\))|(?:src\s*=s*(?:\w+:|\/\/))|(?:\w+\[("\w+"|\w+\|\|))|(?:[\d\W]\|\|[\d\W]|\W=\w+,)|(?:\/\s*\+\s*[a-z"])|(?:=\s*\$[^([]*\()|(?:=\s*\(\s*")', 5, 'Detects obfuscated JavaScript script injections');
-INSERT INTO blacklist_filters VALUES (26, '(?:[^:\s\w]+\s*[^\w\/](href|protocol|host|hostname|pathname|hash|port|cookie)[^\w])', 4, 'Detects JavaScript cookie stealing and redirection attempts');
-INSERT INTO blacklist_filters VALUES (27, '(?:(?:vbs|vbscript|data):.*[,+])|(?:\w+\s*=\W*(?!https?)\w+:)|(jar:\w+:)|(=\s*"?\s*vbs(?:ript)?:)|(language\s*=\s?"?\s*vbs(?:ript)?)|on\w+\s*=\*\w+\-"?', 5, 'Detects data: URL injections, VBS injections and common URI schemes');
-INSERT INTO blacklist_filters VALUES (28, '(?:firefoxurl:\w+\|)|(?:(?:file|res|telnet|nntp|news|mailto|chrome)\s*:\s*[%&#xu\/]+)|(wyciwyg|firefoxurl\s*:\s*\/\s*\/)', 5, 'Detects IE firefoxurl injections, cache poisoning attempts and local file inclusion/execution');
-INSERT INTO blacklist_filters VALUES (29, '(?:binding\s?=|moz-binding|behavior\s?=)|(?:[\s\/]style\s*=\s*[-\\])', 4, 'Detects bindings and behavior injections');
-INSERT INTO blacklist_filters VALUES (30, '(?:=\s*\w+\s*\+\s*")|(?:\+=\s*\(\s")|(?:!+\s*[\d.,]+\w?\d*\s*\?)|(?:=\s*\[s*\])|(?:"\s*\+\s*")|(?:[^\s]\[\s*\d+\s*\]\s*[;+])|(?:"\s*[&|]+\s*")|(?:\/\s*\?\s*")|(?:\/\s*\)\s*\[)|(?:\d\?.+:\d)|(?:]\s*\[\W*\w)|(?:[^\s]\s*=\s*\/)', 4, 'Detects common XSS concatenation patterns 1/2');
-INSERT INTO blacklist_filters VALUES (31, '(?:=\s*\d*\.\d*\?\d*\.\d*)|(?:[|&]{2,}\s*")|(?:!\d+\.\d*\?")|(?:\/:[\w.]+,)|(?:=[\d\W\s]*\[[^]]+\])|(?:\?\w+:\w+)', 4, 'Detects common XSS concatenation patterns 2/2');
-INSERT INTO blacklist_filters VALUES (32, '(?:[^\w\s=]on(?!g\&gt;)\w+[^=_+-]*=[^$]+(?:\W|\&gt;)?)', 4, 'Detects possible event handlers');
-INSERT INTO blacklist_filters VALUES (33, '(?:<\w*:?\s(?:[^>]*)t(?!rong))|(?:<scri)|(<\w+:\w+)', 4, 'Detects obfuscated script tags and XML wrapped HTML');
-INSERT INTO blacklist_filters VALUES (34, '(?:<\/\w+\s\w+)|(?:@(?:cc_on|set)[\s@,"=])', 4, 'Detects attributes in closing tags and conditional compilation tokens');
-INSERT INTO blacklist_filters VALUES (35, '(?:--[^\n]*$)|(?:<!-|-->)|(?:[^*]\/\*|\*\/[^*])|(?:(?:[\W\d]#|--|\{)$)|(?:\/{3,}.*$)|(?:<!\[\W)|(?:\]!>)', 3, 'Detects common comment types');
-INSERT INTO blacklist_filters VALUES (37, '(?:<base\s+)|(?:<!(?:element|entity|\[CDATA))', 5, 'Detects base href injections and XML entity injections');
-INSERT INTO blacklist_filters VALUES (38, '(?:<[\/]?(?:[i]?frame|applet|isindex|marquee|keygen|script|audio|video|input|button|textarea|style|base|body|meta|link|object|embed|param|plaintext|xm\w+|image|im(?:g|port)))', 4, 'Detects possibly malicious html elements including some attributes');
-INSERT INTO blacklist_filters VALUES (39, '(?:\\x[01fe][\db-ce-f])|(?:%[01fe][\db-ce-f])|(?:&#[01fe][\db-ce-f])|(?:\\[01fe][\db-ce-f])|(?:&#x[01fe][\db-ce-f])', 5, 'Detects nullbytes and other dangerous characters');
-INSERT INTO blacklist_filters VALUES (40, '(?:\)\s*when\s*\d+\s*then)|(?:"\s*(?:#|--|\{))|(?:\/\*!\s?\d+)|(?:ch(?:a)?r\s*\(\s*\d)|(?:(?:(n?and|x?or|not)\s+|\|\||\&\&)\s*\w+\()', 6, 'Detects MySQL comments, conditions and ch(a)r injections');
-INSERT INTO blacklist_filters VALUES (41, '(?:[\s()]case\s*\()|(?:\)\s*like\s*\()|(?:having\s*[^\s]+\s*[^\w\s])|(?:if\s?\([\d\w]\s*[=<>~])', 6, 'Detects conditional SQL injection attempts');
-INSERT INTO blacklist_filters VALUES (42, '(?:"\s*or\s*"?\d)|(?:\\x(?:23|27|3d))|(?:^.?"$)|(?:(?:^["\\]*(?:[\d"]+|[^"]+"))+\s*(?:n?and|x?or|not|\|\||\&\&)\s*[\w"[+&!@(),.-])|(?:[^\w\s]\w+\s*[|-]\s*"\s*\w)|(?:@\w+\s+(and|or)\s*["\d]+)|(?:@[\w-]+\s(and|or)\s*[^\w\s])|(?:[^\w\s:]\s*\d\W+[^\w\s]\s*".)|(?:\Winformation_schema|table_name\W)', 6, 'Detects classic SQL injection probings 1/2');
-INSERT INTO blacklist_filters VALUES (43, '(?:"\s*\*.+(?:or|id)\W*"\d)|(?:\^")|(?:^[\w\s"-]+(?<=and\s)(?<=or\s)(?<=xor\s)(?<=nand\s)(?<=not\s)(?<=\|\|)(?<=\&\&)\w+\()|(?:"[\s\d]*[^\w\s]+\W*\d\W*.*["\d])|(?:"\s*[^\w\s?]+\s*[^\w\s]+\s*")|(?:"\s*[^\w\s]+\s*[\W\d].*(?:#|--))|(?:".*\*\s*\d)|(?:"\s*or\s[^\d]+[\w-]+.*\d)|(?:[()*<>%+-][\w-]+[^\w\s]+"[^,])', 6, 'Detects classic SQL injection probings 2/2');
-INSERT INTO blacklist_filters VALUES (44, '(?:\d"\s+"\s+\d)|(?:^admin\s*"|(\/\*)+"+\s?(?:--|#|\/\*|\{)?)|(?:"\s*or[\w\s-]+\s*[+<>=(),-]\s*[\d"])|(?:"\s*[^\w\s]?=\s*")|(?:"\W*[+=]+\W*")|(?:"\s*[!=|][\d\s!=+-]+.*["(].*$)|(?:"\s*[!=|][\d\s!=]+.*\d+$)|(?:"\s*like\W+[\w"(])|(?:\sis\s*0\W)|(?:where\s[\s\w\.,-]+\s=)|(?:"[<>~]+")', 7, 'Detects basic SQL authentication bypass attempts 1/3');
-INSERT INTO blacklist_filters VALUES (45, '(?:union\s*(?:all|distinct|[(!@]*)?\s*[([]*\s*select)|(?:\w+\s+like\s+\")|(?:like\s*"\%)|(?:"\s*like\W*["\d])|(?:"\s*(?:n?and|x?or|not |\|\||\&\&)\s+[\s\w]+=\s*\w+\s*having)|(?:"\s*\*\s*\w+\W+")|(?:"\s*[^?\w\s=.,;)(]+\s*[(@"]*\s*\w+\W+\w)|(?:select\s*[\[\]()\s\w\.,"-]+from)|(?:find_in_set\s*\()', 7, 'Detects basic SQL authentication bypass attempts 2/3');
-INSERT INTO blacklist_filters VALUES (46, '(?:in\s*\(+\s*select)|(?:(?:n?and|x?or|not |\|\||\&\&)\s+[\s\w+]+(?:regexp\s*\(|sounds\s+like\s*"|[=\d]+x))|("\s*\d\s*(?:--|#))|(?:"[%&<>^=]+\d\s*(=|or))|(?:"\W+[\w+-]+\s*=\s*\d\W+")|(?:"\s*is\s*\d.+"?\w)|(?:"\|?[\w-]{3,}[^\w\s.,]+")|(?:"\s*is\s*[\d.]+\s*\W.*")', 7, 'Detects basic SQL authentication bypass attempts 3/3');
-INSERT INTO blacklist_filters VALUES (47, '(?:[\d\W]\s+as\s*["\w]+\s*from)|(?:^[\W\d]+\s*(?:union|select|create|rename|truncate|load|alter|delete|update|insert|desc))|(?:(?:select|create|rename|truncate|load|alter|delete|update|insert|desc)\s+(?:(?:group_)concat|char|load_file)\s?\(?)|(?:end\s*\);)|("\s+regexp\W)|(?:[\s(]load_file\s*\()', 5, 'Detects concatenated basic SQL injection and SQLLFI attempts');
-INSERT INTO blacklist_filters VALUES (48, '(?:@.+=\s*\(\s*select)|(?:\d+\s*or\s*\d+\s*[\-+])|(?:\/\w+;?\s+(?:having|and|or|select)\W)|(?:\d\s+group\s+by.+\()|(?:(?:;|#|--)\s*(?:drop|alter))|(?:(?:;|#|--)\s*(?:update|insert)\s*\w{2,})|(?:[^\w]SET\s*@\w+)|(?:(?:n?and|x?or|not |\|\||\&\&)[\s(]+\w+[\s)]*[!=+]+[\s\d]*["=()])', 6, 'Detects chained SQL injection attempts 1/2');
-INSERT INTO blacklist_filters VALUES (49, '(?:"\s+and\s*=\W)|(?:\(\s*select\s*\w+\s*\()|(?:\*\/from)|(?:\+\s*\d+\s*\+\s*@)|(?:\w"\s*(?:[-+=|@]+\s*)+[\d(])|(?:coalesce\s*\(|@@\w+\s*[^\w\s])|(?:\W!+"\w)|(?:";\s*(?:if|while|begin))|(?:"[\s\d]+=\s*\d)|(?:order\s+by\s+if\w*\s*\()|(?:[\s(]+case\d*\W.+[tw]hen[\s(])', 6, 'Detects chained SQL injection attempts 2/2');
-INSERT INTO blacklist_filters VALUES (50, '(?:(select|;)\s+(?:benchmark|if|sleep)\s*?\(\s*\(?\s*\w+)', 4, 'Detects SQL benchmark and sleep injection attempts including conditional queries');
-INSERT INTO blacklist_filters VALUES (51, '(?:create\s+function\s+\w+\s+returns)|(?:;\s*(?:select|create|rename|truncate|load|alter|delete|update|insert|desc)\s*[\[(]?\w{2,})', 6, 'Detects MySQL UDF injection and other data/structure manipulation attempts');
-INSERT INTO blacklist_filters VALUES (52, '(?:alter\s*\w+.*character\s+set\s+\w+)|(";\s*waitfor\s+time\s+")|(?:";.*:\s*goto)', 6, 'Detects MySQL charset switch and MSSQL DoS attempts');
-INSERT INTO blacklist_filters VALUES (53, '(?:procedure\s+analyse\s*\()|(?:;\s*(declare|open)\s+[\w-]+)|(?:create\s+(procedure|function)\s*\w+\s*\(\s*\)\s*-)|(?:declare[^\w]+[@#]\s*\w+)|(exec\s*\(\s*@)', 7, 'Detects MySQL and PostgreSQL stored procedure/function injections');
-INSERT INTO blacklist_filters VALUES (54, '(?:select\s*pg_sleep)|(?:waitfor\s*delay\s?"+\s?\d)|(?:;\s*shutdown\s*(?:;|--|#|\/\*|\{))', 5, 'Detects Postgres pg_sleep injection, waitfor delay attacks and database shutdown attempts');
-INSERT INTO blacklist_filters VALUES (55, '(?:\sexec\s+xp_cmdshell)|(?:"\s*!\s*["\w])|(?:from\W+information_schema\W)|(?:(?:(?:current_)?user|database|schema|connection_id)\s*\([^\)]*)|(?:";?\s*(?:select|union|having)\s*[^\s])|(?:\wiif\s*\()|(?:exec\s+master\.)|(?:union select @)|(?:union[\w(\s]*select)|(?:select.*\w?user\()|(?:into[\s+]+(?:dump|out)file\s*")', 5, 'Detects MSSQL code execution and information gathering attempts');
-INSERT INTO blacklist_filters VALUES (56, '(?:merge.*using\s*\()|(execute\s*immediate\s*")|(?:\W+\d*\s*having\s*[^\s\-])|(?:match\s*[\w(),+-]+\s*against\s*\()', 5, 'Detects MATCH AGAINST, MERGE, EXECUTE IMMEDIATE and HAVING injections');
-INSERT INTO blacklist_filters VALUES (57, '(?:,.*[)\da-f"]"(?:".*"|\Z|[^"]+))|(?:\Wselect.+\W*from)|((?:select|create|rename|truncate|load|alter|delete|update|insert|desc)\s*\(\s*space\s*\()', 5, 'Detects MySQL comment-/space-obfuscated injections and backtick termination');
-INSERT INTO blacklist_filters VALUES (58, '(?:@[\w-]+\s*\()|(?:]\s*\(\s*["!]\s*\w)|(?:<[?%](?:php)?.*(?:[?%]>)?)|(?:;[\s\w|]*\$\w+\s*=)|(?:\$\w+\s*=(?:(?:\s*\$?\w+\s*[(;])|\s*".*"))|(?:;\s*\{\W*\w+\s*\()', 7, 'Detects code injection attempts 1/3');
-INSERT INTO blacklist_filters VALUES (59, '(?:(?:[;]+|(<[?%](?:php)?)).*(?:define|eval|file_get_contents|include|require|require_once|set|shell_exec|phpinfo|system|passthru|preg_\w+|execute)\s*["(@])', 7, 'Detects code injection attempts 2/3');
-INSERT INTO blacklist_filters VALUES (60, '(?:(?:[;]+|(<[?%](?:php)?)).*[^\w](?:echo|print|print_r|var_dump|[fp]open))|(?:;\s*rm\s+-\w+\s+)|(?:;.*\{.*\$\w+\s*=)|(?:\$\w+\s*\[\]\s*=\s*)', 7, 'Detects code injection attempts 3/3');
-INSERT INTO blacklist_filters VALUES (61, '(?:\w+]?(?<!href)(?<!src)(?<!longdesc)(?<!returnurl)=(?:https?|ftp):)|(?:\{\s*\$\s*\{)', 5, 'Detects url injections and RFE attempts');
-INSERT INTO blacklist_filters VALUES (62, '(?:function[^(]*\([^)]*\))|(?:(?:delete|void|throw|instanceof|new|typeof)[^\w.]+\w+\s*[([])|([)\]]\s*\.\s*\w+\s*=)|(?:\(\s*new\s+\w+\s*\)\.)', 5, 'Detects common function declarations and special JS operators');
-INSERT INTO blacklist_filters VALUES (63, '(?:[\w.-]+@[\w.-]+%(?:[01][\db-ce-f])+\w+:)', 5, 'Detects common mail header injections');
-INSERT INTO blacklist_filters VALUES (64, '(?:\.pl\?\w+=\w?\|\w+;)|(?:\|\(\w+=\*)|(?:\*\s*\)+\s*;)', 5, 'Detects perl echo shellcode injection and LDAP vectors');
-INSERT INTO blacklist_filters VALUES (65, '(?:(^|\W)const\s+[\w\-]+\s*=)|(?:(?:do|for|while)\s*\([^;]+;+\))|(?:(?:^|\W)on\w+\s*=[\w\W]*(?:on\w+|alert|eval|print|confirm|prompt))|(?:groups=\d+\(\w+\))|(?:(.)\1{128,})', 5, 'Detects basic XSS DoS attempts');
-INSERT INTO blacklist_filters VALUES (67, '(?:\({2,}\+{2,}:{2,})|(?:\({2,}\+{2,}:+)|(?:\({3,}\++:{2,})|(?:\$\[!!!\])', 7, 'Detects unknown attack vectors based on PHPIDS Centrifuge detection');
-INSERT INTO blacklist_filters VALUES (68, '(?:[\s\/"]+[-\w\/\\\*]+\s*=.+(?:\/\s*>))', 4, 'Finds attribute breaking injections including obfuscated attributes');
-INSERT INTO blacklist_filters VALUES (69, '(?:(?:msgbox|eval)\s*\+|(?:language\s*=\*vbscript))', 4, 'Finds basic VBScript injection attempts');
-INSERT INTO blacklist_filters VALUES (70, '(?:\[\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|or)\])', 4, 'Finds basic MongoDB SQL injection attempts');
-INSERT INTO blacklist_filters VALUES (71, '(?:[\s\d\/"]+(?:on\w+|style|poster|background)=[$"\w])|(?:-type\s*:\s*multipart)', 6, 'Finds malicious attribute injection attempts and MHTML attacks');
-INSERT INTO blacklist_filters VALUES (72, '(?:(sleep\((\s*)(\d*)(\s*)\)|benchmark\((.*)\,(.*)\)))', 4, 'Detects blind sqli tests using sleep() or benchmark().');
-INSERT INTO blacklist_filters VALUES (73, '(?i:(\%SYSTEMROOT\%))', 4, 'An attacker is trying to locate a file to read or write.');
-INSERT INTO blacklist_filters VALUES (75, '(?:(((.*)\%[c|d|i|e|f|g|o|s|u|x|p|n]){8}))', 4, 'Looking for a format string attack');
-INSERT INTO blacklist_filters VALUES (76, '(?:(union(.*)select(.*)from))', 3, 'Looking for basic sql injection. Common attack string for mysql, oracle and others.');
-INSERT INTO blacklist_filters VALUES (77, '(?:^(-0000023456|4294967295|4294967296|2147483648|2147483647|0000012345|-2147483648|-2147483649|0000023456|2.2250738585072007e-308|1e309)$)', 3, 'Looking for intiger overflow attacks, these are taken from skipfish, except 2.2250738585072007e-308 is the "magic number" crash');
-INSERT INTO blacklist_filters VALUES (100, '(?:&#?(\w+);)', 3, 'Detects HTML escaped characters');
-INSERT INTO blacklist_filters VALUES (101, '(?:[^\w]on(\w+)(\s*)=)', 4, 'Detects possible event handlers');
-INSERT INTO blacklist_filters VALUES (102, '(?:\(\)(\s*)\{(.*);(\s*)\}(\s*);)', 6, 'Detects possible Shellshock injection attempts');
-INSERT INTO blacklist_filters VALUES (103, '(?:<(?:a|applet|base|body|button|embed|form|frame|frameset|html|iframe|img|input|link|map|meta|object|option|script|select|style|svg|textarea)\W)', 4, 'Detects tags that are the most common direct HTML injection points');
-INSERT INTO blacklist_filters VALUES (104, '(?:\|(\s*)$)', 5, 'Detects possible command injection in Perl');
-INSERT INTO blacklist_filters VALUES (105, '(?:(?<![\w.-])(?:bash|cc|cmd|curl|ftp|g\+\+|gcc|nasm|nc|netcat|perl|php|ping|python|ruby|sh|telnet|wget)(?![a-z]))', 4, 'Detects possible system commands');
-INSERT INTO blacklist_filters VALUES (106, '(?:<\?(?!xml\s))', 4, 'Detects possible PHP open tag');
-INSERT INTO blacklist_filters VALUES (107, '(?:\b(?:call_user_func|create_function|eval|exec|f(?:get|open|read|write)|file_(?:get|put)_contents|move_uploaded_file|passthru|popen|proc_open|readfile|shell_exec|system)\b)', 5, 'Detects possible PHP code');
-INSERT INTO blacklist_filters VALUES (108, '(?:[\n\r]\s*\b(?:to|b?cc)\b\s*:.*?\@)', 5, 'Detects email injections');
-INSERT INTO blacklist_filters VALUES (109, '(?:(?<!\w)(?:\.(?:ht(?:access|passwd|group)|www_?acl)|(?:/etc/(?:passwd|shadow))|boot\.ini|global\.asa|(?:apache|httpd|lighttpd)\.conf)\b)', 4, 'Finds sensible file names');
-INSERT INTO blacklist_filters VALUES (110, '(?:<!--\W*?#\W*?(cmd|echo|exec|include|printenv)\b)', 6, 'Detects Server-Site Include injections');
+INSERT INTO blacklist_filters VALUES (1, '\(\)\s*\{.*?;\s*\}\s*;', 9, 'Shellshock (CVE-2014-6271)');
+INSERT INTO blacklist_filters VALUES (2, '\(\)\s*\{.*?\(.*?\).*?=>.*?\\''', 9, 'Shellshock (CVE-2014-7169)');
+INSERT INTO blacklist_filters VALUES (3, '\{\{.*?\}\}', 4, 'Flask curly syntax');
+INSERT INTO blacklist_filters VALUES (4, '\bfind_in_set\b.*?\(.+?,.+?\)', 6, 'Common MySQL function "find_in_set"');
+INSERT INTO blacklist_filters VALUES (5, '["''].*?>', 3, 'HTML breaking');
+INSERT INTO blacklist_filters VALUES (6, '\bsqlite_master\b', 7, 'SQLite information disclosure "sqlite_master"');
+INSERT INTO blacklist_filters VALUES (7, '\bmysql.*?\..*?user\b', 7, 'MySQL information disclosure "mysql.user"');
+INSERT INTO blacklist_filters VALUES (8, '#.+?\)["\s]*>', 5, 'HTML breaking');
+INSERT INTO blacklist_filters VALUES (9, '[''"][,;\s]+\w*[\[\(]', 3, 'HTML breaking');
+INSERT INTO blacklist_filters VALUES (10, '>.*?<\s*\/?[\w\s]+>', 3, 'Unquoted HTML breaking with closing tag');
+INSERT INTO blacklist_filters VALUES (11, '\blocation\b.*?\..*?\bhash\b', 2, 'JavaScript "location.hash"');
+INSERT INTO blacklist_filters VALUES (12, '\bwith\b\s*\(.+?\)[\s\w]+\(', 6, 'Self-contained payload');
+INSERT INTO blacklist_filters VALUES (13, '(\b(do|while|for)\b.*?\([^)]*\).*?\{)|(\}.*?\b(do|while|for)\b.*?\([^)]*\))', 4, 'C-style loops');
+INSERT INTO blacklist_filters VALUES (14, '[=(].+?\?.+?:', 2, 'C-style ternary operator');
+INSERT INTO blacklist_filters VALUES (15, '\\u00[a-f0-9]{2}', 1, 'Octal entity');
+INSERT INTO blacklist_filters VALUES (16, '\\x0*[a-f0-9]{2}', 1, 'Hex entity');
+INSERT INTO blacklist_filters VALUES (17, '\\\d{2,3}', 1, 'Unicode entity');
+INSERT INTO blacklist_filters VALUES (18, '\.\.[\/\\]', 4, 'Directory traversal');
+INSERT INTO blacklist_filters VALUES (19, '%(c0\.|af\.|5c\.)', 4, 'Directory traversal unicode + urlencoding');
+INSERT INTO blacklist_filters VALUES (20, '%2e%2e[\/\\]', 4, 'Directory traversal urlencoding');
+INSERT INTO blacklist_filters VALUES (21, '%c0%ae[\/\\]', 4, 'Directory traversal unicode + urlencoding');
+INSERT INTO blacklist_filters VALUES (22, '\.(ht(access|passwd|group))|(apache|httpd)\d?\.conf', 4, 'Common Apache files');
+INSERT INTO blacklist_filters VALUES (23, '\/etc\/[.\/]*(passwd|shadow|master\.passwd)', 4, 'Common Unix files');
+INSERT INTO blacklist_filters VALUES (24, '\bdata:.*?,', 2, 'Data URI scheme');
+INSERT INTO blacklist_filters VALUES (25, ';base64|base64,', 2, 'Data URI scheme "base64"');
+INSERT INTO blacklist_filters VALUES (26, 'php:\/\/filter', 6, 'PHP input/output stream filter');
+INSERT INTO blacklist_filters VALUES (27, 'php:\/\/input', 6, 'PHP input stream');
+INSERT INTO blacklist_filters VALUES (28, 'php:\/\/output', 6, 'PHP output stream');
+INSERT INTO blacklist_filters VALUES (29, 'convert\.base64-(de|en)code', 6, 'PHP input/output stream filter "base64"');
+INSERT INTO blacklist_filters VALUES (30, 'zlib\.(de|in)flate', 6, 'PHP input/output stream filter "zlib"');
+INSERT INTO blacklist_filters VALUES (31, '@import\b', 3, 'CSS "import"');
+INSERT INTO blacklist_filters VALUES (32, '\burl\s*\(.+?\)', 2, 'CSS pointer to resource');
+INSERT INTO blacklist_filters VALUES (33, '\/\/.+?\/', 1, 'URL');
+INSERT INTO blacklist_filters VALUES (34, '\)\s*\[', 2, 'JavaScript language construct');
+INSERT INTO blacklist_filters VALUES (35, '<\?(?!xml\s)', 3, 'PHP opening tag');
+INSERT INTO blacklist_filters VALUES (36, '%(HOME(DRIVE|PATH)|SYSTEM(DRIVE|ROOT)|WINDIR|USER(DOMAIN|PROFILE|NAME)|((LOCAL)?APP|PROGRAM)DATA)%', 2, 'Common Windows environment variable');
+INSERT INTO blacklist_filters VALUES (37, '%\w+%', 2, 'Windows environment variable pattern');
+INSERT INTO blacklist_filters VALUES (38, '\bunion\b.+?\bselect\b', 3, 'Common SQL command "union select"');
+INSERT INTO blacklist_filters VALUES (39, '\bupdate\b.+?\bset\b', 3, 'Common SQL command "update"');
+INSERT INTO blacklist_filters VALUES (40, '\bdrop\b.+?\b(database|table)\b', 3, 'Common SQL command "drop"');
+INSERT INTO blacklist_filters VALUES (41, '\bdelete\b.+?\bfrom\b', 3, 'Common SQL command "delete"');
+INSERT INTO blacklist_filters VALUES (42, '--.+?', 1, 'Common SQL comment syntax');
+INSERT INTO blacklist_filters VALUES (43, '\[\$(ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|or)\]', 5, 'MongoDB SQL commands');
+INSERT INTO blacklist_filters VALUES (44, '\$\(.+?\)', 2, 'jQuery selector');
+INSERT INTO blacklist_filters VALUES (45, '\/\*.*?\*\/', 3, 'C-style comment syntax');
+INSERT INTO blacklist_filters VALUES (46, '<!-.+?-->', 3, 'XML comment syntax');
+INSERT INTO blacklist_filters VALUES (47, '<base\b.+?\bhref\b.+?>', 6, 'Base URL');
+INSERT INTO blacklist_filters VALUES (48, '<!(element|entity|\[CDATA)', 6, 'XML entity injections');
+INSERT INTO blacklist_filters VALUES (49, '<(applet|object|embed|audio|video|img|svg)', 2, 'Common JavaScript injection points (media)');
+INSERT INTO blacklist_filters VALUES (50, '<a\b.+?\bhref\b', 2, 'Common JavaScript injection points (links)');
+INSERT INTO blacklist_filters VALUES (51, '<(form|button|input|keygen|textarea|select|option)', 4, 'Common JavaScript injection points (forms)');
+INSERT INTO blacklist_filters VALUES (52, '<(html|body|meta|link|i?frame|script|map)', 4, 'Common JavaScript injection points');
+INSERT INTO blacklist_filters VALUES (53, '(?<!\w)(boot\.ini|global\.asa|sam)\b', 4, 'Common Windows files');
+INSERT INTO blacklist_filters VALUES (54, '\bon\w+\s*=', 3, 'HTML event handler');
+INSERT INTO blacklist_filters VALUES (55, '\b(chrome|file):\/\/', 3, 'Local file inclusion');
+INSERT INTO blacklist_filters VALUES (56, '&#?(\w+);', 2, 'HTML escaped character');
+INSERT INTO blacklist_filters VALUES (57, '^(\s*)\||\|(\s*)$', 5, 'Perl command injection');
+INSERT INTO blacklist_filters VALUES (58, '<!--\W*?#\W*?(cmd|echo|exec|include|printenv)\b', 6, 'Apache server-side include');
+INSERT INTO blacklist_filters VALUES (59, '\{\s*\w+\s*:\s*[+-]?\s*\d+\s*:.*?\}', 5, 'Serialized PHP objects');
+INSERT INTO blacklist_filters VALUES (60, '[\n\r]\s*\b(?:to|b?cc)\b\s*:.*?\@', 5, 'Email injection');
+INSERT INTO blacklist_filters VALUES (61, '\bcall_user_func\b.*?\(.+?\)', 7, 'Critical PHP function "call_user_func"');
+INSERT INTO blacklist_filters VALUES (62, '\bcreate_function\b.*?\(.+?\)', 7, 'Critical PHP function "create_function"');
+INSERT INTO blacklist_filters VALUES (63, '\beval\b.*?(\(.+?\)|\{.+?\})', 4, 'Critical function "eval"');
+INSERT INTO blacklist_filters VALUES (64, '\bexec\b.*?\(.+?\)', 4, 'Critical PHP function "exec"');
+INSERT INTO blacklist_filters VALUES (65, '\bf(get|open|read|write)\b.*?\(.+?\)', 5, 'Critical PHP function "fopen/fget/fread/fwrite"');
+INSERT INTO blacklist_filters VALUES (66, '\bfile_(get|put)_contents\b.*?\(.+?\)', 7, 'Critical PHP function "file_get_contents/file_put_contents"');
+INSERT INTO blacklist_filters VALUES (67, '\bmove_uploaded_file\b.*?\(.+?\)', 7, 'Critical PHP function "move_uploaded_file"');
+INSERT INTO blacklist_filters VALUES (68, '\bpassthru\b.*?\(.+?\)', 7, 'Critical PHP function "passthru"');
+INSERT INTO blacklist_filters VALUES (69, '\bp(roc_)?open\b.*?\(.+?\)', 6, 'Critical PHP function "popen/proc_open"');
+INSERT INTO blacklist_filters VALUES (70, '\breadfile\b.*?\(.+?\)', 5, 'Critical PHP function "readfile"');
+INSERT INTO blacklist_filters VALUES (71, '\bshell_exec\b.*?\(.+?\)', 7, 'Critical PHP function "shell_exec"');
+INSERT INTO blacklist_filters VALUES (72, '\bsystem\b.*?\(.+?\)', 5, 'Critical PHP function "system"');
+INSERT INTO blacklist_filters VALUES (73, '\bpreg_(replace|match)\b.*?\(.+?\)', 7, 'Critical PHP function "preg_match/preg_replace"');
+INSERT INTO blacklist_filters VALUES (74, '\binclude(_once)?\b.*?;', 4, 'Critical PHP function "include"');
+INSERT INTO blacklist_filters VALUES (75, '\brequire(_once)?\b.*?;', 4, 'Critical PHP function "require"');
+INSERT INTO blacklist_filters VALUES (76, '\{\s*\$\s*\{.+?\}\s*\}', 8, 'PHP complex curly syntax');
+INSERT INTO blacklist_filters VALUES (77, '@(cc_on|set)\b', 3, 'Conditional compilation token');
+INSERT INTO blacklist_filters VALUES (78, '\bfirefoxurl\s*:', 3, 'Firefox "firefoxurl" URI handler');
+INSERT INTO blacklist_filters VALUES (79, '\bwyciwyg\s*:', 3, 'Firefox "wyciwyg" URI handler');
+INSERT INTO blacklist_filters VALUES (80, '\bdocument\b.*?\.', 2, 'JavaScript attribute "document"');
+INSERT INTO blacklist_filters VALUES (81, '\bwindow\b.*?\.', 2, 'JavaScript attribute "window"');
+INSERT INTO blacklist_filters VALUES (82, '=\s*\w+\s*\+\s*[''"]', 1, 'Common concatenation pattern');
+INSERT INTO blacklist_filters VALUES (83, '\+=\s*\(\s*[''"]', 1, 'Common concatenation pattern');
+INSERT INTO blacklist_filters VALUES (84, '[''"]\s*\+\s*[''"]', 1, 'Common concatenation pattern');
+INSERT INTO blacklist_filters VALUES (85, '\|\(\w+=', 3, 'LDAP');
+INSERT INTO blacklist_filters VALUES (86, '\bfunction\b[^(]*\([^)]*\)', 3, 'Common function declaration');
+INSERT INTO blacklist_filters VALUES (87, '\bbenchmark\b.*?\(.+?,.+?\)', 8, 'Blind MySQL "benchmark"');
+INSERT INTO blacklist_filters VALUES (88, '\bsleep\b.*?\(.+?\)', 2, 'Blind SQL "sleep"');
+INSERT INTO blacklist_filters VALUES (89, '\bload_file\b.*?\(.+?\)', 7, 'MySQL file disclosure "load_file"');
+INSERT INTO blacklist_filters VALUES (90, '\bload\b.*?\bdata\b.*?\binfile\b.*?\binto\b.*?\btable\b', 7, 'MySQL file disclosure "load data"');
+INSERT INTO blacklist_filters VALUES (91, '\bselect\b.*?\binto\b.*?\b(out|dump)file\b', 8, 'MySQL file write "into outfile"');
+INSERT INTO blacklist_filters VALUES (92, '\b(group_)?concat(_ws)?\b.*?\(.+?\)', 3, 'MySQL function "concat"');
+INSERT INTO blacklist_filters VALUES (93, '\binformation_schema\b', 5, 'MySQL information disclosure');
+INSERT INTO blacklist_filters VALUES (94, '\bpg_sleep\b.*?\(.+?\)', 6, 'Blind PgSQL "pg_sleep"');
+INSERT INTO blacklist_filters VALUES (95, '\bwaitfor\b.*?\b(delay|time(out)?)\b', 4, 'Blind TSQL "waitfor"');
+INSERT INTO blacklist_filters VALUES (96, '\b(char_|bit_)?length\b.*?\(.+?\)', 2, 'Common SQL function "length"');
+INSERT INTO blacklist_filters VALUES (97, '\b(un)?hex\b.*?\(.+?\)', 2, 'Common SQL function "hex/unhex"');
+INSERT INTO blacklist_filters VALUES (98, '\b(from|to)_base64\b.*?\(.+?\)', 4, 'Common MySQL function "from_base64/to_base64"');
+INSERT INTO blacklist_filters VALUES (99, '\bsubstr(ing(_index)?)?\b.*?\(.+?,.+?\)', 3, 'Common SQL function "substr"');
+INSERT INTO blacklist_filters VALUES (100, '\b(current_)?user\b.*?\(.*?\)', 2, 'Common SQL function "user"');
+INSERT INTO blacklist_filters VALUES (101, '\bversion\b.*?\(.*?\)', 2, 'Common SQL function "version"');
+INSERT INTO blacklist_filters VALUES (102, '@@.+?', 1, 'SQL system variable');
+INSERT INTO blacklist_filters VALUES (103, '\boct\b.*?\(.+?\)', 2, 'Common SQL function "oct"');
+INSERT INTO blacklist_filters VALUES (104, '\bord\b.*?\(.+?\)', 2, 'Common SQL function "ord"');
+INSERT INTO blacklist_filters VALUES (105, '\bascii\b.*?\(.+?\)', 2, 'Common SQL function "ascii"');
+INSERT INTO blacklist_filters VALUES (106, '\bbin\b.*?\(.+?\)', 2, 'Common SQL function "bin"');
+INSERT INTO blacklist_filters VALUES (107, '\bcha?r\b.*?\(.+?\)', 2, 'Common SQL function "char"');
+INSERT INTO blacklist_filters VALUES (108, '\bwhere\b.+?(\b(not_)?(like|regexp)\b|[=<>])', 2, 'Common SQL comparison "where"');
+INSERT INTO blacklist_filters VALUES (109, '\bif\b.*?\(.+?,.+?,.+?\)', 2, 'Common SQL comparison "if"');
+INSERT INTO blacklist_filters VALUES (110, '\b(ifnull|nullif)\b.*?\(.+?,.+?\)', 3, 'Common SQL comparison "ifnull"');
+INSERT INTO blacklist_filters VALUES (111, '\bwhere\b.+?(\b(n?and|x?or|not)\b|(\&\&|\|\|))', 3, 'Common SQL comparison "where"');
+INSERT INTO blacklist_filters VALUES (112, '\bcase\b.+?\bwhen\b.+?\bend\b', 4, 'Common SQL comparison "case"');
+INSERT INTO blacklist_filters VALUES (113, '\bexec\b.+?\bxp_cmdshell\b', 9, 'MSSQL code execution "xp_cmdshell"');
+INSERT INTO blacklist_filters VALUES (114, '\bcreate\b.+?\b(procedure|function)\b.*?\(.*?\)', 4, 'Common SQL command "create"');
+INSERT INTO blacklist_filters VALUES (115, '\binsert\b.+?\binto\b.*?\bvalues\b.*?\(.+?\)', 5, 'Common SQL command "insert"');
+INSERT INTO blacklist_filters VALUES (116, '\bselect\b.+?\bfrom\b', 3, 'Common SQL command "select"');
+INSERT INTO blacklist_filters VALUES (117, '\bpg_user\b', 7, 'PgSQL information disclosure "pg_user"');
+INSERT INTO blacklist_filters VALUES (118, '\bpg_database\b', 7, 'PgSQL information disclosure "pg_database"');
+INSERT INTO blacklist_filters VALUES (119, '\bpg_shadow\b', 7, 'PgSQL information disclosure "pg_shadow"');
+INSERT INTO blacklist_filters VALUES (120, '\b(current_)?database\b.*?\(.*?\)', 2, 'Common SQL function "database"');
 
 INSERT INTO tags VALUES (1, 'xss');
-INSERT INTO tags VALUES (2, 'csrf');
-INSERT INTO tags VALUES (3, 'dt');
-INSERT INTO tags VALUES (4, 'id');
+INSERT INTO tags VALUES (2, 'win');
+INSERT INTO tags VALUES (3, 'unix');
+INSERT INTO tags VALUES (4, 'rce');
 INSERT INTO tags VALUES (5, 'lfi');
-INSERT INTO tags VALUES (6, 'rfe');
+INSERT INTO tags VALUES (6, 'rfi');
 INSERT INTO tags VALUES (7, 'sqli');
 INSERT INTO tags VALUES (8, 'spam');
 INSERT INTO tags VALUES (9, 'dos');
-INSERT INTO tags VALUES (10, 'files');
-INSERT INTO tags VALUES (11, 'exec');
-INSERT INTO tags VALUES (12, 'format string');
+INSERT INTO tags VALUES (10, 'php');
+INSERT INTO tags VALUES (11, 'perl');
+INSERT INTO tags VALUES (12, 'python');
+INSERT INTO tags VALUES (13, 'xxe');
+INSERT INTO tags VALUES (14, 'ldap');
+INSERT INTO tags VALUES (15, 'bash');
+INSERT INTO tags VALUES (16, 'id');
+INSERT INTO tags VALUES (17, 'mysql');
+INSERT INTO tags VALUES (18, 'pgsql');
+INSERT INTO tags VALUES (19, 'sqlite');
+INSERT INTO tags VALUES (20, 'mongo');
+INSERT INTO tags VALUES (21, 'tsql');
+INSERT INTO tags VALUES (22, 'mssql');
+INSERT INTO tags VALUES (23, 'css');
 
-INSERT INTO tags_filters VALUES (1, 1);
-INSERT INTO tags_filters VALUES (2, 1);
-INSERT INTO tags_filters VALUES (1, 2);
-INSERT INTO tags_filters VALUES (2, 2);
-INSERT INTO tags_filters VALUES (1, 3);
-INSERT INTO tags_filters VALUES (2, 3);
-INSERT INTO tags_filters VALUES (1, 4);
-INSERT INTO tags_filters VALUES (2, 4);
+INSERT INTO tags_filters VALUES (4, 1);
+INSERT INTO tags_filters VALUES (15, 1);
+INSERT INTO tags_filters VALUES (4, 2);
+INSERT INTO tags_filters VALUES (15, 2);
+INSERT INTO tags_filters VALUES (4, 3);
+INSERT INTO tags_filters VALUES (16, 3);
+INSERT INTO tags_filters VALUES (7, 4);
+INSERT INTO tags_filters VALUES (17, 4);
 INSERT INTO tags_filters VALUES (1, 5);
-INSERT INTO tags_filters VALUES (2, 5);
-INSERT INTO tags_filters VALUES (1, 6);
-INSERT INTO tags_filters VALUES (2, 6);
-INSERT INTO tags_filters VALUES (1, 7);
-INSERT INTO tags_filters VALUES (2, 7);
+INSERT INTO tags_filters VALUES (7, 6);
+INSERT INTO tags_filters VALUES (19, 6);
+INSERT INTO tags_filters VALUES (7, 7);
+INSERT INTO tags_filters VALUES (17, 7);
 INSERT INTO tags_filters VALUES (1, 8);
-INSERT INTO tags_filters VALUES (2, 8);
 INSERT INTO tags_filters VALUES (1, 9);
-INSERT INTO tags_filters VALUES (2, 9);
-INSERT INTO tags_filters VALUES (3, 10);
-INSERT INTO tags_filters VALUES (4, 10);
-INSERT INTO tags_filters VALUES (5, 10);
-INSERT INTO tags_filters VALUES (3, 11);
-INSERT INTO tags_filters VALUES (4, 11);
-INSERT INTO tags_filters VALUES (5, 11);
-INSERT INTO tags_filters VALUES (3, 12);
-INSERT INTO tags_filters VALUES (4, 12);
-INSERT INTO tags_filters VALUES (5, 12);
+INSERT INTO tags_filters VALUES (1, 10);
+INSERT INTO tags_filters VALUES (1, 11);
+INSERT INTO tags_filters VALUES (1, 12);
+INSERT INTO tags_filters VALUES (4, 13);
 INSERT INTO tags_filters VALUES (1, 13);
-INSERT INTO tags_filters VALUES (2, 13);
-INSERT INTO tags_filters VALUES (1, 14);
-INSERT INTO tags_filters VALUES (2, 14);
+INSERT INTO tags_filters VALUES (9, 13);
 INSERT INTO tags_filters VALUES (4, 14);
-INSERT INTO tags_filters VALUES (6, 14);
-INSERT INTO tags_filters VALUES (1, 15);
-INSERT INTO tags_filters VALUES (2, 15);
+INSERT INTO tags_filters VALUES (1, 14);
 INSERT INTO tags_filters VALUES (4, 15);
-INSERT INTO tags_filters VALUES (6, 15);
-INSERT INTO tags_filters VALUES (1, 16);
-INSERT INTO tags_filters VALUES (2, 16);
+INSERT INTO tags_filters VALUES (1, 15);
 INSERT INTO tags_filters VALUES (4, 16);
-INSERT INTO tags_filters VALUES (6, 16);
-INSERT INTO tags_filters VALUES (1, 17);
-INSERT INTO tags_filters VALUES (2, 17);
+INSERT INTO tags_filters VALUES (1, 16);
 INSERT INTO tags_filters VALUES (4, 17);
-INSERT INTO tags_filters VALUES (6, 17);
-INSERT INTO tags_filters VALUES (1, 18);
-INSERT INTO tags_filters VALUES (2, 18);
-INSERT INTO tags_filters VALUES (4, 18);
-INSERT INTO tags_filters VALUES (6, 18);
-INSERT INTO tags_filters VALUES (1, 19);
-INSERT INTO tags_filters VALUES (2, 19);
-INSERT INTO tags_filters VALUES (4, 19);
-INSERT INTO tags_filters VALUES (6, 19);
-INSERT INTO tags_filters VALUES (1, 20);
-INSERT INTO tags_filters VALUES (2, 20);
-INSERT INTO tags_filters VALUES (4, 20);
-INSERT INTO tags_filters VALUES (6, 20);
-INSERT INTO tags_filters VALUES (1, 21);
-INSERT INTO tags_filters VALUES (2, 21);
-INSERT INTO tags_filters VALUES (4, 21);
-INSERT INTO tags_filters VALUES (6, 21);
-INSERT INTO tags_filters VALUES (1, 22);
-INSERT INTO tags_filters VALUES (2, 22);
-INSERT INTO tags_filters VALUES (4, 22);
-INSERT INTO tags_filters VALUES (6, 22);
-INSERT INTO tags_filters VALUES (1, 23);
-INSERT INTO tags_filters VALUES (2, 23);
+INSERT INTO tags_filters VALUES (1, 17);
+INSERT INTO tags_filters VALUES (5, 18);
+INSERT INTO tags_filters VALUES (5, 19);
+INSERT INTO tags_filters VALUES (5, 20);
+INSERT INTO tags_filters VALUES (5, 21);
+INSERT INTO tags_filters VALUES (5, 22);
+INSERT INTO tags_filters VALUES (5, 23);
+INSERT INTO tags_filters VALUES (3, 23);
 INSERT INTO tags_filters VALUES (1, 24);
-INSERT INTO tags_filters VALUES (2, 24);
 INSERT INTO tags_filters VALUES (1, 25);
-INSERT INTO tags_filters VALUES (2, 25);
-INSERT INTO tags_filters VALUES (1, 26);
-INSERT INTO tags_filters VALUES (2, 26);
-INSERT INTO tags_filters VALUES (1, 27);
-INSERT INTO tags_filters VALUES (6, 27);
+INSERT INTO tags_filters VALUES (5, 26);
+INSERT INTO tags_filters VALUES (4, 26);
+INSERT INTO tags_filters VALUES (10, 26);
+INSERT INTO tags_filters VALUES (4, 27);
+INSERT INTO tags_filters VALUES (10, 27);
 INSERT INTO tags_filters VALUES (1, 28);
-INSERT INTO tags_filters VALUES (6, 28);
-INSERT INTO tags_filters VALUES (5, 28);
-INSERT INTO tags_filters VALUES (2, 28);
-INSERT INTO tags_filters VALUES (1, 29);
-INSERT INTO tags_filters VALUES (2, 29);
-INSERT INTO tags_filters VALUES (6, 29);
-INSERT INTO tags_filters VALUES (1, 30);
-INSERT INTO tags_filters VALUES (2, 30);
+INSERT INTO tags_filters VALUES (10, 28);
+INSERT INTO tags_filters VALUES (5, 29);
+INSERT INTO tags_filters VALUES (4, 29);
+INSERT INTO tags_filters VALUES (10, 29);
+INSERT INTO tags_filters VALUES (5, 30);
 INSERT INTO tags_filters VALUES (4, 30);
-INSERT INTO tags_filters VALUES (6, 30);
+INSERT INTO tags_filters VALUES (10, 30);
 INSERT INTO tags_filters VALUES (1, 31);
-INSERT INTO tags_filters VALUES (2, 31);
-INSERT INTO tags_filters VALUES (4, 31);
-INSERT INTO tags_filters VALUES (6, 31);
+INSERT INTO tags_filters VALUES (23, 31);
 INSERT INTO tags_filters VALUES (1, 32);
-INSERT INTO tags_filters VALUES (2, 32);
-INSERT INTO tags_filters VALUES (1, 33);
+INSERT INTO tags_filters VALUES (23, 32);
+INSERT INTO tags_filters VALUES (6, 32);
+INSERT INTO tags_filters VALUES (6, 33);
 INSERT INTO tags_filters VALUES (1, 34);
-INSERT INTO tags_filters VALUES (2, 34);
-INSERT INTO tags_filters VALUES (1, 35);
-INSERT INTO tags_filters VALUES (2, 35);
 INSERT INTO tags_filters VALUES (4, 35);
-INSERT INTO tags_filters VALUES (1, 37);
+INSERT INTO tags_filters VALUES (10, 35);
+INSERT INTO tags_filters VALUES (5, 36);
+INSERT INTO tags_filters VALUES (2, 36);
+INSERT INTO tags_filters VALUES (5, 37);
 INSERT INTO tags_filters VALUES (2, 37);
-INSERT INTO tags_filters VALUES (4, 37);
-INSERT INTO tags_filters VALUES (1, 38);
-INSERT INTO tags_filters VALUES (2, 38);
-INSERT INTO tags_filters VALUES (4, 38);
-INSERT INTO tags_filters VALUES (6, 38);
-INSERT INTO tags_filters VALUES (5, 38);
-INSERT INTO tags_filters VALUES (4, 39);
-INSERT INTO tags_filters VALUES (6, 39);
-INSERT INTO tags_filters VALUES (1, 39);
+INSERT INTO tags_filters VALUES (7, 38);
+INSERT INTO tags_filters VALUES (7, 39);
 INSERT INTO tags_filters VALUES (7, 40);
-INSERT INTO tags_filters VALUES (4, 40);
-INSERT INTO tags_filters VALUES (5, 40);
 INSERT INTO tags_filters VALUES (7, 41);
-INSERT INTO tags_filters VALUES (4, 41);
-INSERT INTO tags_filters VALUES (5, 41);
 INSERT INTO tags_filters VALUES (7, 42);
-INSERT INTO tags_filters VALUES (4, 42);
-INSERT INTO tags_filters VALUES (5, 42);
 INSERT INTO tags_filters VALUES (7, 43);
-INSERT INTO tags_filters VALUES (4, 43);
-INSERT INTO tags_filters VALUES (5, 43);
-INSERT INTO tags_filters VALUES (7, 44);
-INSERT INTO tags_filters VALUES (4, 44);
-INSERT INTO tags_filters VALUES (5, 44);
+INSERT INTO tags_filters VALUES (20, 43);
+INSERT INTO tags_filters VALUES (1, 44);
 INSERT INTO tags_filters VALUES (7, 45);
-INSERT INTO tags_filters VALUES (4, 45);
-INSERT INTO tags_filters VALUES (5, 45);
-INSERT INTO tags_filters VALUES (7, 46);
-INSERT INTO tags_filters VALUES (4, 46);
-INSERT INTO tags_filters VALUES (5, 46);
-INSERT INTO tags_filters VALUES (7, 47);
-INSERT INTO tags_filters VALUES (4, 47);
-INSERT INTO tags_filters VALUES (5, 47);
-INSERT INTO tags_filters VALUES (7, 48);
-INSERT INTO tags_filters VALUES (4, 48);
-INSERT INTO tags_filters VALUES (7, 49);
-INSERT INTO tags_filters VALUES (4, 49);
-INSERT INTO tags_filters VALUES (7, 50);
-INSERT INTO tags_filters VALUES (4, 50);
-INSERT INTO tags_filters VALUES (7, 51);
-INSERT INTO tags_filters VALUES (4, 51);
-INSERT INTO tags_filters VALUES (7, 52);
-INSERT INTO tags_filters VALUES (4, 52);
-INSERT INTO tags_filters VALUES (7, 53);
-INSERT INTO tags_filters VALUES (4, 53);
-INSERT INTO tags_filters VALUES (7, 54);
-INSERT INTO tags_filters VALUES (4, 54);
-INSERT INTO tags_filters VALUES (7, 55);
-INSERT INTO tags_filters VALUES (4, 55);
-INSERT INTO tags_filters VALUES (7, 56);
-INSERT INTO tags_filters VALUES (4, 56);
-INSERT INTO tags_filters VALUES (7, 57);
+INSERT INTO tags_filters VALUES (1, 46);
+INSERT INTO tags_filters VALUES (13, 46);
+INSERT INTO tags_filters VALUES (1, 47);
+INSERT INTO tags_filters VALUES (1, 48);
+INSERT INTO tags_filters VALUES (13, 48);
+INSERT INTO tags_filters VALUES (1, 49);
+INSERT INTO tags_filters VALUES (1, 50);
+INSERT INTO tags_filters VALUES (1, 51);
+INSERT INTO tags_filters VALUES (1, 52);
+INSERT INTO tags_filters VALUES (5, 53);
+INSERT INTO tags_filters VALUES (2, 53);
+INSERT INTO tags_filters VALUES (1, 54);
+INSERT INTO tags_filters VALUES (1, 55);
+INSERT INTO tags_filters VALUES (5, 55);
+INSERT INTO tags_filters VALUES (1, 56);
 INSERT INTO tags_filters VALUES (4, 57);
+INSERT INTO tags_filters VALUES (11, 57);
 INSERT INTO tags_filters VALUES (4, 58);
-INSERT INTO tags_filters VALUES (6, 58);
+INSERT INTO tags_filters VALUES (1, 58);
 INSERT INTO tags_filters VALUES (5, 58);
-INSERT INTO tags_filters VALUES (4, 59);
-INSERT INTO tags_filters VALUES (6, 59);
-INSERT INTO tags_filters VALUES (5, 59);
-INSERT INTO tags_filters VALUES (4, 60);
-INSERT INTO tags_filters VALUES (6, 60);
-INSERT INTO tags_filters VALUES (5, 60);
+INSERT INTO tags_filters VALUES (10, 59);
+INSERT INTO tags_filters VALUES (8, 60);
 INSERT INTO tags_filters VALUES (4, 61);
-INSERT INTO tags_filters VALUES (6, 61);
-INSERT INTO tags_filters VALUES (5, 61);
+INSERT INTO tags_filters VALUES (10, 61);
 INSERT INTO tags_filters VALUES (4, 62);
-INSERT INTO tags_filters VALUES (6, 62);
-INSERT INTO tags_filters VALUES (5, 62);
+INSERT INTO tags_filters VALUES (10, 62);
 INSERT INTO tags_filters VALUES (4, 63);
-INSERT INTO tags_filters VALUES (8, 63);
-INSERT INTO tags_filters VALUES (5, 64);
-INSERT INTO tags_filters VALUES (6, 64);
-INSERT INTO tags_filters VALUES (6, 65);
-INSERT INTO tags_filters VALUES (9, 65);
-INSERT INTO tags_filters VALUES (1, 67);
-INSERT INTO tags_filters VALUES (2, 67);
+INSERT INTO tags_filters VALUES (10, 63);
+INSERT INTO tags_filters VALUES (11, 63);
+INSERT INTO tags_filters VALUES (4, 64);
+INSERT INTO tags_filters VALUES (10, 64);
+INSERT INTO tags_filters VALUES (4, 65);
+INSERT INTO tags_filters VALUES (5, 65);
+INSERT INTO tags_filters VALUES (10, 65);
+INSERT INTO tags_filters VALUES (4, 66);
+INSERT INTO tags_filters VALUES (5, 66);
+INSERT INTO tags_filters VALUES (10, 66);
 INSERT INTO tags_filters VALUES (4, 67);
-INSERT INTO tags_filters VALUES (6, 67);
-INSERT INTO tags_filters VALUES (5, 67);
-INSERT INTO tags_filters VALUES (1, 68);
-INSERT INTO tags_filters VALUES (2, 68);
-INSERT INTO tags_filters VALUES (1, 69);
-INSERT INTO tags_filters VALUES (2, 69);
-INSERT INTO tags_filters VALUES (7, 70);
-INSERT INTO tags_filters VALUES (1, 71);
-INSERT INTO tags_filters VALUES (2, 71);
-INSERT INTO tags_filters VALUES (7, 72);
+INSERT INTO tags_filters VALUES (10, 67);
+INSERT INTO tags_filters VALUES (4, 68);
+INSERT INTO tags_filters VALUES (10, 68);
+INSERT INTO tags_filters VALUES (4, 69);
+INSERT INTO tags_filters VALUES (10, 69);
+INSERT INTO tags_filters VALUES (5, 70);
+INSERT INTO tags_filters VALUES (10, 70);
+INSERT INTO tags_filters VALUES (4, 71);
+INSERT INTO tags_filters VALUES (10, 71);
 INSERT INTO tags_filters VALUES (4, 72);
-INSERT INTO tags_filters VALUES (10, 73);
+INSERT INTO tags_filters VALUES (10, 72);
 INSERT INTO tags_filters VALUES (4, 73);
-INSERT INTO tags_filters VALUES (12, 75);
-INSERT INTO tags_filters VALUES (7, 76);
+INSERT INTO tags_filters VALUES (10, 73);
+INSERT INTO tags_filters VALUES (4, 74);
+INSERT INTO tags_filters VALUES (5, 74);
+INSERT INTO tags_filters VALUES (10, 74);
+INSERT INTO tags_filters VALUES (4, 75);
+INSERT INTO tags_filters VALUES (5, 75);
+INSERT INTO tags_filters VALUES (10, 75);
 INSERT INTO tags_filters VALUES (4, 76);
-INSERT INTO tags_filters VALUES (7, 77);
-INSERT INTO tags_filters VALUES (4, 77);
-INSERT INTO tags_filters VALUES (1, 100);
-INSERT INTO tags_filters VALUES (1, 101);
-INSERT INTO tags_filters VALUES (11, 102);
-INSERT INTO tags_filters VALUES (1, 103);
-INSERT INTO tags_filters VALUES (11, 104);
-INSERT INTO tags_filters VALUES (11, 105);
-INSERT INTO tags_filters VALUES (11, 106);
-INSERT INTO tags_filters VALUES (11, 107);
-INSERT INTO tags_filters VALUES (8, 108);
-INSERT INTO tags_filters VALUES (10, 109);
-INSERT INTO tags_filters VALUES (11, 110);
+INSERT INTO tags_filters VALUES (10, 76);
+INSERT INTO tags_filters VALUES (1, 77);
+INSERT INTO tags_filters VALUES (1, 78);
+INSERT INTO tags_filters VALUES (1, 79);
+INSERT INTO tags_filters VALUES (1, 80);
+INSERT INTO tags_filters VALUES (1, 81);
+INSERT INTO tags_filters VALUES (1, 82);
+INSERT INTO tags_filters VALUES (1, 83);
+INSERT INTO tags_filters VALUES (1, 84);
+INSERT INTO tags_filters VALUES (14, 85);
+INSERT INTO tags_filters VALUES (1, 86);
+INSERT INTO tags_filters VALUES (4, 86);
+INSERT INTO tags_filters VALUES (7, 87);
+INSERT INTO tags_filters VALUES (17, 87);
+INSERT INTO tags_filters VALUES (7, 88);
+INSERT INTO tags_filters VALUES (9, 88);
+INSERT INTO tags_filters VALUES (7, 89);
+INSERT INTO tags_filters VALUES (17, 89);
+INSERT INTO tags_filters VALUES (7, 90);
+INSERT INTO tags_filters VALUES (17, 90);
+INSERT INTO tags_filters VALUES (7, 91);
+INSERT INTO tags_filters VALUES (17, 91);
+INSERT INTO tags_filters VALUES (7, 92);
+INSERT INTO tags_filters VALUES (17, 92);
+INSERT INTO tags_filters VALUES (7, 93);
+INSERT INTO tags_filters VALUES (17, 93);
+INSERT INTO tags_filters VALUES (7, 94);
+INSERT INTO tags_filters VALUES (18, 94);
+INSERT INTO tags_filters VALUES (7, 95);
+INSERT INTO tags_filters VALUES (9, 95);
+INSERT INTO tags_filters VALUES (21, 95);
+INSERT INTO tags_filters VALUES (7, 96);
+INSERT INTO tags_filters VALUES (7, 97);
+INSERT INTO tags_filters VALUES (7, 98);
+INSERT INTO tags_filters VALUES (7, 99);
+INSERT INTO tags_filters VALUES (7, 100);
+INSERT INTO tags_filters VALUES (7, 101);
+INSERT INTO tags_filters VALUES (7, 102);
+INSERT INTO tags_filters VALUES (7, 103);
+INSERT INTO tags_filters VALUES (7, 104);
+INSERT INTO tags_filters VALUES (7, 105);
+INSERT INTO tags_filters VALUES (7, 106);
+INSERT INTO tags_filters VALUES (7, 107);
+INSERT INTO tags_filters VALUES (7, 108);
+INSERT INTO tags_filters VALUES (7, 109);
+INSERT INTO tags_filters VALUES (7, 110);
+INSERT INTO tags_filters VALUES (7, 111);
+INSERT INTO tags_filters VALUES (7, 112);
+INSERT INTO tags_filters VALUES (7, 113);
+INSERT INTO tags_filters VALUES (4, 113);
+INSERT INTO tags_filters VALUES (22, 113);
+INSERT INTO tags_filters VALUES (7, 114);
+INSERT INTO tags_filters VALUES (7, 115);
+INSERT INTO tags_filters VALUES (7, 116);
+INSERT INTO tags_filters VALUES (7, 117);
+INSERT INTO tags_filters VALUES (18, 117);
+INSERT INTO tags_filters VALUES (7, 118);
+INSERT INTO tags_filters VALUES (18, 118);
+INSERT INTO tags_filters VALUES (7, 119);
+INSERT INTO tags_filters VALUES (18, 119);
+INSERT INTO tags_filters VALUES (7, 120);
 
 INSERT INTO whitelist_filters VALUES (1, '^[0-9]*$', 1, 'Numeric');
-INSERT INTO whitelist_filters VALUES (2, '^-?(?:\d+|\d*(\.|,)\d+)$', 2, 'Numeric (Extended)');
+INSERT INTO whitelist_filters VALUES (2, '^-?(?:\d+|\d*(\.|,)\d+)$', 2, 'Numeric (extended)');
 INSERT INTO whitelist_filters VALUES (3, '^[0-9a-f]*$', 5, 'Hexadecimal');
 INSERT INTO whitelist_filters VALUES (4, '^[0-9a-z]*$', 6, 'Alphanumeric');
 INSERT INTO whitelist_filters VALUES (5, '^[\s0-9a-z+/]+={0,2}$', 10, 'Base64');

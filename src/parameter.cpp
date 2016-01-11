@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,64 +31,75 @@
 
 #include "parameter.h"
 
-swd::parameter::parameter(std::string value) :
- value_(value),
+swd::parameter::parameter() :
  threat_(false),
- critical_impact_(false),
- total_rules_(0) {
+ critical_blacklist_impact_(false),
+ total_whitelist_rules_(0) {
 }
 
-std::string swd::parameter::get_value() {
-	return value_;
+void swd::parameter::set_path(const std::string& path) {
+    path_ = path;
 }
 
-void swd::parameter::add_blacklist_filter(swd::blacklist_filter_ptr filter) {
-	filters_.push_back(filter);
+std::string swd::parameter::get_path() const {
+    return path_;
 }
 
-const swd::blacklist_filters& swd::parameter::get_blacklist_filters() {
-	return filters_;
+void swd::parameter::set_value(const std::string& value) {
+    value_ = value;
 }
 
-void swd::parameter::add_whitelist_rule(swd::whitelist_rule_ptr rule) {
-	rules_.push_back(rule);
+std::string swd::parameter::get_value() const {
+    return value_;
 }
 
-const swd::whitelist_rules& swd::parameter::get_whitelist_rules() {
-	return rules_;
+void swd::parameter::add_blacklist_filter(const swd::blacklist_filter_ptr& filter) {
+    blacklist_filters_.push_back(filter);
 }
 
-int swd::parameter::get_impact() {
-	int impact = 0;
-
-	for (swd::blacklist_filters::iterator it_filter = filters_.begin();
-	 it_filter != filters_.end(); it_filter++) {
-		impact += (*it_filter)->get_impact();
-	}
-
-	return impact;
+const swd::blacklist_filters& swd::parameter::get_blacklist_filters() const {
+    return blacklist_filters_;
 }
 
-void swd::parameter::is_threat(bool threat) {
-	threat_ = threat;
+void swd::parameter::add_whitelist_rule(const swd::whitelist_rule_ptr& rule) {
+    whitelist_rules_.push_back(rule);
 }
 
-bool swd::parameter::is_threat() {
-	return threat_;
+const swd::whitelist_rules& swd::parameter::get_whitelist_rules() const {
+    return whitelist_rules_;
 }
 
-void swd::parameter::has_critical_impact(bool critical) {
-	critical_impact_ = critical;
+int swd::parameter::get_impact() const {
+    int impact = 0;
+
+    for (swd::blacklist_filters::const_iterator it_filter = blacklist_filters_.begin();
+     it_filter != blacklist_filters_.end(); it_filter++) {
+        impact += (*it_filter)->get_impact();
+    }
+
+    return impact;
 }
 
-bool swd::parameter::has_critical_impact() {
-	return critical_impact_;
+void swd::parameter::set_threat(const bool& threat) {
+    threat_ = threat;
 }
 
-void swd::parameter::set_total_rules(int total_rules) {
-	total_rules_ = total_rules;
+bool swd::parameter::is_threat() const {
+    return threat_;
 }
 
-int swd::parameter::get_total_rules() {
-	return total_rules_;
+void swd::parameter::set_critical_blacklist_impact(const bool& critical) {
+    critical_blacklist_impact_ = critical;
+}
+
+bool swd::parameter::has_critical_blacklist_impact() const {
+    return critical_blacklist_impact_;
+}
+
+void swd::parameter::set_total_whitelist_rules(const int& total_whitelist_rules) {
+    total_whitelist_rules_ = total_whitelist_rules;
+}
+
+int swd::parameter::get_total_whitelist_rules() const {
+    return total_whitelist_rules_;
 }

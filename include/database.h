@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,9 +33,8 @@
 #define DATABASE_H
 
 #include <string>
-#include <vector>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 #include <dbi/dbi.h>
 
 #include "profile.h"
@@ -43,159 +42,218 @@
 #include "whitelist_filter.h"
 #include "blacklist_rule.h"
 #include "blacklist_filter.h"
-#include "singleton.h"
+#include "integrity_rule.h"
 #include "shared.h"
 
 namespace swd {
-	/**
-	 * @brief Encapsulates and handles the database communication.
-	 *
-	 * There is one database connection for the complete daemon. This is not
-	 * perfect, but libdbi does not seem to be thread safe. This is also the
-	 * reason why the database queries are protected with mutexes.
-	 */
-	class database :
-	 public swd::singleton<swd::database> {
-		public:
-			/**
-			 * @brief Open a database connection.
-			 *
-			 * This method tries to establish a database connection and throws
-			 * an exception if it is not possible.
-			 *
-			 * @param driver The database driver, originating from the config
-			 * @param host The database host, originating from the config
-			 * @param port The database port, originating from the config
-			 * @param username The database user, originating from the config
-			 * @param password The database password, originating from the config
-			 * @param name The database name, originating from the config
-			 * @param encoding The database encoding, originating from the config
-			 */
-			void connect(std::string driver, std::string host, std::string port,
-			 std::string username, std::string password, std::string name,
-			 std::string encoding);
+    /**
+     * @brief Encapsulates and handles the database communication.
+     *
+     * There is one database connection for the complete daemon. This is not
+     * perfect, but libdbi does not seem to be thread safe. This is also the
+     * reason why the database queries are protected with mutexes.
+     */
+    class database {
+        public:
+            /**
+             * @brief Open a database connection.
+             *
+             * This method tries to establish a database connection and throws
+             * an exception if it is not possible.
+             *
+             * @param driver The database driver, originating from the config
+             * @param host The database host, originating from the config
+             * @param port The database port, originating from the config
+             * @param username The database user, originating from the config
+             * @param password The database password, originating from the config
+             * @param name The database name, originating from the config
+             * @param encoding The database encoding, originating from the config
+             */
+            void connect(const std::string& driver, const std::string& host,
+             const std::string& port, const std::string& username,
+             const std::string& password, const std::string& name,
+             const std::string& encoding);
 
-			/**
-			 * @brief Close the database connection.
-			 *
-			 * This method closes conn_ and shutdowns instance_. It is not in
-			 * use at the moment.
-			 */
-			void disconnect();
+            /**
+             * @brief Close the database connection.
+             *
+             * This method closes conn_ and shutdowns instance_. It is not in
+             * use at the moment.
+             */
+            void disconnect();
 
-			/**
-			 * @brief Ensure that the database connection is still open.
-			 *
-			 * This method tests the database connection and tries to reconnect
-			 * if the connection is closed. The manual of libdbi states that some
-			 * drivers attempt to reconnect automatically if dbi_conn_ping is called,
-			 * but this does not seem to be the norm.
-			 */
-			void ensure_connection();
+            /**
+             * @brief Ensure that the database connection is still open.
+             *
+             * This method tests the database connection and tries to reconnect
+             * if the connection is closed. The manual of libdbi states that
+             * some drivers attempt to reconnect automatically if dbi_conn_ping
+             * is called, but this does not seem to be the norm.
+             */
+            void ensure_connection();
 
-			/**
-			 * @brief Get a profile by the server ip.
-			 *
-			 * Since a single shadowd instance can observe multiple different
-			 * web servers at once it is necessary to separate the data.
-			 * Some data can also vary from profile to profile like the hmac
-			 * key or the blacklist impact threshold.
-			 *
-			 * @param server_ip The ip of the httpd server/shadowd client
-			 * @param profile_id The database id of the profile
-			 * @return The corresponding table row
-			 */
-			swd::profile_ptr get_profile(std::string server_ip, int profile_id);
+            /**
+             * @brief Get a profile.
+             *
+             * Since a single shadowd instance can observe multiple different
+             * web servers at once it is necessary to separate the data.
+             * Some data can also vary from profile to profile like the hmac
+             * key or the blacklist impact threshold.
+             *
+             * @param server_ip The ip of the httpd server/shadowd client
+             * @param profile_id The database id of the profile
+             * @return The corresponding table row
+             */
+            swd::profile_ptr get_profile(const std::string& server_ip,
+             const int& profile_id);
 
-			/**
-			 * @brief Get blacklist rules by the profile and caller.
-			 *
-			 * @param profile The profile id of the request
-			 * @param caller The caller (php file) that initiated the connection
-			 * @param path The path of the parameter
-			 * @return The corresponding table rows
-			 */
-			swd::blacklist_rules get_blacklist_rules(int profile, std::string caller,
-			 std::string path);
+            /**
+             * @brief Get blacklist rules.
+             *
+             * @param profile The profile id of the request
+             * @param caller The caller (php file) that initiated the connection
+             * @param path The path of the parameter
+             * @return The corresponding table rows
+             */
+            swd::blacklist_rules get_blacklist_rules(const int& profile,
+             const std::string& caller, const std::string& path);
 
-			/**
-			 * @brief Get all blacklist filters.
-			 *
-			 * @return The corresponding table rows
-			 */
-			swd::blacklist_filters get_blacklist_filters();
+            /**
+             * @brief Get all blacklist filters.
+             *
+             * @return The corresponding table rows
+             */
+            swd::blacklist_filters get_blacklist_filters();
 
-			/**
-			 * @brief Get whitelist rules by the profile and caller.
-			 *
-			 * @param profile The profile id of the request
-			 * @param caller The caller (resource) that initiated the connection
-			 * @param path The path of the parameter
-			 * @return The corresponding table rows
-			 */
-			swd::whitelist_rules get_whitelist_rules(int profile, std::string caller,
-			 std::string path);
+            /**
+             * @brief Get whitelist rules.
+             *
+             * @param profile The profile id of the request
+             * @param caller The caller (resource) that initiated the connection
+             * @param path The path of the parameter
+             * @return The corresponding table rows
+             */
+            swd::whitelist_rules get_whitelist_rules(const int& profile,
+             const std::string& caller, const std::string& path);
 
-			/**
-			 * @brief Save information about a request.
-			 *
-			 * @param profile The profile id of the request
-			 * @param caller The caller (php file) that initiated the connection
-			 * @param learning The status of the learning mode
-			 * @param client_ip The ip of the attacker
-			 * @return The id of the new row
-			 */
-			int save_request(int profile, std::string caller, int learning,
-			 std::string client_ip);
+            /**
+             * @brief Get integrity rules.
+             *
+             * @param profile The profile id of the request
+             * @param caller The caller (resource) that initiated the connection
+             */
+            swd::integrity_rules get_integrity_rules(const int& profile,
+             const std::string& caller);
 
-			/**
-			 * @brief Save information about a parameter.
-			 *
-			 * @param request The id of the corresponding request
-			 * @param path The path (i.e. key) of the parameter
-			 * @param value The value of the parameter
-			 * @param total_rules The total number of whitelist rules that are
-			 *  responsible for this parameter
-			 * @param critical_impact The status of the blacklist test
-			 * @param threat The status of the analyzer
-			 * @return The id of the new row
-			 */
-			int save_parameter(int request, std::string path, std::string value,
-			 int total_rules, int critical_impact, int threat);
+            /**
+             * @brief Save information about a request.
+             *
+             * @param profile_id The profile id of the request
+             * @param caller The caller (php file) that initiated the connection
+             * @param resource The resource identifier
+             * @param mode The status of the system
+             * @param client_ip The ip of the attacker
+             * @param total_integrity_rules The number of broken integrity rules
+             * @return The id of the new row
+             */
+            int save_request(const int& profile_id, const std::string& caller,
+             const std::string& resource, const int& mode,
+             const std::string& client_ip, const int& total_integrity_rules);
 
-			/**
-			 * @brief Add a many to many connector for a matching blacklist filter.
-			 *
-			 * @param filter The id of the blacklist filter
-			 * @param parameter The id of the parameter
-			 */
-			void add_blacklist_parameter_connector(int filter, int parameter);
+            /**
+             * @brief Save information about a parameter.
+             *
+             * @param request_id The id of the corresponding request
+             * @param path The path (i.e. key) of the parameter
+             * @param value The value of the parameter
+             * @param total_whitelist_rules The total number of whitelist rules
+             *  that are responsible for this parameter
+             * @param critical_impact The status of the blacklist test
+             * @param threat The status of the analyzer
+             * @return The id of the new row
+             */
+            int save_parameter(const int& request_id, const std::string& path,
+             const std::string& value, const int& total_whitelist_rules,
+             const int& critical_impact, const int& threat);
 
-			/**
-			 * @brief Add a many to many connector for a broken whitelist rule.
-			 *
-			 * @param rule The id of the whitelist rule
-			 * @param parameter The id of the parameter
-			 */
-			void add_whitelist_parameter_connector(int rule, int parameter);
+            /**
+             * @brief Save information about a hash.
+             *
+             * @param request_id The id of the corresponding request
+             * @param algorithm The algorithm that is used to calculate the hash
+             * @param digest The output of the hash algorithm on the message
+             */
+            int save_hash(const int& request_id, const std::string& algorithm,
+             const std::string& digest);
 
-			/**
-			 * @brief Get the flooding status of the attacker.
-			 *
-			 * @param client_ip The ip of the attacker
-			 * @param profile_id The profile id of the request
-			 * @return The status of the flooding check
-			 */
-			bool is_flooding(std::string client_ip, int profile_id);
+            /**
+             * @brief Add a many to many connector for a matching blacklist filter.
+             *
+             * @param filter_id The id of the blacklist filter
+             * @param parameter_id The id of the parameter
+             */
+            void add_blacklist_parameter_connector(const int& filter_id,
+             const int& parameter_id);
 
-		private:
-			std::string driver_;
-			dbi_conn conn_;
+            /**
+             * @brief Add a many to many connector for a broken whitelist rule.
+             *
+             * @param rule_id The id of the whitelist rule
+             * @param parameter_id The id of the parameter
+             */
+            void add_whitelist_parameter_connector(const int& rule_id,
+             const int& parameter_id);
+
+            /**
+             * @brief Add a many to many connector for a broken integrity rule.
+             *
+             * @param rule_id The id of the integrity rule
+             * @param request_id The id of the request
+             */
+            void add_integrity_request_connector(const int& rule_id,
+             const int& request_id);
+
+            /**
+             * @brief Get the flooding status of the client.
+             *
+             * @param client_ip The ip of the client
+             * @param profile_id The profile id of the request
+             * @return The status of the flooding check
+             */
+            bool is_flooding(const std::string& client_ip, const int& profile_id);
+
+            /**
+             * @brief Set the status of the cache.
+             *
+             * @param profile_id The id of the profile, negative if all
+             * @param cache_outdated The status of the cache
+             */
+            void set_cache_outdated(const int& profile_id,
+             const bool& cache_outdated);
+
+        private:
+            /**
+             * @brief The database connection.
+             */
+            dbi_conn conn_;
+
+            /**
+             * @brief The database instance.
+             */
 #if defined(HAVE_DBI_NEW)
-			dbi_inst instance_;
+            dbi_inst instance_;
 #endif /* defined(HAVE_DBI_NEW) */
-			boost::mutex dbi_mutex_;
-	};
+
+            /**
+             * @brief The mutex for database access.
+             */
+            boost::mutex dbi_mutex_;
+    };
+
+    /**
+     * @brief Database pointer.
+     */
+    typedef boost::shared_ptr<swd::database> database_ptr;
 }
 
 #endif /* DATABASE_H */

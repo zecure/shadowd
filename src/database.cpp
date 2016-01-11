@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,382 +31,462 @@
 
 #include <sstream>
 #include <stdio.h>
-#include <string.h>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "database.h"
 #include "log.h"
 
-void swd::database::connect(std::string driver, std::string host, std::string port,
- std::string username, std::string password, std::string name, std::string encoding) {
-	driver_ = driver;
-
+void swd::database::connect(const std::string& driver, const std::string& host,
+ const std::string& port, const std::string& username, const std::string& password,
+ const std::string& name, const std::string& encoding) {
 #if defined(HAVE_DBI_NEW)
-	dbi_initialize_r(NULL, &instance_);
-	conn_ = dbi_conn_new_r(driver.c_str(), instance_);
+    dbi_initialize_r(NULL, &instance_);
+    conn_ = dbi_conn_new_r(driver.c_str(), instance_);
 #else
-	dbi_initialize(NULL);
-	conn_ = dbi_conn_new(driver.c_str());
+    dbi_initialize(NULL);
+    conn_ = dbi_conn_new(driver.c_str());
 #endif
 
-	dbi_conn_set_option(conn_, "host", host.c_str());
-	dbi_conn_set_option(conn_, "port", port.c_str());
-	dbi_conn_set_option(conn_, "username", username.c_str());
-	dbi_conn_set_option(conn_, "password", password.c_str());
-	dbi_conn_set_option(conn_, "dbname", name.c_str());
-	dbi_conn_set_option(conn_, "encoding", encoding.c_str());
+    dbi_conn_set_option(conn_, "host", host.c_str());
+    dbi_conn_set_option(conn_, "port", port.c_str());
+    dbi_conn_set_option(conn_, "username", username.c_str());
+    dbi_conn_set_option(conn_, "password", password.c_str());
+    dbi_conn_set_option(conn_, "dbname", name.c_str());
+    dbi_conn_set_option(conn_, "encoding", encoding.c_str());
 
-	/* If the initial connection can not be established the process is shut down. */
-	if (dbi_conn_connect(conn_) < 0) {
-		throw swd::exceptions::core_exception("Can't connect to database server");
-	}
+    /* If the initial connection can not be established the process is shut down. */
+    if (dbi_conn_connect(conn_) < 0) {
+        throw swd::exceptions::core_exception("Can't connect to database server");
+    }
 }
 
 void swd::database::disconnect() {
-	dbi_conn_close(conn_);
+    dbi_conn_close(conn_);
 #if defined(HAVE_DBI_NEW)
-	dbi_shutdown_r(instance_);
+    dbi_shutdown_r(instance_);
 #endif
 }
 
 void swd::database::ensure_connection() {
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	if (dbi_conn_ping(conn_) < 1) {
-		swd::log::i()->send(swd::notice, "Dropped database connection");
+    if (dbi_conn_ping(conn_) < 1) {
+        swd::log::i()->send(swd::notice, "Dropped database connection");
 
-		if (dbi_conn_connect(conn_) < 0) {
-			throw swd::exceptions::database_exception("Lost database connection");
-		}
-	}
+        if (dbi_conn_connect(conn_) < 0) {
+            throw swd::exceptions::database_exception("Lost database connection");
+        }
+    }
 }
 
-swd::profile_ptr swd::database::get_profile(std::string server_ip, int profile_id) {
-	swd::log::i()->send(swd::notice, "Get profile -> server_ip: " + server_ip
-	 + "; profile_id: " + boost::lexical_cast<std::string>(profile_id));
+swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
+ const int& profile_id) {
+    std::stringstream log_message;
+    log_message << "Get profile from db -> server_ip: " << server_ip
+     << "; profile_id: " << profile_id;
 
-	/* Test the database connection status. Tries to reconnect if disconnected. */
-	ensure_connection();
+    swd::log::i()->send(swd::notice, log_message.str());
 
-	/* Mutex to avoid race conditions. */
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    /* Test the database connection status. Tries to reconnect if disconnected. */
+    ensure_connection();
 
-	/**
-	 * First we escape server_ip. It comes from a trusted source, but better safe
-	 * than sorry. This does not work with std::string though.
-	 */
-	char *server_ip_esc = strdup(server_ip.c_str());
-	dbi_conn_quote_string(conn_, &server_ip_esc);
+    /* Mutex to avoid race conditions. */
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	/* Insert the ip and execute the query. */
-	dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, learning_enabled, "
-	 "whitelist_enabled, blacklist_enabled, threshold FROM profiles WHERE server_ip "
-	 "= %s AND id = %i", server_ip_esc, profile_id);
+    /**
+     * First we escape server_ip. It comes from a trusted source, but better safe
+     * than sorry. This does not work with std::string though.
+     */
+    char *server_ip_esc = strdup(server_ip.c_str());
+    dbi_conn_quote_string(conn_, &server_ip_esc);
 
-	/* Don't forget to free server_ip_esc to avoid a memory leak. */
-	free(server_ip_esc);
+    /* Insert the ip and execute the query. */
+    dbi_result res = dbi_conn_queryf(conn_, "SELECT id, hmac_key, mode, "
+     "whitelist_enabled, blacklist_enabled, integrity_enabled, flooding_enabled, "
+     "blacklist_threshold, cache_outdated FROM profiles WHERE %s LIKE "
+     "prepare_wildcard(server_ip) AND id = %i", server_ip_esc, profile_id);
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute profile query");
-	}
+    /* Don't forget to free server_ip_esc to avoid a memory leak. */
+    free(server_ip_esc);
 
-	if (dbi_result_get_numrows(res) != 1) {
-		throw swd::exceptions::database_exception("Can't get profile");
-	}
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute profile query");
+    }
 
-	if (!dbi_result_next_row(res)) {
-		throw swd::exceptions::database_exception("No profile?");
-	}
+    if (dbi_result_get_numrows(res) != 1) {
+        throw swd::exceptions::database_exception("Can't get profile");
+    }
 
-	swd::profile_ptr profile(
-		new swd::profile(
-			server_ip,
-			dbi_result_get_uint(res, "id"),
-			(dbi_result_get_uint(res, "learning_enabled") == 1),
-			(dbi_result_get_uint(res, "whitelist_enabled") == 1),
-			(dbi_result_get_uint(res, "blacklist_enabled") == 1),
-			dbi_result_get_string(res, "hmac_key"),
-			dbi_result_get_uint(res, "threshold")
-		)
-	);
+    if (!dbi_result_next_row(res)) {
+        throw swd::exceptions::database_exception("No profile?");
+    }
 
-	dbi_result_free(res);
+    swd::profile_ptr profile(new swd::profile());
+    profile->set_server_ip(server_ip),
+    profile->set_id(dbi_result_get_uint(res, "id"));
+    profile->set_mode(dbi_result_get_uint(res, "mode"));
+    profile->set_whitelist_enabled(dbi_result_get_uint(res, "whitelist_enabled") == 1);
+    profile->set_blacklist_enabled(dbi_result_get_uint(res, "blacklist_enabled") == 1);
+    profile->set_integrity_enabled(dbi_result_get_uint(res, "integrity_enabled") == 1);
+    profile->set_flooding_enabled(dbi_result_get_uint(res, "flooding_enabled") == 1);
+    profile->set_key(dbi_result_get_string(res, "hmac_key"));
+    profile->set_blacklist_threshold(dbi_result_get_uint(res, "blacklist_threshold"));
+    profile->set_cache_outdated(dbi_result_get_uint(res, "cache_outdated") == 1);
 
-	return profile;
+    dbi_result_free(res);
+
+    return profile;
 }
 
-swd::blacklist_rules swd::database::get_blacklist_rules(int profile,
- std::string caller, std::string path) {
-	swd::log::i()->send(swd::notice, "Get blacklist rules");
+swd::blacklist_rules swd::database::get_blacklist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path) {
+    swd::log::i()->send(swd::notice, "Get blacklist rules from db");
 
-	ensure_connection();
+    ensure_connection();
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	char *caller_esc = strdup(caller.c_str());
-	dbi_conn_quote_string(conn_, &caller_esc);
+    char *caller_esc = strdup(caller.c_str());
+    dbi_conn_quote_string(conn_, &caller_esc);
 
-	char *path_esc = strdup(path.c_str());
-	dbi_conn_quote_string(conn_, &path_esc);
+    char *path_esc = strdup(path.c_str());
+    dbi_conn_quote_string(conn_, &path_esc);
 
-	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, r.threshold "
-	 "FROM blacklist_rules AS r WHERE r.profile_id = %i AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.caller, '_', '\\_'), '%', '\\%'), '*', '%') AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.path, '_', '\\_'), '%', '\\%'), '*', '%') AND r.status = %i",
-	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
+    dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, r.threshold "
+     "FROM blacklist_rules AS r WHERE r.profile_id = %i AND %s LIKE "
+     "prepare_wildcard(r.caller) AND %s LIKE prepare_wildcard(r.path) AND "
+     "r.status = %i", profile_id, caller_esc, path_esc, STATUS_ACTIVATED);
 
-	free(caller_esc);
-	free(path_esc);
+    free(caller_esc);
+    free(path_esc);
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute blacklist_rules query");
-	}
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute blacklist_rules query");
+    }
 
-	swd::blacklist_rules rules;
+    swd::blacklist_rules rules;
 
-	while (dbi_result_next_row(res)) {
-		swd::blacklist_rule_ptr rule(
-			new swd::blacklist_rule(
-				dbi_result_get_uint(res, "id"),
-				dbi_result_get_uint(res, "threshold")
-			)
-		);
+    while (dbi_result_next_row(res)) {
+        swd::blacklist_rule_ptr rule(new swd::blacklist_rule());
+        rule->set_id(dbi_result_get_uint(res, "id"));
+        rule->set_threshold(dbi_result_get_uint(res, "threshold"));
 
-		rules.push_back(rule);
-	}
+        rules.push_back(rule);
+    }
 
-	dbi_result_free(res);
+    dbi_result_free(res);
 
-	return rules;
+    return rules;
 }
 
 swd::blacklist_filters swd::database::get_blacklist_filters() {
-	swd::log::i()->send(swd::notice, "Get blacklist filters");
+    swd::log::i()->send(swd::notice, "Get blacklist filters from db");
 
-	ensure_connection();
+    ensure_connection();
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	dbi_result res = dbi_conn_query(conn_, "SELECT id, rule, impact FROM blacklist_filters");
+    dbi_result res = dbi_conn_query(conn_, "SELECT id, impact, rule FROM blacklist_filters");
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute blacklist_filters query");
-	}
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute blacklist_filters query");
+    }
 
-	swd::blacklist_filters filters;
+    swd::blacklist_filters filters;
 
-	while (dbi_result_next_row(res)) {
-		swd::blacklist_filter_ptr filter(
-			new swd::blacklist_filter(
-				dbi_result_get_uint(res, "id"),
-				dbi_result_get_string(res, "rule"),
-				dbi_result_get_uint(res, "impact")
-			)
-		);
+    while (dbi_result_next_row(res)) {
+        swd::blacklist_filter_ptr filter(new swd::blacklist_filter());
+        filter->set_id(dbi_result_get_uint(res, "id"));
+        filter->set_impact(dbi_result_get_uint(res, "impact"));
+        filter->set_regex(dbi_result_get_string(res, "rule"));
 
-		filters.push_back(filter);
-	}
+        filters.push_back(filter);
+    }
 
-	dbi_result_free(res);
+    dbi_result_free(res);
 
-	return filters;
+    return filters;
 }
 
-swd::whitelist_rules swd::database::get_whitelist_rules(int profile,
- std::string caller, std::string path) {
-	swd::log::i()->send(swd::notice, "Get whitelist rules");
+swd::whitelist_rules swd::database::get_whitelist_rules(const int& profile_id,
+ const std::string& caller, const std::string& path) {
+    swd::log::i()->send(swd::notice, "Get whitelist rules from db");
 
-	ensure_connection();
+    ensure_connection();
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	char *caller_esc = strdup(caller.c_str());
-	dbi_conn_quote_string(conn_, &caller_esc);
+    char *caller_esc = strdup(caller.c_str());
+    dbi_conn_quote_string(conn_, &caller_esc);
 
-	char *path_esc = strdup(path.c_str());
-	dbi_conn_quote_string(conn_, &path_esc);
+    char *path_esc = strdup(path.c_str());
+    dbi_conn_quote_string(conn_, &path_esc);
 
-	/**
-	 * Remove LIKE single character wildcard, because it could result easily in security
-	 * problems if a user forgets to escape an underscore. And instead of a percentage sign
-	 * it is nicer to use an asterisk, because it is more common.
-	 */
-	dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, f.id as filter_id, "
-	 "f.rule, f.impact, r.min_length, r.max_length FROM whitelist_rules AS r, "
-	 "whitelist_filters AS f WHERE r.filter_id = f.id AND r.profile_id = %i AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.caller, '_', '\\_'), '%', '\\%'), '*', '%') AND %s LIKE "
-	 "REPLACE(REPLACE(REPLACE(r.path, '_', '\\_'), '%', '\\%'), '*', '%') AND r.status = %i",
-	 profile, caller_esc, path_esc, STATUS_ACTIVATED);
+    /**
+     * Remove LIKE single character wildcard, because it could result easily in security
+     * problems if a user forgets to escape an underscore. And instead of a percentage sign
+     * it is nicer to use an asterisk, because it is more common.
+     */
+    dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.path, f.id as filter_id, "
+     "f.rule, f.impact, r.min_length, r.max_length FROM whitelist_rules AS r, "
+     "whitelist_filters AS f WHERE r.filter_id = f.id AND r.profile_id = %i AND %s LIKE "
+     "prepare_wildcard(r.caller) AND %s LIKE prepare_wildcard(r.path) AND r.status = %i",
+     profile_id, caller_esc, path_esc, STATUS_ACTIVATED);
 
-	free(caller_esc);
-	free(path_esc);
+    free(caller_esc);
+    free(path_esc);
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute whitelist_rules query");
-	}
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute whitelist_rules query");
+    }
 
-	swd::whitelist_rules rules;
+    swd::whitelist_rules rules;
 
-	while (dbi_result_next_row(res)) {
-		swd::whitelist_filter_ptr filter(
-			new swd::whitelist_filter(
-				dbi_result_get_uint(res, "filter_id"),
-				dbi_result_get_string(res, "rule")
-			)
-		);
+    while (dbi_result_next_row(res)) {
+        swd::whitelist_filter_ptr filter(new swd::whitelist_filter());
+        filter->set_id(dbi_result_get_uint(res, "filter_id"));
+        filter->set_regex(dbi_result_get_string(res, "rule"));
 
-		swd::whitelist_rule_ptr rule(
-			new swd::whitelist_rule(
-				dbi_result_get_uint(res, "id"),
-				filter,
-				dbi_result_get_uint(res, "min_length"),
-				dbi_result_get_uint(res, "max_length")
-			)
-		);
+        swd::whitelist_rule_ptr rule(new swd::whitelist_rule());
+        rule->set_id(dbi_result_get_uint(res, "id"));
+        rule->set_filter(filter);
+        rule->set_min_length(dbi_result_get_uint(res, "min_length"));
+        rule->set_max_length(dbi_result_get_uint(res, "max_length"));
 
-		rules.push_back(rule);
-	}
+        rules.push_back(rule);
+    }
 
-	dbi_result_free(res);
+    dbi_result_free(res);
 
-	return rules;
+    return rules;
 }
 
-int swd::database::save_request(int profile, std::string caller, int learning,
- std::string client_ip) {
-	swd::log::i()->send(swd::notice, "Save request -> profile: "
-	 + boost::lexical_cast<std::string>(profile) + "; caller: " + caller
-	 + "; learning: " + boost::lexical_cast<std::string>(learning)
-	 + "; client_ip: " + client_ip);
+swd::integrity_rules swd::database::get_integrity_rules(const int& profile_id,
+ const std::string& caller) {
+    swd::log::i()->send(swd::notice, "Get integrity rules from db");
 
-	ensure_connection();
+    ensure_connection();
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	char *caller_esc = strdup(caller.c_str());
-	dbi_conn_quote_string(conn_, &caller_esc);
+    char *caller_esc = strdup(caller.c_str());
+    dbi_conn_quote_string(conn_, &caller_esc);
 
-	char *client_ip_esc = strdup(client_ip.c_str());
-	dbi_conn_quote_string(conn_, &client_ip_esc);
+    dbi_result res = dbi_conn_queryf(conn_, "SELECT r.id, r.algorithm, r.digest FROM "
+     "integrity_rules AS r WHERE r.profile_id = %i AND %s LIKE prepare_wildcard(r.caller) "
+     "AND r.status = %i", profile_id, caller_esc, STATUS_ACTIVATED);
 
-	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO requests (profile_id, "
-	 "caller, learning, client_ip) VALUES (%i, %s, %i, %s)", profile, caller_esc,
-	 learning, client_ip_esc);
+    free(caller_esc);
 
-	free(caller_esc);
-	free(client_ip_esc);
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute whitelist_rules query");
+    }
 
-	if (!res) {
-		/**
-		 * It is important to unlock the mutex before returning. Otherwise we get
-		 * a dead lock and the daemon doesn't work anymore.
-		 */
-		throw swd::exceptions::database_exception("Can't execute request query");
-	}
+    swd::integrity_rules rules;
 
-	int id = dbi_conn_sequence_last(conn_, "requests_id_seq");
+    while (dbi_result_next_row(res)) {
+        swd::integrity_rule_ptr rule(new swd::integrity_rule());
+        rule->set_id(dbi_result_get_uint(res, "id"));
+        rule->set_algorithm(dbi_result_get_string(res, "algorithm"));
+        rule->set_digest(dbi_result_get_string(res, "digest"));
 
-	dbi_result_free(res);
+        rules.push_back(rule);
+    }
 
-	return id;
+    dbi_result_free(res);
+
+    return rules;
 }
 
-int swd::database::save_parameter(int request, std::string path, std::string value,
- int total_rules, int critical_impact, int threat) {
-	ensure_connection();
+int swd::database::save_request(const int& profile_id, const std::string& caller,
+ const std::string& resource, const int& mode, const std::string& client_ip,
+ const int& total_integrity_rules) {
+    std::stringstream log_message;
+    log_message << "Save request -> profile: " << profile_id
+     << "; caller: " << caller << "; resource: " << resource
+     << "; mode: " << mode << "; client_ip: " << client_ip;
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    swd::log::i()->send(swd::notice, log_message.str());
 
-	char *path_esc = strdup(path.c_str());
-	dbi_conn_quote_string(conn_, &path_esc);
+    ensure_connection();
 
-	char *value_esc = strdup(value.c_str());
-	dbi_conn_quote_string(conn_, &value_esc);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO parameters (request_id, "
-	 "path, value, total_rules, critical_impact, threat) VALUES (%i, %s, %s, %i, %i, %i)",
-	 request, path_esc, value_esc, total_rules, critical_impact, threat);
+    char *caller_esc = strdup(caller.c_str());
+    dbi_conn_quote_string(conn_, &caller_esc);
 
-	free(path_esc);
-	free(value_esc);
+    char *resource_esc = strdup(resource.c_str());
+    dbi_conn_quote_string(conn_, &resource_esc);
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute parameter query");
-	}
+    char *client_ip_esc = strdup(client_ip.c_str());
+    dbi_conn_quote_string(conn_, &client_ip_esc);
 
-	int id = dbi_conn_sequence_last(conn_, "parameters_id_seq");
+    dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO requests (profile_id, "
+     "caller, resource, mode, client_ip, total_integrity_rules) VALUES (%i, %s, "
+     "%s, %i, %s, %i)", profile_id, caller_esc, resource_esc, mode, client_ip_esc,
+     total_integrity_rules);
 
-	dbi_result_free(res);
+    free(caller_esc);
+    free(resource_esc);
+    free(client_ip_esc);
 
-	return id;
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute request query");
+    }
+
+    int id = dbi_conn_sequence_last(conn_, "requests_id_seq");
+
+    dbi_result_free(res);
+
+    return id;
 }
 
-void swd::database::add_blacklist_parameter_connector(int filter, int parameter) {
-	ensure_connection();
+int swd::database::save_parameter(const int& request_id, const std::string& path,
+ const std::string& value, const int& total_whitelist_rules,
+ const int& critical_impact, const int& threat) {
+    ensure_connection();
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO blacklist_parameters "
-	 "(filter_id, parameter_id) VALUES (%i, %i)", filter, parameter);
+    char *path_esc = strdup(path.c_str());
+    dbi_conn_quote_string(conn_, &path_esc);
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute blacklist_parameter query");
-	}
+    char *value_esc = strdup(value.c_str());
+    dbi_conn_quote_string(conn_, &value_esc);
+
+    dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO parameters "
+     "(request_id, path, value, total_whitelist_rules, critical_impact, threat) "
+     "VALUES (%i, %s, %s, %i, %i, %i)", request_id, path_esc, value_esc,
+     total_whitelist_rules, critical_impact, threat);
+
+    free(path_esc);
+    free(value_esc);
+
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute parameter query");
+    }
+
+    int id = dbi_conn_sequence_last(conn_, "parameters_id_seq");
+
+    dbi_result_free(res);
+
+    return id;
 }
 
-void swd::database::add_whitelist_parameter_connector(int rule, int parameter) {
-	ensure_connection();
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+int swd::database::save_hash(const int& request_id, const std::string& algorithm,
+ const std::string& digest) {
+    ensure_connection();
 
-	dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO whitelist_parameters "
-	 "(rule_id, parameter_id) VALUES (%i, %i)", rule, parameter);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute whitelist_parameter query");
-	}
+    char *algorithm_esc = strdup(algorithm.c_str());
+    dbi_conn_quote_string(conn_, &algorithm_esc);
+
+    char *digest_esc = strdup(digest.c_str());
+    dbi_conn_quote_string(conn_, &digest_esc);
+
+    dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO hashes (request_id, "
+     "algorithm, digest) VALUES (%i, %s, %s)", request_id, algorithm_esc, digest_esc);
+
+    free(algorithm_esc);
+    free(digest_esc);
+
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute hash query");
+    }
+
+    int id = dbi_conn_sequence_last(conn_, "hashes_id_seq");
+
+    dbi_result_free(res);
+
+    return id;
 }
 
-bool swd::database::is_flooding(std::string client_ip, int profile_id) {
-	ensure_connection();
+void swd::database::add_blacklist_parameter_connector(const int& filter_id,
+ const int& parameter_id) {
+    ensure_connection();
 
-	boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	char *client_ip_esc = strdup(client_ip.c_str());
-	dbi_conn_quote_string(conn_, &client_ip_esc);
+    dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO blacklist_parameters "
+     "(filter_id, parameter_id) VALUES (%i, %i)", filter_id, parameter_id);
 
-	dbi_result res;
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute blacklist_parameter query");
+    }
+}
 
-	if (driver_ == "pgsql") {
-		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.learning = 0 AND "
-		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
-		 "> NOW() - ((SELECT profiles.flooding_time FROM profiles WHERE profiles.id "
-		 "= %i) || ' minute')::INTERVAL) r WHERE r.request_count >= (SELECT "
-		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i AND "
-		 "profiles.flooding_threshold > 0)",
-		 client_ip_esc, profile_id, profile_id, profile_id);
-	} else if (driver_ == "mysql") {
-		res = dbi_conn_queryf(conn_, "SELECT 1 FROM (SELECT COUNT(requests.id) "
-		 "AS request_count FROM requests WHERE requests.learning = 0 AND "
-		 "requests.client_ip = %s AND requests.profile_id = %i AND requests.date "
-		 "> NOW() - INTERVAL (SELECT profiles.flooding_time FROM profiles WHERE "
-		 "profiles.id = %i) MINUTE) r WHERE r.request_count >= (SELECT "
-		 "profiles.flooding_threshold FROM profiles WHERE profiles.id = %i AND "
-		 "profiles.flooding_threshold > 0)",
-		 client_ip_esc, profile_id, profile_id, profile_id);
-	}
+void swd::database::add_whitelist_parameter_connector(const int& rule_id,
+ const int& parameter_id) {
+    ensure_connection();
 
-	free(client_ip_esc);
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-	if (!res) {
-		throw swd::exceptions::database_exception("Can't execute request count query");
-	}
+    dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO whitelist_parameters "
+     "(rule_id, parameter_id) VALUES (%i, %i)", rule_id, parameter_id);
 
-	bool status = (dbi_result_get_numrows(res) == 1);
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute whitelist_parameter query");
+    }
+}
 
-	dbi_result_free(res);
+void swd::database::add_integrity_request_connector(const int& rule_id,
+ const int& request_id) {
+    ensure_connection();
 
-	return status;
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+
+    dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO integrity_requests "
+     "(rule_id, request_id) VALUES (%i, %i)", rule_id, request_id);
+
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute integrity_request query");
+    }
+}
+
+bool swd::database::is_flooding(const std::string& client_ip,
+ const int& profile_id) {
+    ensure_connection();
+
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+
+    char *client_ip_esc = strdup(client_ip.c_str());
+    dbi_conn_quote_string(conn_, &client_ip_esc);
+
+    dbi_result res = dbi_conn_queryf(conn_, "SELECT is_flooding(%i, %s) AS result",
+     profile_id, client_ip_esc);
+
+    free(client_ip_esc);
+
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute request count query");
+    }
+
+    bool flooding = false;
+
+    if (dbi_result_get_numrows(res) == 1) {
+        if (!dbi_result_next_row(res)) {
+            throw swd::exceptions::database_exception("No flooding?");
+        }
+
+        flooding = (dbi_result_get_uint(res, "result") == 1);
+    }
+
+    dbi_result_free(res);
+
+    return flooding;
+}
+
+void swd::database::set_cache_outdated(const int& profile_id,
+ const bool& cache_outdated) {
+    ensure_connection();
+
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+
+    dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i "
+     "WHERE id = %i OR %i < 0", (cache_outdated ? 1 : 0), profile_id, profile_id);
+
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute cache_outdated query");
+    }
 }

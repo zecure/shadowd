@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -32,74 +32,92 @@
 #ifndef REPLY_H
 #define REPLY_H
 
-#include <string>
 #include <vector>
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "shared.h"
 
 namespace swd {
-	/**
-	 * @brief Models a reply.
-	 */
-	class reply {
-		public:
-			/**
-			 * @brief Set the status code of the reply.
-			 *
-			 * @param status The status code of the reply
-			 */
-			void set_status(int status);
+    /**
+     * @brief Models a reply.
+     */
+    class reply {
+        public:
+            /**
+             * @brief Set the status code of the reply.
+             *
+             * @param status The status code of the reply
+             */
+            void set_status(const int& status);
 
-			/**
-			 * @brief Get the status code of the reply.
-			 *
-			 * @return The status code of the reply
-			 */
-			int get_status();
+            /**
+             * @brief Get the status code of the reply.
+             *
+             * @return The status code of the reply
+             */
+            int get_status() const;
 
-			/**
-			 * @brief Set a list of threat paths.
-			 *
-			 * @param threats A list of paths strings of parameters that were
-			 *  classified as threats.
-			 */
-			void set_threats(std::vector<std::string> threats);
+            /**
+             * @brief Set a list of threat paths.
+             *
+             * @param threats A list of paths strings of parameters that were
+             *  classified as threats.
+             */
+            void set_threats(const std::vector<std::string>& threats);
 
-			/**
-			 * @brief Get the list of threat paths.
-			 */
-			std::vector<std::string> get_threats();
+            /**
+             * @brief Get the list of threat paths.
+             */
+            std::vector<std::string> get_threats() const;
 
-			/**
-			 * @brief Set the content that gets send back to the http server.
-			 *
-			 * @param content The output content
-			 */
-			void set_content(std::string content);
+            /**
+             * @brief Set the content that gets send back to the http server.
+             *
+             * @param content The output content
+             */
+            void set_content(const std::string& content);
 
-			/**
-			 * @brief Convert the reply into a vector of buffers.
-			 *
-			 * The buffers do not own the underlying memory blocks, therefore
-			 * the reply object must remain valid and not be changed until the
-			 * write operation has completed.
-			 *
-			 * @return The output that gets send back to the http server
-			 */
-			std::vector<boost::asio::const_buffer> to_buffers();
+            /**
+             * @brief Get the content that gets send back to the http server.
+             *
+             * @return The output content
+             */
+            std::string get_content() const;
 
-		private:
-			int status_;
-			std::vector<std::string> threats_;
-			std::string content_;
-	};
+            /**
+             * @brief Convert the reply into a vector of buffers.
+             *
+             * The buffers do not own the underlying memory blocks, therefore
+             * the reply object must remain valid and not be changed until the
+             * write operation has completed.
+             *
+             * @return The output that gets send back to the http server
+             */
+            std::vector<boost::asio::const_buffer> to_buffers() const;
 
-	/**
-	 * @brief Reply pointer.
-	 */
-	typedef boost::shared_ptr<swd::reply> reply_ptr;
+        private:
+            /**
+             * @brief The status of the reply.
+             */
+            int status_;
+
+            /**
+             * @brief The paths of dangerous parameters.
+             */
+            std::vector<std::string> threats_;
+
+            /**
+             * @brief The json-encoded content of the reply.
+             */
+            std::string content_;
+    };
+
+    /**
+     * @brief Reply pointer.
+     */
+    typedef boost::shared_ptr<swd::reply> reply_ptr;
 }
 
 #endif /* REPLY_H */

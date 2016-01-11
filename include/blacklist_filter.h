@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -35,63 +35,83 @@
 #include <vector>
 #include <string>
 #include <boost/regex.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace swd {
-	/**
-	 * @brief Models a blacklist filter.
-	 *
-	 * This class and its regular expressions are based on PHPIDS.
-	 * Parameters are directly connected with matching filters if the request
-	 * is classified as an attack or if learning mode is enabled.
-	 */
-	class blacklist_filter {
-		public:
-			/**
-			 * @brief Construct a blacklist filter.
-			 *
-			 * @param id The database id of the filter
-			 * @param rule The regular expression of the filter
-			 * @param impact The dangerousness of the filter
-			 */
-			blacklist_filter(int id, std::string rule, int impact);
+    /**
+     * @brief Models a blacklist filter.
+     */
+    class blacklist_filter {
+        public:
+            /**
+             * @brief Set the id of the filter.
+             *
+             * @param id The id of the filter
+             */
+            void set_id(const int& id);
 
-			/**
-			 * @brief Get the id of the filter.
-			 *
-			 * @return The id of the filter
-			 */
-			int get_id();
+            /**
+             * @brief Get the id of the filter.
+             *
+             * @return The id of the filter
+             */
+            int get_id() const;
 
-			/**
-			 * @brief Get the impact of the filter.
-			 *
-			 * @return The impact of the filter
-			 */
-			int get_impact();
+            /**
+             * @brief Set the impact of the filter.
+             *
+             * @param impact The impact of the filter
+             */
+            void set_impact(const int& impact);
 
-			/**
-			 * @brief Test for input if the filter matches.
-			 *
-			 * @param input The string that should be tested
-			 * @return The status of the regular expression test
-			 */
-			bool match(std::string input);
+            /**
+             * @brief Get the impact of the filter.
+             *
+             * @return The impact of the filter
+             */
+            int get_impact() const;
 
-		private:
-			int id_;
-			int impact_;
-			boost::regex rule_;
-	};
+            /**
+             * @brief Set the regular expression of the filter.
+             *
+             * @param regex The regular expression of the filter
+             */
+            void set_regex(const std::string& regex);
 
-	/**
-	 * @brief Blacklist filter pointer.
-	 */
-	typedef boost::shared_ptr<swd::blacklist_filter> blacklist_filter_ptr;
+            /**
+             * @brief Test for input if the regular expression matches.
+             *
+             * @param input The string that should be tested
+             * @return The result of the test
+             */
+            bool matches(const std::string& input) const;
 
-	/**
-	 * @brief List of blacklist filter pointers.
-	 */
-	typedef std::vector<swd::blacklist_filter_ptr> blacklist_filters;
+        private:
+            /**
+             * @brief The database id of the filter.
+             */
+            int id_;
+
+            /**
+             * @brief The impact/severity of the filter.
+             */
+            int impact_;
+
+            /**
+             * @brief The regular expression of the filter.
+             */
+            boost::regex regex_;
+    };
+
+    /**
+     * @brief Blacklist filter pointer.
+     */
+    typedef boost::shared_ptr<swd::blacklist_filter> blacklist_filter_ptr;
+
+    /**
+     * @brief List of blacklist filter pointers.
+     */
+    typedef std::vector<swd::blacklist_filter_ptr> blacklist_filters;
 }
 
 #endif /* BLACKLIST_FILTER_H */

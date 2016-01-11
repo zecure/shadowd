@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,35 +33,36 @@
 #define SINGLETON_H
 
 namespace swd {
-	/**
-	 * @brief Interface for singleton classes.
-	 */
-	template <typename C> class singleton {
-		public:
-			virtual ~singleton () {
-				instance_ = 0;
-			}
-			/**
-			 * @brief Get the global instance of the template class.
-			 *
-			 * @return Pointer to the template class.
-			 */
-			static C* i() {
-				if (!instance_) {
-					instance_ = new C();
-				}
+    /**
+     * @brief Interface for singleton classes.
+     */
+    template <typename C> class singleton {
+        public:
+            virtual ~singleton () {
+                instance_ = 0;
+            }
 
-				return instance_;
-			}
+            /**
+             * @brief Get the global instance of the template class.
+             *
+             * @return Pointer to the template class.
+             */
+            static C* i() {
+                if (!instance_) {
+                    instance_ = new C();
+                }
 
-		private:
-			static C* instance_;
+                return instance_;
+            }
 
-		protected:
-			singleton() {}
-	};
+        private:
+            static C* instance_;
 
-	template <typename C> C* singleton <C>::instance_ = 0;
+        protected:
+            singleton() {}
+    };
+
+    template <typename C> C* singleton <C>::instance_ = 0;
 }
 
 #endif /* SINGLETON_H */

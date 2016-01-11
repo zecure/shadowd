@@ -1,0 +1,34 @@
+language: cpp
+
+compiler:
+  - gcc
+
+addons:
+  apt:
+    packages:
+      - libssl-dev
+      - libboost-system-dev
+      - libboost-thread-dev
+      - libboost-program-options-dev
+      - libboost-regex-dev
+      - libboost-test-dev
+      - libasio-dev
+      - libjsoncpp-dev
+      - libcrypto++-dev
+      - libdbi-dev
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  - make tests && make test
+  - ../misc/blacklist/helper.py --test
+
+os:
+  - linux
+
+sudo: required
+
+dist: trusty

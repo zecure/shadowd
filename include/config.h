@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -40,65 +40,89 @@ namespace po = boost::program_options;
 #include "shared.h"
 
 namespace swd {
-	/**
-	 * @brief Encapsulates and handles the configuration parsing.
-	 */
-	class config :
-	 public swd::singleton<swd::config> {
-		public:
-			/**
-			 * @brief Construct the config and add all possible options.
-			 */
-			config();
+    /**
+     * @brief Encapsulates and handles the configuration parsing.
+     */
+    class config :
+     public swd::singleton<swd::config> {
+        public:
+            /**
+             * @brief Construct the config and add all possible options.
+             */
+            config();
 
-			/**
-			 * @brief Parse the command line and apply it to the config.
-			 *
-			 * @param argc The number of command line arguments
-			 * @param argv The command line arguments
-			 */
-			void parse_command_line(int argc, char** argv);
+            /**
+             * @brief Parse the command line and apply it to the config.
+             *
+             * @param argc The number of command line arguments
+             * @param argv The command line arguments
+             */
+            void parse_command_line(int argc, char** argv);
 
-			/**
-			 * @brief Parse a file and apply it to the config.
-			 *
-			 * @param file The file that gets parsed
-			 */
-			void parse_config_file(std::string file);
+            /**
+             * @brief Parse a file and apply it to the config.
+             *
+             * @param file The file that gets parsed
+             */
+            void parse_config_file(const std::string& file);
 
-			/**
-			 * @brief Validate the configuration and throw an exception if something
-			 *  important is not set.
-			 */
-			void validate();
+            /**
+             * @brief Validate the configuration and throw an exception if something
+             *  important is not set.
+             */
+            void validate() const;
 
-			/**
-			 * @brief Test if the configuration value is set.
-			 *
-			 * defined and get are just simple wrappers for boost::program_options
-			 * functionality at the moment. This way the po lib stays isolated and
-			 * it is easier to replace it later if there is a reason to do so.
-			 *
-			 * @param key The key of the configuration value
-			 */
-			bool defined(std::string key) { return (vm_.count(key) > 0); }
+            /**
+             * @brief Test if the configuration value is set.
+             *
+             * defined and get are just simple wrappers for boost::program_options
+             * functionality at the moment. This way the po lib stays isolated and
+             * it is easier to replace it later if there is a reason to do so.
+             *
+             * @param key The key of the configuration value
+             */
+            bool defined(const std::string& key) const { return (vm_.count(key) > 0); }
 
-			/**
-			 * @brief Get the configuration value.
-			 *
-			 * @see defined
-			 *
-			 * @param key The key of the configuration value
-			 */
-			template<class T> T get(std::string key) { return vm_[key].as<T>(); }
+            /**
+             * @brief Get the configuration value.
+             *
+             * @see defined
+             *
+             * @param key The key of the configuration value
+             */
+            template<class T> T get(const std::string& key) const { return vm_[key].as<T>(); }
 
-		private:
-			po::options_description od_generic_;
-			po::options_description od_server_;
-			po::options_description od_daemon_;
-			po::options_description od_database_;
-			po::variables_map vm_;
-	};
+        private:
+            /**
+             * @brief Contains all information about generic settings.
+             */
+            po::options_description od_generic_;
+
+            /**
+             * @brief Contains all information about server settings.
+             */
+            po::options_description od_server_;
+
+            /**
+             * @brief Contains all information about daemon settings.
+             */
+            po::options_description od_daemon_;
+
+            /**
+             * @brief Contains all information about security settings.
+             */
+            po::options_description od_security_;
+
+            /**
+             * @brief Contains all information about database settings.
+             */
+            po::options_description od_database_;
+
+            /**
+             * @brief Contains the actual values of all settings.
+             */
+            po::variables_map vm_;
+    };
 }
 
 #endif /* CONFIG_H */

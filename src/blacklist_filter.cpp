@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,20 +31,26 @@
 
 #include "blacklist_filter.h"
 
-swd::blacklist_filter::blacklist_filter(int id, std::string rule, int impact) :
- id_(id),
- impact_(impact) {
-	rule_.set_expression(rule, boost::regex::icase | boost::regex::mod_s);
+void swd::blacklist_filter::set_id(const int& id) {
+    id_ = id;
 }
 
-int swd::blacklist_filter::get_id() {
-	return id_;
+int swd::blacklist_filter::get_id() const {
+    return id_;
 }
 
-int swd::blacklist_filter::get_impact() {
-	return impact_;
+void swd::blacklist_filter::set_impact(const int& impact) {
+    impact_ = impact;
 }
 
-bool swd::blacklist_filter::match(std::string input) {
-	return regex_search(input, rule_);
+int swd::blacklist_filter::get_impact() const {
+    return impact_;
+}
+
+void swd::blacklist_filter::set_regex(const std::string& regex) {
+    regex_.set_expression(regex, boost::regex::icase | boost::regex::mod_s);
+}
+
+bool swd::blacklist_filter::matches(const std::string& input) const {
+    return regex_search(input, regex_);
 }

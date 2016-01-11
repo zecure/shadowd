@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -38,59 +38,60 @@
 #include "request.h"
 
 namespace swd {
-	/**
-	 * @brief Parses the input of a client character by character.
-	 */
-	class request_parser {
-		public:
-			/**
-			 * @brief Construct a request parser and set the state to the beginning.
-			 */
-			request_parser();
+    /**
+     * @brief Parses the input of a client character by character.
+     */
+    class request_parser {
+        public:
+            /**
+             * @brief Construct a request parser and set the state to the beginning.
+             */
+            request_parser();
 
-			/**
-			 * @brief Parse some data.
-			 *
-			 * The tribool return value is true when a complete request has been
-			 * parsed, false if the data is invalid, indeterminate when more data
-			 * is required. The InputIterator return value indicates how much of
-			 * the input has been consumed.
-			 *
-			 * @param request The pointer to the request object
-			 * @param begin The beginning of the input iterator
-			 * @param end The end of the input iterator
-			 */
-			template <typename InputIterator> boost::tuple<boost::tribool, InputIterator>
-			 parse(swd::request_ptr request, InputIterator begin, InputIterator end) {
-				while (begin != end) {
-					boost::tribool result = consume(request, *begin++);
+            /**
+             * @brief Parse some data.
+             *
+             * The tribool return value is true when a complete request has been
+             * parsed, false if the data is invalid, indeterminate when more data
+             * is required. The InputIterator return value indicates how much of
+             * the input has been consumed.
+             *
+             * @param request The pointer to the request object
+             * @param begin The beginning of the input iterator
+             * @param end The end of the input iterator
+             */
+            template <typename InputIterator> boost::tuple<boost::tribool, InputIterator>
+             parse(swd::request_ptr request, InputIterator begin, InputIterator end) {
+                while (begin != end) {
+                    boost::tribool result = consume(request, *begin++);
 
-					if (result || !result) {
-						return boost::make_tuple(result, begin);
-					}
-				}
-				boost::tribool result = boost::indeterminate;
-				return boost::make_tuple(result, begin);
-			}
+                    if (result || !result) {
+                        return boost::make_tuple(result, begin);
+                    }
+                }
+                boost::tribool result = boost::indeterminate;
+                return boost::make_tuple(result, begin);
+            }
 
-		private:
-			/**
-			 * @brief Consume the next character of the input.
-			 *
-			 * @param request The pointer to the request object
-			 * @param input The current character
-			 */
-			boost::tribool consume(swd::request_ptr request, char input);
+        private:
+            /**
+             * @brief Consume the next character of the input.
+             *
+             * @param request The pointer to the request object
+             * @param input The current character
+             */
+            boost::tribool consume(const swd::request_ptr& request,
+             const char& input);
 
-			/**
-			 * @brief The current state of the parser.
-			 */
-			enum state {
-				profile,
-				signature,
-				content
-			} state_;
-	};
+            /**
+             * @brief The current state of the parser.
+             */
+            enum state {
+                profile,
+                signature,
+                content
+            } state_;
+    };
 }
 
 #endif /* REQUEST_PARSER_H */

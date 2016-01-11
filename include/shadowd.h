@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -34,31 +34,61 @@
 
 #include "daemon.h"
 #include "server.h"
+#include "database.h"
+#include "cache.h"
+#include "storage.h"
 
 namespace swd {
-	/**
-	 * @brief Glues everything together.
-	 */
-	class shadowd {
-		public:
-			/**
-			 * @brief Prepare the configuration, daemonization and the
-			 *  initialization of the server.
-			 *
-			 * @param argc The number of command line arguments
-			 * @param argv The command line arguments
-			 */
-			void init(int argc, char** argv);
+    /**
+     * @brief Glues everything together.
+     */
+    class shadowd {
+        public:
+            /**
+             * @brief Construct a shadowd object.
+             */
+            shadowd();
 
-			/**
-			 * @brief Tell the server to add threads to the thread pool.
-			 */
-			void start();
+            /**
+             * @brief Prepare the configuration, daemonization and the
+             *  initialization of the server.
+             *
+             * @param argc The number of command line arguments
+             * @param argv The command line arguments
+             */
+            void init(int argc, char** argv);
 
-		private:
-			swd::daemon daemon_;
-			swd::server server_;
-	};
+            /**
+             * @brief Tell the server to add threads to the thread pool.
+             */
+            void start();
+
+        private:
+            /**
+             * @brief The pointer to the database object.
+             */
+            swd::database_ptr database_;
+
+            /**
+             * @brief The pointer to the cache object.
+             */
+            swd::cache_ptr cache_;
+
+            /**
+             * @brief The pointer to the storage object.
+             */
+            swd::storage_ptr storage_;
+
+            /**
+             * @brief The daemon object.
+             */
+            swd::daemon daemon_;
+
+            /**
+             * @brief The server object.
+             */
+            swd::server server_;
+    };
 }
 
 #endif /* SHADOWD_H */

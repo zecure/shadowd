@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,33 +29,34 @@
  * files in the program, then also delete it here.
  */
 
-#include <string>
-#include <boost/lexical_cast.hpp>
-
 #include "reply.h"
 
-std::vector<boost::asio::const_buffer> swd::reply::to_buffers() {
-	std::vector<boost::asio::const_buffer> buffers;
-	buffers.push_back(boost::asio::buffer(content_));
-	return buffers;
+void swd::reply::set_status(const int& status) {
+    status_ = status;
 }
 
-void swd::reply::set_status(int status) {
-	status_ = status;
+int swd::reply::get_status() const {
+    return status_;
 }
 
-int swd::reply::get_status() {
-	return status_;
+void swd::reply::set_threats(const std::vector<std::string>& threats) {
+    threats_ = threats;
 }
 
-void swd::reply::set_threats(std::vector<std::string> threats) {
-	threats_ = threats;
+std::vector<std::string> swd::reply::get_threats() const {
+    return threats_;
 }
 
-std::vector<std::string> swd::reply::get_threats() {
-	return threats_;
+void swd::reply::set_content(const std::string& content) {
+    content_ = content;
 }
 
-void swd::reply::set_content(std::string content) {
-	content_ = content;
+std::string swd::reply::get_content() const {
+    return content_;
+}
+
+std::vector<boost::asio::const_buffer> swd::reply::to_buffers() const {
+    std::vector<boost::asio::const_buffer> buffers;
+    buffers.push_back(boost::asio::buffer(content_));
+    return buffers;
 }

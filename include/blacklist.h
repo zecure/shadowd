@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,32 +33,35 @@
 #define BLACKLIST_H
 
 #include "request.h"
-#include "blacklist_filter.h"
+#include "cache.h"
 
 namespace swd {
-	/**
-	 * @brief Handles the blacklist examination of a request.
-	 */
-	class blacklist {
-		public:
-			/**
-			 * @brief Construct the blacklist. Initialize the blacklist filters
-			 *  once to cache them for the life time of this request.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			blacklist(swd::request_ptr request);
+    /**
+     * @brief Handles the blacklist examination of a request.
+     */
+    class blacklist {
+        public:
+            /**
+             * @brief Construct the blacklist.
+             *
+             * @param cache The pointer to the cache object
+             */
+            blacklist(const swd::cache_ptr& cache);
 
-			/**
-			 * @brief Scan all parameters in the request and add connections to
-			 *  matching filters.
-			 */
-			void scan();
+            /**
+             * @brief Scan all parameters in the request and add connections to
+             *  matching filters.
+             *
+             * @param request The pointer to the request object
+             */
+            void scan(swd::request_ptr& request);
 
-		private:
-			swd::request_ptr request_;
-			swd::blacklist_filters filters_;
-	};
+        private:
+            /**
+             * @brief The pointer to the cache object.
+             */
+            swd::cache_ptr cache_;
+    };
 }
 
 #endif /* BLACKLIST_H */

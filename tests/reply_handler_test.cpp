@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,36 +29,35 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef ANALYZER_H
-#define ANALYZER_H
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
 
-#include "request.h"
+#include "reply_handler.h"
 
-namespace swd {
-	/**
-	 * @brief Manages the examination of a request.
-	 *
-	 * At the moment the white- and blacklist get checked and results are
-	 * written directly into the request. Maybe there will be additional checks
-	 * in later versions.
-	 */
-	class analyzer {
-		public:
-			/**
-			 * @brief Construct the analyzer.
-			 *
-			 * @param request The pointer to the request object
-			 */
-			analyzer(swd::request_ptr request);
+BOOST_AUTO_TEST_SUITE(reply_handler_test)
 
-			/**
-			 * @brief Start the analysis and write results into the request object.
-			 */
-			void start();
+BOOST_AUTO_TEST_CASE(encode_normal) {
+    swd::reply_ptr reply(new swd::reply);
+    swd::reply_handler reply_handler(reply);
 
-		private:
-			swd::request_ptr request_;
-	};
+    reply->set_status(STATUS_OK);
+
+    BOOST_CHECK(reply_handler.encode() == true);
+    BOOST_CHECK(reply->get_content() == "{\"status\":1,\"threats\":[]}\n");
 }
 
-#endif /* ANALYZER_H */
+BOOST_AUTO_TEST_CASE(encode_attack) {
+    swd::reply_ptr reply(new swd::reply);
+    swd::reply_handler reply_handler(reply);
+
+    std::vector<std::string> threats;
+    threats.push_back("foo");
+    threats.push_back("bar");
+    reply->set_threats(threats);
+    reply->set_status(STATUS_ATTACK);
+
+    BOOST_CHECK(reply_handler.encode() == true);
+    BOOST_CHECK(reply->get_content() == "{\"status\":5,\"threats\":[\"foo\",\"bar\"]}\n");
+}
+
+BOOST_AUTO_TEST_SUITE_END()

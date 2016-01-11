@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -35,44 +35,44 @@
 #include <string>
 
 namespace swd {
-	/**
-	 * @brief Encapsulates the daemon functionality.
-	 */
-	class daemon {
-		public:
-			/**
-			 * @brief Change the uid of the process.
-			 *
-			 * @param user The name of the user
-			 */
-			void set_user(std::string user);
+    /**
+     * @brief Encapsulates the daemon functionality.
+     */
+    class daemon {
+        public:
+            /**
+             * @brief Change the uid of the process.
+             *
+             * @param user The name of the user
+             */
+            void set_user(const std::string& user);
 
-			/**
-			 * @brief Change the gid of the process.
-			 *
-			 * @param group The name of the group
-			 */
-			void set_group(std::string group);
+            /**
+             * @brief Change the gid of the process.
+             *
+             * @param group The name of the group
+             */
+            void set_group(const std::string& group);
 
-			/**
-			 * @brief Write the pid to a file.
-			 *
-			 * @param file The file that the pid gets written to
-			 */
-			void write_pid(std::string file);
+            /**
+             * @brief Write the pid to a file.
+             *
+             * @param file The file that the pid gets written to
+             */
+            void write_pid(const std::string& file);
 
-			/**
-			 * @brief Change the root directory of the process.
-			 *
-			 * @param directory The directory that is used for chroot
-			 */
-			void change_root(std::string directory);
+            /**
+             * @brief Change the root directory of the process.
+             *
+             * @param directory The directory that is used for chroot
+             */
+            void change_root(const std::string& directory);
 
-			/**
-			 * @brief Detach the process and make him silent.
-			 */
-			void detach();
-	};
+            /**
+             * @brief Detach the process and make him silent.
+             */
+            void detach();
+    };
 }
 
 #endif /* DAEMON_H */

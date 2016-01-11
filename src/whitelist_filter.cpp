@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,15 +31,18 @@
 
 #include "whitelist_filter.h"
 
-swd::whitelist_filter::whitelist_filter(int id, std::string rule) :
- id_(id) {
-	rule_.set_expression(rule, boost::regex::icase | boost::regex::mod_s);
+void swd::whitelist_filter::set_id(const int& id) {
+    id_ = id;
 }
 
-int swd::whitelist_filter::get_id() {
-	return id_;
+int swd::whitelist_filter::get_id() const {
+    return id_;
 }
 
-bool swd::whitelist_filter::match(std::string input) {
-	return regex_search(input, rule_);
+void swd::whitelist_filter::set_regex(const std::string& regex) {
+    regex_.set_expression(regex, boost::regex::icase | boost::regex::mod_s);
+}
+
+bool swd::whitelist_filter::matches(const std::string& input) const {
+    return regex_search(input, regex_);
 }

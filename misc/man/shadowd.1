@@ -7,7 +7,7 @@ shadowd \- Shadow Daemon web application firewall server
 .B ...
 .SH "DESCRIPTION"
 .B Shadow Daemon
-is a collection of tools to detect, protocol and prevent attacks on web
+is a collection of tools to detect, record and prevent attacks on web
 applications. Technically speaking, Shadow Daemon is a web application
 firewall that intercepts requests and filters out malicious parameters.
 It is a modular system that separates web application, analysis and
@@ -18,6 +18,7 @@ storage of requests.
 .SH "OPTIONS"
 .B shadowd
 requires at least a configuration file. The other parameters are optional.
+Database settings can only be set via the configuration file.
 .TP
 .B "\-h, \-\-help"
 Show a help text and exit.
@@ -69,6 +70,15 @@ Set the group id.
 .TP
 .B "\-R, \-\-chroot <path>"
 Set the root directory.
+.TP
+.B "\-\-max-parameters <number> (64)"
+Set the maximum number of parameters per request.
+.TP
+.B "\-\-max-length-path <number> (64)"
+Set the maximum length of parameter paths.
+.TP
+.B "\-\-max-length-value <number> (-1)"
+Set the maximum length of parameter values.
 .SH "REQUIREMENTS"
 A set up database is required to use shadowd.
 .SH "LICENSE"
