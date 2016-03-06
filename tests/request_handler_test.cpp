@@ -90,6 +90,19 @@ BOOST_AUTO_TEST_CASE(invalid_decode) {
     BOOST_CHECK(request_handler.decode() == false);
 }
 
+BOOST_AUTO_TEST_CASE(nullbyte_decode) {
+    swd::request_ptr request(new swd::request);
+    swd::request_handler request_handler(request, swd::cache_ptr(), swd::storage_ptr());
+
+    request->set_content("{\"version\":\"\",\"client_ip\":\"\",\"caller\":\"\",\"resource\":"
+     "\"foo\\u0000bar\",\"input\":{},\"hashes\":{}}");
+    BOOST_CHECK(request_handler.decode() == true);
+
+    std::stringstream expected;
+    expected << "foo" << '\0' << "bar";
+    BOOST_CHECK(request->get_resource() == expected.str());
+}
+
 BOOST_AUTO_TEST_CASE(get_threats) {
     swd::request_ptr request(new swd::request);
     swd::request_handler request_handler(request, swd::cache_ptr(), swd::storage_ptr());
