@@ -248,6 +248,11 @@ namespace swd {
              * @brief The mutex for database access.
              */
             boost::mutex dbi_mutex_;
+
+            /**
+             * @brief Remove nullbytes for libdbi.
+             */
+            std::string remove_null(std::string target);
     };
 
     /**

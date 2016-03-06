@@ -311,13 +311,13 @@ int swd::database::save_request(const int& profile_id, const std::string& caller
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-    char *caller_esc = strdup(caller.c_str());
+    char *caller_esc = strdup(remove_null(caller).c_str());
     dbi_conn_quote_string(conn_, &caller_esc);
 
-    char *resource_esc = strdup(resource.c_str());
+    char *resource_esc = strdup(remove_null(resource).c_str());
     dbi_conn_quote_string(conn_, &resource_esc);
 
-    char *client_ip_esc = strdup(client_ip.c_str());
+    char *client_ip_esc = strdup(remove_null(client_ip).c_str());
     dbi_conn_quote_string(conn_, &client_ip_esc);
 
     dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO requests (profile_id, "
@@ -347,10 +347,10 @@ int swd::database::save_parameter(const int& request_id, const std::string& path
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-    char *path_esc = strdup(path.c_str());
+    char *path_esc = strdup(remove_null(path).c_str());
     dbi_conn_quote_string(conn_, &path_esc);
 
-    char *value_esc = strdup(value.c_str());
+    char *value_esc = strdup(remove_null(value).c_str());
     dbi_conn_quote_string(conn_, &value_esc);
 
     dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO parameters "
@@ -379,10 +379,10 @@ int swd::database::save_hash(const int& request_id, const std::string& algorithm
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
-    char *algorithm_esc = strdup(algorithm.c_str());
+    char *algorithm_esc = strdup(remove_null(algorithm).c_str());
     dbi_conn_quote_string(conn_, &algorithm_esc);
 
-    char *digest_esc = strdup(digest.c_str());
+    char *digest_esc = strdup(remove_null(digest).c_str());
     dbi_conn_quote_string(conn_, &digest_esc);
 
     dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO hashes (request_id, "
@@ -489,4 +489,9 @@ void swd::database::set_cache_outdated(const int& profile_id,
     if (!res) {
         throw swd::exceptions::database_exception("Can't execute cache_outdated query");
     }
+}
+
+std::string swd::database::remove_null(std::string target) {
+    std::replace(target.begin(), target.end(), '\0', ' ');
+    return target;
 }

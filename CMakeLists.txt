@@ -40,12 +40,6 @@ if(NOT HAVE_CRYPTOPP_H)
     message(FATAL_ERROR "libcryptopp is missing")
 endif()
 
-CHECK_INCLUDE_FILE_CXX("jsoncpp/json/json.h" HAVE_JSONCPP_H)
-
-if(NOT HAVE_JSONCPP_H)
-    message(FATAL_ERROR "libjsoncpp is missing")
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Config

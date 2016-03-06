@@ -1,3 +1,4 @@
+include_directories(${SHADOWD_SOURCE_DIR}/dist)
 include_directories(${SHADOWD_SOURCE_DIR}/include)
 link_directories(${SHADOWD_BINARY_DIR}/src)
 
@@ -27,13 +28,13 @@ add_executable(shadowd
     integrity.cpp
     integrity_rule.cpp
     hash.cpp
+    ${SHADOWD_SOURCE_DIR}/dist/jsoncpp.cpp
 )
 
 target_link_libraries(shadowd
     pthread
     dbi
     cryptopp
-    jsoncpp
     ${OPENSSL_LIBRARIES}
     ${Boost_LIBRARIES}
 )
