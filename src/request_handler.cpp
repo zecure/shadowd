@@ -32,7 +32,7 @@
 #include <cryptopp/hmac.h>
 #include <cryptopp/sha.h>
 #include <cryptopp/hex.h>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 
 #include "request_handler.h"
 #include "blacklist.h"

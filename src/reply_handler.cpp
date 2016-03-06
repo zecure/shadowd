@@ -31,7 +31,7 @@
 
 #include <vector>
 #include <string>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 
 #include "reply_handler.h"
 #include "log.h"
