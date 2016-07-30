@@ -1,5 +1,10 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.4)
 project(SHADOWD)
+
+# Settings
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Version
 set(SHADOWD_MAJOR_VERSION 2)
@@ -39,8 +44,6 @@ CHECK_INCLUDE_FILE_CXX("cryptopp/hmac.h" HAVE_CRYPTOPP_H)
 if(NOT HAVE_CRYPTOPP_H)
     message(FATAL_ERROR "libcryptopp is missing")
 endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Config
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
