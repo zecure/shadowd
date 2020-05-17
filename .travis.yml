@@ -16,6 +16,10 @@ addons:
       - libjsoncpp-dev
       - libcrypto++-dev
       - libdbi-dev
+  sonarcloud:
+    organization: "zecure"
+    token:
+      secure: "sZaYONDYjaqNO2DKEOGTvmimAafCRNnOSgzot/x+Kc4J9EoKKwBNI99p+c/5bQbMuHh+kxxhH9cUdl6V+y/XyxkX9gEJl1Gr8hKacwBlSkiF9jdsTH1N96ttx7txn0w7NcOh1GRwnIQCEcmrUkItEHmnUcNhyCaxUbtfE/nHU/tjEygLG+heWXWl6qwZw+NC8SU+2N3wkx/enB0LPlodjh8dGJgkDMQTzRXu3svEorXcnDwD4KGVnFRYFaVC5OgX7zySycMv2hVAt+Sd/XAJ/89scp46pH/sYIryrDhhiTZodZeBsYlNHhD1dm5kiZ179Pb/GjED2SVQDjUrPdkO6lZWl7lYYfY1+D/a2ORtk+s0twroqV/n6JFWLvmxGBNNFmvU+Nho8Q09rudl1V4yGceX7I0j0VPRJXlezfPWZvakWGQDefpCtpxUIlkvCWOJ7Q9lyGlDMOogBPjZbMW7DF8kOmhU/2QwoZFI7RagTIUZSSYeMRue7b38eE8t4mooR1k6J5pc+XGQj4sXe1BYDUjJaF22gzpy2pzAZDstUx+mj93LNwqSyWu2o+FD1KCSec/zTZ2BTfugKhmkI6lI/9uSG6rH7DTGGKw2Hs+/Bt1oBHWxdES5BbVv4XdzsSz2aPmjRXZJXKuFz/o+QFp6h8KkIF4KokP80qu/pVUD9HA="
 
 before_script:
   - mkdir build
@@ -25,6 +29,8 @@ before_script:
 script:
   - make tests && make test
   - ../misc/blacklist/helper.py --test
+  - build-wrapper-linux-x86-64 --out-dir bw-output make shadowd
+  - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output -Dproject.settings=../.sonarcloud.properties
 
 os:
   - linux
