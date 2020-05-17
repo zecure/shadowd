@@ -30,7 +30,7 @@ script:
   - make tests && make test
   - ../misc/blacklist/helper.py --test
   - build-wrapper-linux-x86-64 --out-dir bw-output make shadowd
-  - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output -Dproject.settings=.sonarcloud.properties
+  - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output -Dproject.settings=../.sonarcloud.properties
 
 os:
   - linux
