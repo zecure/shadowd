@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # Shadow Daemon -- Web Application Firewall
 #
 # Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
@@ -49,21 +49,21 @@ if args.test:
             rule = re.compile(filter['rule'], flags=re.I|re.S)
 
             if not 'examples' in filter:
-                print 'Filter ' + filter['id'] + ' missing examples'
+                print('Filter ' + filter['id'] + ' missing examples')
                 continue
 
             for example in filter['examples']:
                 if not rule.search(example):
                     raise
         except:
-            print 'Filter ' + filter['id'] + ' failed'
+            print('Filter ' + filter['id'] + ' failed')
             error = True
 
     if error:
-        print 'Test failed'
+        print('Test failed')
         sys.exit(1)
     else:
-        print 'Test succeeded'
+        print('Test succeeded')
         sys.exit(0)
 elif args.insert:
     if args.driver == 'mysql':
