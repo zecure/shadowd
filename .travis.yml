@@ -38,4 +38,4 @@ os:
 
 sudo: required
 
-dist: trusty
+dist: focal
