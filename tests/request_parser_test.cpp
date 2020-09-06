@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -65,7 +65,8 @@ BOOST_AUTO_TEST_CASE(valid_parse) {
         );
 
     /* First we check the status code of parse. */
-    BOOST_CHECK(result == true);
+    BOOST_CHECK(indeterminate(result) == false);
+    BOOST_CHECK((bool)result == true);
 
     /* The parsed version should equal the initial values again. */
     BOOST_CHECK(request->get_profile_id() == profile_id);
@@ -94,7 +95,7 @@ BOOST_AUTO_TEST_CASE(incomplete_parse) {
         );
 
     /* Check the status code of parse. */
-    BOOST_CHECK(indeterminate(result));
+    BOOST_CHECK(indeterminate(result) == true);
 }
 
 BOOST_AUTO_TEST_CASE(invalid_parse_id) {
@@ -118,7 +119,8 @@ BOOST_AUTO_TEST_CASE(invalid_parse_id) {
         );
 
     /* Check the status code of parse. */
-    BOOST_CHECK(result == false);
+    BOOST_CHECK(indeterminate(result) == false);
+    BOOST_CHECK((bool)result == false);
 }
 
 BOOST_AUTO_TEST_CASE(invalid_parse_hmac) {
@@ -142,7 +144,8 @@ BOOST_AUTO_TEST_CASE(invalid_parse_hmac) {
         );
 
     /* Check the status code of parse. */
-    BOOST_CHECK(result == false);
+    BOOST_CHECK(indeterminate(result) == false);
+    BOOST_CHECK((bool)result == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
