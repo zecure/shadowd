@@ -49,8 +49,8 @@ bool swd::reply_handler::encode() {
         std::vector<std::string> threats = reply_->get_threats();
 
         Json::Value output(Json::arrayValue);
-        for (std::vector<std::string>::iterator it = threats.begin(); it != threats.end(); ++it) {
-            output.append(*it);
+        for (const auto& threat: threats) {
+            output.append(threat);
         }
 
         root["threats"] = output;

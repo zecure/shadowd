@@ -42,15 +42,8 @@ void swd::blacklist::scan(swd::request_ptr& request) {
     swd::parameters parameters = request->get_parameters();
 
     /* Iterate over all parameters and check every filter. */
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        /* Save the iterators in variables for the sake of readability. */
-        swd::parameter_ptr parameter(*it_parameter);
-
-        for (swd::blacklist_filters::iterator it_filter = filters.begin();
-         it_filter != filters.end(); it_filter++) {
-            swd::blacklist_filter_ptr filter(*it_filter);
-
+    for (const auto& parameter: parameters) {
+        for (const auto& filter: filters) {
             /* If there is catastrophic backtracking boost throws an exception. */
             try {
                 /* Add pointers to all filters that match to the parameter. */
@@ -67,11 +60,7 @@ void swd::blacklist::scan(swd::request_ptr& request) {
     }
 
     /* Iterate over all parameters again and check total impact. */
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        /* Save the iterators in variables for the sake of readability. */
-        swd::parameter_ptr parameter(*it_parameter);
-
+    for (const auto& parameter: parameters) {
         swd::blacklist_rules rules = cache_->get_blacklist_rules(
             request->get_profile()->get_id(),
             request->get_caller(),
@@ -80,19 +69,13 @@ void swd::blacklist::scan(swd::request_ptr& request) {
 
         int threshold = request->get_profile()->get_blacklist_threshold();
 
-        if (rules.size() > 0) {
-            /* Get the most secure threshold in case of an overlap. */
-            for (swd::blacklist_rules::iterator it_rule = rules.begin();
-             it_rule != rules.end(); it_rule++) {
-                swd::blacklist_rule_ptr rule(*it_rule);
-
-                if (it_rule == rules.begin()) {
-                    /* If there is a rule the global threshold is ignored. */
+        /* Blacklist rules take priority over the profile threshold. */
+        if (!rules.empty()) {
+            threshold = -1;
+            for (const auto& rule: rules) {
+                /* Get the most secure (i.e. lowest) threshold in case of an overlap. */
+                if ((rule->get_threshold() > -1) && (rule->get_threshold() < threshold)) {
                     threshold = rule->get_threshold();
-                } else if (rule->get_threshold() > -1) {
-                    if ((threshold < 0) || (rule->get_threshold() < threshold)) {
-                        threshold = rule->get_threshold();
-                    }
                 }
             }
         }

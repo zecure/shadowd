@@ -57,10 +57,7 @@ void swd::integrity::scan(swd::request_ptr& request) {
     }
 
     /* Iterate over all rules. */
-    for (swd::integrity_rules::iterator it_rule = rules.begin();
-     it_rule != rules.end(); it_rule++) {
-        swd::integrity_rule_ptr rule(*it_rule);
-
+    for (const auto& rule: rules) {
         try {
             swd::hash_ptr hash = request->get_hash(rule->get_algorithm());
 

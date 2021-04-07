@@ -173,10 +173,7 @@ bool swd::request::is_threat() const {
 
 bool swd::request::has_threats() const {
     /* Iterate over all parameters and check for threats. */
-    for (swd::parameters::const_iterator it_parameter = parameters_.begin();
-     it_parameter != parameters_.end(); it_parameter++) {
-        swd::parameter_ptr parameter(*it_parameter);
-
+    for (const auto& parameter: parameters_) {
         /* We only need to know if there is at least one threat. */
         if (parameter->is_threat()) {
             return true;

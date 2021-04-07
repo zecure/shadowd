@@ -72,9 +72,8 @@ const swd::whitelist_rules& swd::parameter::get_whitelist_rules() const {
 int swd::parameter::get_impact() const {
     int impact = 0;
 
-    for (swd::blacklist_filters::const_iterator it_filter = blacklist_filters_.begin();
-     it_filter != blacklist_filters_.end(); it_filter++) {
-        impact += (*it_filter)->get_impact();
+    for (const auto& filter: blacklist_filters_) {
+        impact += filter->get_impact();
     }
 
     return impact;

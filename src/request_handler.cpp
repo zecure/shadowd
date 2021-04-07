@@ -143,8 +143,7 @@ bool swd::request_handler::decode() {
         }
 
         /* Iterate over the input and add it to the request as parameters. */
-        for (Json::ValueIterator it_parameter = input.begin();
-         it_parameter != input.end(); it_parameter++) {
+        for (auto it_parameter = input.begin(); it_parameter != input.end(); it_parameter++) {
             try {
                 request_->add_parameter(
                     it_parameter.key().asString(),
@@ -162,8 +161,7 @@ bool swd::request_handler::decode() {
             return false;
         }
 
-        for (Json::ValueIterator it_hash = hashes.begin();
-         it_hash != hashes.end(); it_hash++) {
+        for (auto it_hash = hashes.begin(); it_hash != hashes.end(); it_hash++) {
             try {
                 request_->add_hash(
                     it_hash.key().asString(),
@@ -216,11 +214,7 @@ std::vector<std::string> swd::request_handler::get_threats() const {
 
     swd::parameters parameters = request_->get_parameters();
 
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        /* Save the iterators in variables for the sake of readability. */
-        swd::parameter_ptr parameter(*it_parameter);
-
+    for (const auto& parameter: parameters) {
         if (parameter->is_threat()) {
             threats.push_back(parameter->get_path());
         }

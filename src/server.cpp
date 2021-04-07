@@ -146,8 +146,8 @@ void swd::server::start(std::size_t thread_pool_size) {
     }
 
     /* Wait for all threads in the pool to exit. */
-    for (std::size_t i = 0; i < threads.size(); ++i) {
-        threads[i]->join();
+    for (const auto& thread: threads) {
+        thread->join();
     }
 }
 
