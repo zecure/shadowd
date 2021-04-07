@@ -243,10 +243,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
             int max_length_value = swd::config::i()->get<int>("max-length-value");
 
             if ((max_length_path > -1) || (max_length_value > -1)) {
-                for (swd::parameters::iterator it_parameter = parameters.begin();
-                 it_parameter != parameters.end(); it_parameter++) {
-                    swd::parameter_ptr parameter(*it_parameter);
-
+                for (const auto& parameter: parameters) {
                     if ((max_length_path > -1) && (parameter->get_path().length() > max_length_path)) {
                         swd::log::i()->send(swd::notice, "Too long parameter path");
                         throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
