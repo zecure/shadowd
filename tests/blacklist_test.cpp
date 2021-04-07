@@ -100,4 +100,40 @@ BOOST_AUTO_TEST_CASE(negative_blacklist_check) {
     BOOST_CHECK(parameter->is_threat() == false);
 }
 
+BOOST_AUTO_TEST_CASE(negative_blacklist_check_no_limit) {
+    swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+    swd::blacklist blacklist(cache);
+
+    swd::request_ptr request(new swd::request);
+    request->set_caller("qux");
+    swd::parameter_ptr parameter(new swd::parameter);
+    parameter->set_path("bar");
+    parameter->set_value("foo");
+    request->add_parameter(parameter);
+
+    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+    filter->set_impact(6);
+    filter->set_regex("foo");
+
+    swd::blacklist_filters filters;
+    filters.push_back(filter);
+    cache->set_blacklist_filters(filters);
+
+    swd::blacklist_rule_ptr rule(new swd::blacklist_rule);
+    rule->set_threshold(-1);
+
+    swd::blacklist_rules rules;
+    rules.push_back(rule);
+    cache->add_blacklist_rules(1, "qux", "bar", rules);
+
+    swd::profile_ptr profile(new swd::profile);
+    profile->set_id(1);
+    profile->set_blacklist_threshold(5);
+    request->set_profile(profile);
+
+    blacklist.scan(request);
+    BOOST_CHECK(parameter->get_blacklist_filters().size() == 1);
+    BOOST_CHECK(parameter->is_threat() == false);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
