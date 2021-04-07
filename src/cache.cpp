@@ -30,12 +30,13 @@
  */
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <utility>
 
 #include "cache.h"
 #include "log.h"
 
-swd::cache::cache(const swd::database_ptr& database) :
- database_(database),
+swd::cache::cache(swd::database_ptr database) :
+ database_(std::move(database)),
  stop_(false) {
 }
 

@@ -34,6 +34,8 @@
 #include <cryptopp/hex.h>
 #include <json/json.h>
 
+#include <utility>
+
 #include "request_handler.h"
 #include "blacklist.h"
 #include "whitelist.h"
@@ -41,11 +43,11 @@
 #include "storage.h"
 #include "log.h"
 
-swd::request_handler::request_handler(const swd::request_ptr& request,
- const swd::cache_ptr& cache, const swd::storage_ptr& storage) :
- request_(request),
- cache_(cache),
- storage_(storage) {
+swd::request_handler::request_handler(swd::request_ptr request,
+ swd::cache_ptr cache, swd::storage_ptr storage) :
+ request_(std::move(request)),
+ cache_(std::move(cache)),
+ storage_(std::move(storage)) {
 }
 
 bool swd::request_handler::valid_signature() const {

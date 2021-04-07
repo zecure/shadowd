@@ -35,17 +35,18 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
+#include <utility>
 
 #include "server.h"
 #include "config.h"
 #include "log.h"
 #include "shared.h"
 
-swd::server::server(const swd::storage_ptr& storage,
- const swd::database_ptr& database, const swd::cache_ptr& cache) :
- storage_(storage),
- database_(database),
- cache_(cache),
+swd::server::server(swd::storage_ptr storage,
+ swd::database_ptr database, swd::cache_ptr cache) :
+ storage_(std::move(storage)),
+ database_(std::move(database)),
+ cache_(std::move(cache)),
  signals_stop_(io_service_),
  signals_reload_(io_service_),
  acceptor_(io_service_),

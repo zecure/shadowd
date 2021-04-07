@@ -91,7 +91,7 @@ namespace swd {
              *
              * @param database The pointer to the database object
              */
-            cache(const swd::database_ptr& database);
+            cache(swd::database_ptr  database);
 
             /**
              * @brief Start cleanup thread.

@@ -46,7 +46,7 @@ namespace swd {
              *
              * @param cache The pointer to the cache object
              */
-            blacklist(const swd::cache_ptr& cache);
+            blacklist(swd::cache_ptr  cache);
 
             /**
              * @brief Scan all parameters in the request and add connections to

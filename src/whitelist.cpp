@@ -30,12 +30,14 @@
  */
 
 #include "whitelist.h"
+
+#include <utility>
 #include "whitelist_rule.h"
 #include "database.h"
 #include "log.h"
 
-swd::whitelist::whitelist(const swd::cache_ptr& cache) :
- cache_(cache) {
+swd::whitelist::whitelist(swd::cache_ptr cache) :
+ cache_(std::move(cache)) {
 }
 
 void swd::whitelist::scan(swd::request_ptr& request) {

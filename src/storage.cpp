@@ -30,13 +30,14 @@
  */
 
 #include <iostream>
+#include <utility>
 
 #include "storage.h"
 #include "database.h"
 #include "log.h"
 
-swd::storage::storage(const swd::database_ptr& database) :
- database_(database),
+swd::storage::storage(swd::database_ptr database) :
+ database_(std::move(database)),
  stop_(false) {
 }
 

@@ -31,6 +31,7 @@
 
 #include <cstdlib>
 #include <boost/make_shared.hpp>
+#include <utility>
 
 #include "connection.h"
 #include "profile.h"
@@ -40,15 +41,15 @@
 #include "log.h"
 
 swd::connection::connection(boost::asio::io_service& io_service,
- swd::context& context, bool ssl, const swd::storage_ptr& storage,
- const swd::database_ptr& database, const swd::cache_ptr& cache) :
+ swd::context& context, bool ssl, swd::storage_ptr storage,
+ swd::database_ptr database, swd::cache_ptr cache) :
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
  ssl_(ssl),
- storage_(storage),
- database_(database),
- cache_(cache),
+ storage_(std::move(storage)),
+ database_(std::move(database)),
+ cache_(std::move(cache)),
  request_(boost::make_shared<swd::request>()),
  reply_(boost::make_shared<swd::reply>()) {
 }

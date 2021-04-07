@@ -30,13 +30,15 @@
  */
 
 #include "integrity.h"
+
+#include <utility>
 #include "integrity_rule.h"
 #include "hash.h"
 #include "database.h"
 #include "log.h"
 
-swd::integrity::integrity(const swd::cache_ptr& cache) :
- cache_(cache) {
+swd::integrity::integrity(swd::cache_ptr cache) :
+ cache_(std::move(cache)) {
 }
 
 void swd::integrity::scan(swd::request_ptr& request) {

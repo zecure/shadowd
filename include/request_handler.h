@@ -52,8 +52,8 @@ namespace swd {
              * @param cache The pointer to the cache object
              * @param storage The pointer to the storage object
              */
-            request_handler(const swd::request_ptr& request,
-             const swd::cache_ptr& cache, const swd::storage_ptr& storage);
+            request_handler(swd::request_ptr  request,
+             swd::cache_ptr  cache, swd::storage_ptr  storage);
 
             /**
              * @brief Check if the signature of the request is valid.

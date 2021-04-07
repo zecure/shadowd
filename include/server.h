@@ -54,8 +54,8 @@ namespace swd {
              * @param storage The pointer to the storage object
              * @param cache The pointer to the cache object
              */
-            server(const swd::storage_ptr& storage,
-             const swd::database_ptr& database, const swd::cache_ptr& cache);
+            server(swd::storage_ptr  storage,
+             swd::database_ptr  database, swd::cache_ptr  cache);
 
             /**
              * @brief Initialize the server.
