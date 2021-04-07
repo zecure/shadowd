@@ -39,10 +39,10 @@ void swd::database::connect(const std::string& driver, const std::string& host,
  const std::string& port, const std::string& username, const std::string& password,
  const std::string& name, const std::string& encoding) {
 #if defined(HAVE_DBI_NEW)
-    dbi_initialize_r(NULL, &instance_);
+    dbi_initialize_r(nullptr, &instance_);
     conn_ = dbi_conn_new_r(driver.c_str(), instance_);
 #else
-    dbi_initialize(NULL);
+    dbi_initialize(nullptr);
     conn_ = dbi_conn_new(driver.c_str());
 #endif
 

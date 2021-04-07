@@ -51,7 +51,7 @@ void swd::daemon::set_user(const std::string& user) {
 }
 
 void swd::daemon::set_group(const std::string& group) {
-    if (setgroups(0, NULL) == -1) {
+    if (setgroups(0, nullptr) == -1) {
         throw swd::exceptions::core_exception("setgroups() failed");
     }
 

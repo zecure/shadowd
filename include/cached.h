@@ -48,7 +48,7 @@ namespace swd {
             cached(const T& value) :
              value_(value),
              counter_(0),
-             last_(time(NULL)) {
+             last_(time(nullptr)) {
             }
 
             /**
@@ -63,7 +63,7 @@ namespace swd {
                 }
 
                 /* Update the last access time. */
-                last_ = time(NULL);
+                last_ = time(nullptr);
 
                 return value_;
             }
@@ -75,11 +75,11 @@ namespace swd {
              */
             bool is_outdated() const {
                 if (counter_ < 5) {
-                    return ((time(NULL) - last_) > 300);
+                    return ((time(nullptr) - last_) > 300);
                 } else if (counter_ < 25) {
-                    return ((time(NULL) - last_) > 600);
+                    return ((time(nullptr) - last_) > 600);
                 } else {
-                    return ((time(NULL) - last_) > 900);
+                    return ((time(nullptr) - last_) > 900);
                 }
             }
 
