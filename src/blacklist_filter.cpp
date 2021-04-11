@@ -31,19 +31,19 @@
 
 #include "blacklist_filter.h"
 
-void swd::blacklist_filter::set_id(const int& id) {
+void swd::blacklist_filter::set_id(const unsigned int& id) {
     id_ = id;
 }
 
-int swd::blacklist_filter::get_id() const {
+unsigned int swd::blacklist_filter::get_id() const {
     return id_;
 }
 
-void swd::blacklist_filter::set_impact(const int& impact) {
+void swd::blacklist_filter::set_impact(const unsigned int& impact) {
     impact_ = impact;
 }
 
-int swd::blacklist_filter::get_impact() const {
+unsigned int swd::blacklist_filter::get_impact() const {
     return impact_;
 }
 

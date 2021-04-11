@@ -79,7 +79,7 @@ void swd::database::ensure_connection() {
 }
 
 swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
- const int& profile_id) {
+ const unsigned int& profile_id) {
     std::stringstream log_message;
     log_message << "Get profile from db -> server_ip: " << server_ip
      << "; profile_id: " << profile_id;
@@ -129,7 +129,7 @@ swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
     profile->set_integrity_enabled(dbi_result_get_uint(res, "integrity_enabled") == 1);
     profile->set_flooding_enabled(dbi_result_get_uint(res, "flooding_enabled") == 1);
     profile->set_key(dbi_result_get_string(res, "hmac_key"));
-    profile->set_blacklist_threshold(dbi_result_get_uint(res, "blacklist_threshold"));
+    profile->set_blacklist_threshold(dbi_result_get_int(res, "blacklist_threshold"));
     profile->set_cache_outdated(dbi_result_get_uint(res, "cache_outdated") == 1);
 
     dbi_result_free(res);
@@ -137,7 +137,7 @@ swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
     return profile;
 }
 
-swd::blacklist_rules swd::database::get_blacklist_rules(const int& profile_id,
+swd::blacklist_rules swd::database::get_blacklist_rules(const unsigned int& profile_id,
  const std::string& caller, const std::string& path) {
     swd::log::i()->send(swd::notice, "Get blacklist rules from db");
 
@@ -168,7 +168,7 @@ swd::blacklist_rules swd::database::get_blacklist_rules(const int& profile_id,
     while (dbi_result_next_row(res)) {
         swd::blacklist_rule_ptr rule(new swd::blacklist_rule());
         rule->set_id(dbi_result_get_uint(res, "id"));
-        rule->set_threshold(dbi_result_get_uint(res, "threshold"));
+        rule->set_threshold(dbi_result_get_int(res, "threshold"));
 
         rules.push_back(rule);
     }
@@ -207,7 +207,7 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
     return filters;
 }
 
-swd::whitelist_rules swd::database::get_whitelist_rules(const int& profile_id,
+swd::whitelist_rules swd::database::get_whitelist_rules(const unsigned int& profile_id,
  const std::string& caller, const std::string& path) {
     swd::log::i()->send(swd::notice, "Get whitelist rules from db");
 
@@ -249,8 +249,8 @@ swd::whitelist_rules swd::database::get_whitelist_rules(const int& profile_id,
         swd::whitelist_rule_ptr rule(new swd::whitelist_rule());
         rule->set_id(dbi_result_get_uint(res, "id"));
         rule->set_filter(filter);
-        rule->set_min_length(dbi_result_get_uint(res, "min_length"));
-        rule->set_max_length(dbi_result_get_uint(res, "max_length"));
+        rule->set_min_length(dbi_result_get_int(res, "min_length"));
+        rule->set_max_length(dbi_result_get_int(res, "max_length"));
 
         rules.push_back(rule);
     }
@@ -260,7 +260,7 @@ swd::whitelist_rules swd::database::get_whitelist_rules(const int& profile_id,
     return rules;
 }
 
-swd::integrity_rules swd::database::get_integrity_rules(const int& profile_id,
+swd::integrity_rules swd::database::get_integrity_rules(const unsigned int& profile_id,
  const std::string& caller) {
     swd::log::i()->send(swd::notice, "Get integrity rules from db");
 
@@ -297,8 +297,8 @@ swd::integrity_rules swd::database::get_integrity_rules(const int& profile_id,
     return rules;
 }
 
-int swd::database::save_request(const int& profile_id, const std::string& caller,
- const std::string& resource, const int& mode, const std::string& client_ip,
+unsigned int swd::database::save_request(const unsigned int& profile_id, const std::string& caller,
+ const std::string& resource, const unsigned int& mode, const std::string& client_ip,
  const int& total_integrity_rules) {
     std::stringstream log_message;
     log_message << "Save request -> profile: " << profile_id
@@ -333,14 +333,14 @@ int swd::database::save_request(const int& profile_id, const std::string& caller
         throw swd::exceptions::database_exception("Can't execute request query");
     }
 
-    int id = dbi_conn_sequence_last(conn_, "requests_id_seq");
+    unsigned int id = dbi_conn_sequence_last(conn_, "requests_id_seq");
 
     dbi_result_free(res);
 
     return id;
 }
 
-int swd::database::save_parameter(const int& request_id, const std::string& path,
+unsigned int swd::database::save_parameter(const unsigned int& request_id, const std::string& path,
  const std::string& value, const int& total_whitelist_rules,
  const int& critical_impact, const int& threat) {
     ensure_connection();
@@ -365,7 +365,7 @@ int swd::database::save_parameter(const int& request_id, const std::string& path
         throw swd::exceptions::database_exception("Can't execute parameter query");
     }
 
-    int id = dbi_conn_sequence_last(conn_, "parameters_id_seq");
+    unsigned int id = dbi_conn_sequence_last(conn_, "parameters_id_seq");
 
     dbi_result_free(res);
 
@@ -373,7 +373,7 @@ int swd::database::save_parameter(const int& request_id, const std::string& path
 }
 
 
-int swd::database::save_hash(const int& request_id, const std::string& algorithm,
+unsigned int swd::database::save_hash(const unsigned int& request_id, const std::string& algorithm,
  const std::string& digest) {
     ensure_connection();
 
@@ -395,15 +395,15 @@ int swd::database::save_hash(const int& request_id, const std::string& algorithm
         throw swd::exceptions::database_exception("Can't execute hash query");
     }
 
-    int id = dbi_conn_sequence_last(conn_, "hashes_id_seq");
+    unsigned int id = dbi_conn_sequence_last(conn_, "hashes_id_seq");
 
     dbi_result_free(res);
 
     return id;
 }
 
-void swd::database::add_blacklist_parameter_connector(const int& filter_id,
- const int& parameter_id) {
+void swd::database::add_blacklist_parameter_connector(const unsigned int& filter_id,
+ const unsigned int& parameter_id) {
     ensure_connection();
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
@@ -416,8 +416,8 @@ void swd::database::add_blacklist_parameter_connector(const int& filter_id,
     }
 }
 
-void swd::database::add_whitelist_parameter_connector(const int& rule_id,
- const int& parameter_id) {
+void swd::database::add_whitelist_parameter_connector(const unsigned int& rule_id,
+ const unsigned int& parameter_id) {
     ensure_connection();
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
@@ -430,8 +430,8 @@ void swd::database::add_whitelist_parameter_connector(const int& rule_id,
     }
 }
 
-void swd::database::add_integrity_request_connector(const int& rule_id,
- const int& request_id) {
+void swd::database::add_integrity_request_connector(const unsigned int& rule_id,
+ const unsigned int& request_id) {
     ensure_connection();
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
@@ -445,7 +445,7 @@ void swd::database::add_integrity_request_connector(const int& rule_id,
 }
 
 bool swd::database::is_flooding(const std::string& client_ip,
- const int& profile_id) {
+ const unsigned int& profile_id) {
     ensure_connection();
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
@@ -477,14 +477,27 @@ bool swd::database::is_flooding(const std::string& client_ip,
     return flooding;
 }
 
-void swd::database::set_cache_outdated(const int& profile_id,
+void swd::database::set_cache_outdated(const bool& cache_outdated) {
+    ensure_connection();
+
+    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+
+    dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i ",
+     (cache_outdated ? 1 : 0));
+
+    if (!res) {
+        throw swd::exceptions::database_exception("Can't execute cache_outdated query");
+    }
+}
+
+void swd::database::set_cache_outdated(const unsigned int& profile_id,
  const bool& cache_outdated) {
     ensure_connection();
 
     boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
 
     dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i "
-     "WHERE id = %i OR %i < 0", (cache_outdated ? 1 : 0), profile_id, profile_id);
+     "WHERE id = %i", (cache_outdated ? 1 : 0), profile_id);
 
     if (!res) {
         throw swd::exceptions::database_exception("Can't execute cache_outdated query");

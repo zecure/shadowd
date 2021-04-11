@@ -31,11 +31,11 @@
 
 #include "whitelist_filter.h"
 
-void swd::whitelist_filter::set_id(const int& id) {
+void swd::whitelist_filter::set_id(const unsigned int& id) {
     id_ = id;
 }
 
-int swd::whitelist_filter::get_id() const {
+unsigned int swd::whitelist_filter::get_id() const {
     return id_;
 }
 

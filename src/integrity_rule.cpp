@@ -31,11 +31,11 @@
 
 #include "integrity_rule.h"
 
-void swd::integrity_rule::set_id(const int& id) {
+void swd::integrity_rule::set_id(const unsigned int& id) {
     id_ = id;
 }
 
-int swd::integrity_rule::get_id() const {
+unsigned int swd::integrity_rule::get_id() const {
     return id_;
 }
 

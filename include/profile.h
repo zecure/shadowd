@@ -60,28 +60,28 @@ namespace swd {
              *
              * @param id The id of the profile
              */
-            void set_id(const int& id);
+            void set_id(const unsigned int& id);
 
             /**
              * @brief Get the id the profile.
              *
              * @return The id of the profile
              */
-            int get_id() const;
+            unsigned int get_id() const;
 
             /**
              * @brief Set the status of the system.
              *
              * @param mode The status of the system
              */
-            void set_mode(const int& mode);
+            void set_mode(const unsigned int& mode);
 
             /**
              * @brief Get the status of the system.
              *
              * @return The status of the system
              */
-            int get_mode() const;
+            unsigned int get_mode() const;
 
             /**
              * @brief Set the status of the whitelist check for the profile.
@@ -199,12 +199,12 @@ namespace swd {
             /**
              * @brief The database id of the profile.
              */
-            int id_;
+            unsigned int id_;
 
             /**
              * @brief The mode of the profile.
              */
-            int mode_;
+            unsigned int mode_;
 
             /**
              * @brief The status of the whitelist check.

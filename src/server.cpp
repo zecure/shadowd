@@ -210,5 +210,5 @@ void swd::server::handle_reload() {
     swd::log::i()->send(swd::notice, "Received a reload signal");
 
     /* Reset the cache by deleting all elements. */
-    cache_->reset();
+    cache_->reset_all();
 }

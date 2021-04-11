@@ -39,19 +39,19 @@ std::string swd::profile::get_server_ip() const {
     return server_ip_;
 }
 
-void swd::profile::set_id(const int& id) {
+void swd::profile::set_id(const unsigned int& id) {
     id_ = id;
 }
 
-int swd::profile::get_id() const {
+unsigned int swd::profile::get_id() const {
     return id_;
 }
 
-void swd::profile::set_mode(const int& mode) {
+void swd::profile::set_mode(const unsigned int& mode) {
     mode_ = mode;
 }
 
-int swd::profile::get_mode() const {
+unsigned int swd::profile::get_mode() const {
     return mode_;
 }
 

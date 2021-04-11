@@ -31,11 +31,11 @@
 
 #include "whitelist_rule.h"
 
-void swd::whitelist_rule::set_id(const int& id) {
+void swd::whitelist_rule::set_id(const unsigned int& id) {
     id_ = id;
 }
 
-int swd::whitelist_rule::get_id() const {
+unsigned int swd::whitelist_rule::get_id() const {
     return id_;
 }
 

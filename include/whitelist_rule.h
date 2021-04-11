@@ -49,14 +49,14 @@ namespace swd {
              *
              * @param id The id of the rule
              */
-            void set_id(const int& id);
+            void set_id(const unsigned int& id);
 
             /**
              * @brief Get the id of the rule.
              *
              * @return The id of the rule
              */
-            int get_id() const;
+            unsigned int get_id() const;
 
             /**
              * @brief Set the whitelist filter of the rule.
@@ -92,7 +92,7 @@ namespace swd {
             /**
              * @brief The database id of the rule.
              */
-            int id_;
+            unsigned int id_;
 
             /**
              * @brief The pointer to the whitelist filter.

@@ -72,7 +72,7 @@ void swd::storage::process_next() {
 
     while (!stop_) {
         /* Wait for a new request in the queue. */
-        while (1) {
+        while (true) {
             /* Do not wait if there are still elements in the queue. */
             {
                 boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
@@ -106,7 +106,7 @@ void swd::storage::process_next() {
 }
 
 void swd::storage::save(const swd::request_ptr& request) {
-    int request_id;
+    unsigned int request_id;
 
     try {
         /* First we save the request and get its id in the database. */
@@ -163,7 +163,7 @@ void swd::storage::save(const swd::request_ptr& request) {
     swd::parameters parameters = request->get_parameters();
 
     for (const auto& parameter: parameters) {
-        int parameter_id;
+        unsigned int parameter_id;
 
         try {
             parameter_id = database_->save_parameter(

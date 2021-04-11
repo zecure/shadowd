@@ -51,14 +51,14 @@ namespace swd {
              *
              * @param id The database id of the filter
              */
-            void set_id(const int& id);
+            void set_id(const unsigned int& id);
 
             /**
              * @brief Get the id the filter.
              *
              * @return The id of the filter
              */
-            int get_id() const;
+            unsigned int get_id() const;
 
             /**
              * @brief Set the regular expression of the filter.
@@ -79,7 +79,7 @@ namespace swd {
             /**
              * @brief The database id of the filter.
              */
-            int id_;
+            unsigned int id_;
 
             /**
              * @brief The regular expression of the filter.
