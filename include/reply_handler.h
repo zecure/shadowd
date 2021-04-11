@@ -45,7 +45,7 @@ namespace swd {
              *
              * @param reply The pointer to the reply object
              */
-            reply_handler(swd::reply_ptr  reply);
+            reply_handler(swd::reply_ptr reply);
 
             /**
              * @brief Encode the data of the reply with json and save the

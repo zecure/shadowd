@@ -46,7 +46,7 @@ namespace swd {
              *
              * @param cache The pointer to the cache object
              */
-            integrity(swd::cache_ptr  cache);
+            integrity(swd::cache_ptr cache);
 
             /**
              * @brief Scan all parameters in the request and add connections to broken

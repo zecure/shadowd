@@ -49,7 +49,7 @@ namespace swd {
              *
              * @param database The pointer to the database object
              */
-            storage(swd::database_ptr  database);
+            storage(swd::database_ptr database);
 
             /**
              * @brief Start insert thread.
