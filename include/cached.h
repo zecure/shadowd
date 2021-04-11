@@ -32,7 +32,7 @@
 #ifndef CACHED_H
 #define CACHED_H
 
-#include <time.h>
+#include <ctime>
 
 namespace swd {
     /**
