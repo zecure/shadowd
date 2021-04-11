@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -72,9 +72,8 @@ const swd::whitelist_rules& swd::parameter::get_whitelist_rules() const {
 int swd::parameter::get_impact() const {
     int impact = 0;
 
-    for (swd::blacklist_filters::const_iterator it_filter = blacklist_filters_.begin();
-     it_filter != blacklist_filters_.end(); it_filter++) {
-        impact += (*it_filter)->get_impact();
+    for (const auto& filter: blacklist_filters_) {
+        impact += filter->get_impact();
     }
 
     return impact;

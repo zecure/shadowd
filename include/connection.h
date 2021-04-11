@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -85,8 +85,8 @@ namespace swd {
              * @param cache The pointer to the cache object
              */
             explicit connection(boost::asio::io_service& io_service,
-             swd::context& context, bool ssl, const swd::storage_ptr& storage,
-             const swd::database_ptr& database, const swd::cache_ptr& cache);
+             swd::context& context, bool ssl, swd::storage_ptr storage,
+             swd::database_ptr database, swd::cache_ptr cache);
 
             /**
              * @brief Get the socket associated with the connection.

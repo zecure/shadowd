@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -30,13 +30,14 @@
  */
 
 #include <iostream>
+#include <utility>
 
 #include "storage.h"
 #include "database.h"
 #include "log.h"
 
-swd::storage::storage(const swd::database_ptr& database) :
- database_(database),
+swd::storage::storage(swd::database_ptr database) :
+ database_(std::move(database)),
  stop_(false) {
 }
 
@@ -71,7 +72,7 @@ void swd::storage::process_next() {
 
     while (!stop_) {
         /* Wait for a new request in the queue. */
-        while (1) {
+        while (true) {
             /* Do not wait if there are still elements in the queue. */
             {
                 boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
@@ -105,7 +106,7 @@ void swd::storage::process_next() {
 }
 
 void swd::storage::save(const swd::request_ptr& request) {
-    int request_id;
+    unsigned int request_id;
 
     try {
         /* First we save the request and get its id in the database. */
@@ -130,9 +131,7 @@ void swd::storage::save(const swd::request_ptr& request) {
     /* Save all hashes of the request. */
     swd::hashes hashes = request->get_hashes();
 
-    for (swd::hashes::iterator it_hash = hashes.begin(); it_hash != hashes.end(); it_hash++) {
-        swd::hash_ptr hash((*it_hash).second);
-
+    for (auto const& [key, hash] : hashes) {
         try {
             database_->save_hash(
                 request_id,
@@ -148,10 +147,7 @@ void swd::storage::save(const swd::request_ptr& request) {
     /* Connect the broken integrity rules with the request. */
     swd::integrity_rules integrity_rules = request->get_integrity_rules();
 
-    for (swd::integrity_rules::iterator it_integrity_rule = integrity_rules.begin();
-     it_integrity_rule != integrity_rules.end(); it_integrity_rule++) {
-        swd::integrity_rule_ptr integrity_rule(*it_integrity_rule);
-
+    for (const auto& integrity_rule: integrity_rules) {
         try {
             database_->add_integrity_request_connector(
                 integrity_rule->get_id(),
@@ -166,11 +162,8 @@ void swd::storage::save(const swd::request_ptr& request) {
     /* Now iterate over all parameters. */
     swd::parameters parameters = request->get_parameters();
 
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        swd::parameter_ptr parameter(*it_parameter);
-
-        int parameter_id;
+    for (const auto& parameter: parameters) {
+        unsigned int parameter_id;
 
         try {
             parameter_id = database_->save_parameter(
@@ -189,10 +182,7 @@ void swd::storage::save(const swd::request_ptr& request) {
         /* Connect the matching blacklist filters with the parameter. */
         swd::blacklist_filters blacklist_filters = parameter->get_blacklist_filters();
 
-        for (swd::blacklist_filters::iterator it_blacklist_filter = blacklist_filters.begin();
-         it_blacklist_filter != blacklist_filters.end(); it_blacklist_filter++) {
-            swd::blacklist_filter_ptr blacklist_filter(*it_blacklist_filter);
-
+        for (const auto& blacklist_filter: blacklist_filters) {
             try {
                 database_->add_blacklist_parameter_connector(
                     blacklist_filter->get_id(),
@@ -207,10 +197,7 @@ void swd::storage::save(const swd::request_ptr& request) {
         /* Connect the broken whitelist rules with the parameter. */
         swd::whitelist_rules whitelist_rules = parameter->get_whitelist_rules();
 
-        for (swd::whitelist_rules::iterator it_whitelist_rule = whitelist_rules.begin();
-         it_whitelist_rule != whitelist_rules.end(); it_whitelist_rule++) {
-            swd::whitelist_rule_ptr whitelist_rule(*it_whitelist_rule);
-
+        for (const auto& whitelist_rule: whitelist_rules) {
             try {
                 database_->add_whitelist_parameter_connector(
                     whitelist_rule->get_id(),

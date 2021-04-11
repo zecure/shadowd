@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -35,17 +35,18 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
+#include <utility>
 
 #include "server.h"
 #include "config.h"
 #include "log.h"
 #include "shared.h"
 
-swd::server::server(const swd::storage_ptr& storage,
- const swd::database_ptr& database, const swd::cache_ptr& cache) :
- storage_(storage),
- database_(database),
- cache_(cache),
+swd::server::server(swd::storage_ptr storage,
+ swd::database_ptr database, swd::cache_ptr cache) :
+ storage_(std::move(storage)),
+ database_(std::move(database)),
+ cache_(std::move(cache)),
  signals_stop_(io_service_),
  signals_reload_(io_service_),
  acceptor_(io_service_),
@@ -146,8 +147,8 @@ void swd::server::start(std::size_t thread_pool_size) {
     }
 
     /* Wait for all threads in the pool to exit. */
-    for (std::size_t i = 0; i < threads.size(); ++i) {
-        threads[i]->join();
+    for (const auto& thread: threads) {
+        thread->join();
     }
 }
 
@@ -209,5 +210,5 @@ void swd::server::handle_reload() {
     swd::log::i()->send(swd::notice, "Received a reload signal");
 
     /* Reset the cache by deleting all elements. */
-    cache_->reset();
+    cache_->reset_all();
 }

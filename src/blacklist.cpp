@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -30,11 +30,13 @@
  */
 
 #include "blacklist.h"
+
+#include <utility>
 #include "blacklist_rule.h"
 #include "log.h"
 
-swd::blacklist::blacklist(const swd::cache_ptr& cache) :
- cache_(cache) {
+swd::blacklist::blacklist(swd::cache_ptr cache) :
+ cache_(std::move(cache)) {
 }
 
 void swd::blacklist::scan(swd::request_ptr& request) {
@@ -42,15 +44,8 @@ void swd::blacklist::scan(swd::request_ptr& request) {
     swd::parameters parameters = request->get_parameters();
 
     /* Iterate over all parameters and check every filter. */
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        /* Save the iterators in variables for the sake of readability. */
-        swd::parameter_ptr parameter(*it_parameter);
-
-        for (swd::blacklist_filters::iterator it_filter = filters.begin();
-         it_filter != filters.end(); it_filter++) {
-            swd::blacklist_filter_ptr filter(*it_filter);
-
+    for (const auto& parameter: parameters) {
+        for (const auto& filter: filters) {
             /* If there is catastrophic backtracking boost throws an exception. */
             try {
                 /* Add pointers to all filters that match to the parameter. */
@@ -67,11 +62,7 @@ void swd::blacklist::scan(swd::request_ptr& request) {
     }
 
     /* Iterate over all parameters again and check total impact. */
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        /* Save the iterators in variables for the sake of readability. */
-        swd::parameter_ptr parameter(*it_parameter);
-
+    for (const auto& parameter: parameters) {
         swd::blacklist_rules rules = cache_->get_blacklist_rules(
             request->get_profile()->get_id(),
             request->get_caller(),
@@ -80,19 +71,22 @@ void swd::blacklist::scan(swd::request_ptr& request) {
 
         int threshold = request->get_profile()->get_blacklist_threshold();
 
-        if (rules.size() > 0) {
-            /* Get the most secure threshold in case of an overlap. */
-            for (swd::blacklist_rules::iterator it_rule = rules.begin();
-             it_rule != rules.end(); it_rule++) {
-                swd::blacklist_rule_ptr rule(*it_rule);
+        /* Blacklist rules take priority over the profile threshold. */
+        if (!rules.empty()) {
+            bool initial_value = true;
+            for (const auto& rule: rules) {
+                /**
+                 * Get the most secure (i.e. lowest) threshold in case of an overlap. Negative values disable
+                 * the protection, so they have to be considered the highest possible values.
+                 */
+                bool adds_limit = (threshold < 0) && (rule->get_threshold() > -1);
+                bool lower_value = (rule->get_threshold() > -1) && (rule->get_threshold() < threshold);
 
-                if (it_rule == rules.begin()) {
-                    /* If there is a rule the global threshold is ignored. */
+                if (initial_value) {
+                    initial_value = false;
                     threshold = rule->get_threshold();
-                } else if (rule->get_threshold() > -1) {
-                    if ((threshold < 0) || (rule->get_threshold() < threshold)) {
-                        threshold = rule->get_threshold();
-                    }
+                } else if (adds_limit || lower_value) {
+                    threshold = rule->get_threshold();
                 }
             }
         }

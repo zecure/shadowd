@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -30,23 +30,21 @@
  */
 
 #include "whitelist.h"
+
+#include <utility>
 #include "whitelist_rule.h"
 #include "database.h"
 #include "log.h"
 
-swd::whitelist::whitelist(const swd::cache_ptr& cache) :
- cache_(cache) {
+swd::whitelist::whitelist(swd::cache_ptr cache) :
+ cache_(std::move(cache)) {
 }
 
 void swd::whitelist::scan(swd::request_ptr& request) {
     swd::parameters parameters = request->get_parameters();
 
     /* Iterate over all parameters. */
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        /* Save the iterators in variables for the sake of readability. */
-        swd::parameter_ptr parameter(*it_parameter);
-
+    for (const auto& parameter: parameters) {
         /* Import the rules from the database. */
         swd::whitelist_rules rules = cache_->get_whitelist_rules(
             request->get_profile()->get_id(),
@@ -65,10 +63,7 @@ void swd::whitelist::scan(swd::request_ptr& request) {
         }
 
         /* Iterate over all rules. */
-        for (swd::whitelist_rules::iterator it_rule = rules.begin();
-         it_rule != rules.end(); it_rule++) {
-            swd::whitelist_rule_ptr rule(*it_rule);
-
+        for (const auto& rule: rules) {
             try {
                 /* Add pointers to all rules that are not adhered to. */
                 if (!rule->is_adhered_to(parameter->get_value())) {

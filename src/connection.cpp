@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,6 +31,7 @@
 
 #include <cstdlib>
 #include <boost/make_shared.hpp>
+#include <utility>
 
 #include "connection.h"
 #include "profile.h"
@@ -40,15 +41,15 @@
 #include "log.h"
 
 swd::connection::connection(boost::asio::io_service& io_service,
- swd::context& context, bool ssl, const swd::storage_ptr& storage,
- const swd::database_ptr& database, const swd::cache_ptr& cache) :
+ swd::context& context, bool ssl, swd::storage_ptr storage,
+ swd::database_ptr database, swd::cache_ptr cache) :
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
  ssl_(ssl),
- storage_(storage),
- database_(database),
- cache_(cache),
+ storage_(std::move(storage)),
+ database_(std::move(database)),
+ cache_(std::move(cache)),
  request_(boost::make_shared<swd::request>()),
  reply_(boost::make_shared<swd::reply>()) {
 }
@@ -220,7 +221,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
         swd::profile_ptr profile = request_->get_profile();
 
         if (profile->is_cache_outdated()) {
-            cache_->reset(profile->get_id());
+            cache_->reset_profile(profile->get_id());
         }
 
         /* Process the request. */
@@ -243,10 +244,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
             int max_length_value = swd::config::i()->get<int>("max-length-value");
 
             if ((max_length_path > -1) || (max_length_value > -1)) {
-                for (swd::parameters::iterator it_parameter = parameters.begin();
-                 it_parameter != parameters.end(); it_parameter++) {
-                    swd::parameter_ptr parameter(*it_parameter);
-
+                for (const auto& parameter: parameters) {
                     if ((max_length_path > -1) && (parameter->get_path().length() > max_length_path)) {
                         swd::log::i()->send(swd::notice, "Too long parameter path");
                         throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);

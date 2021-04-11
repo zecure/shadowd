@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -61,7 +61,7 @@ namespace swd {
              * @param end The end of the input iterator
              */
             template <typename InputIterator> boost::tuple<boost::tribool, InputIterator>
-             parse(swd::request_ptr request, InputIterator begin, InputIterator end) {
+             parse(const swd::request_ptr& request, InputIterator begin, InputIterator end) {
                 while (begin != end) {
                     boost::tribool result = consume(request, *begin++);
 

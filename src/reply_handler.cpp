@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
  * files in the program, then also delete it here.
  */
 
+#include <utility>
 #include <vector>
 #include <string>
 #include <json/json.h>
@@ -36,8 +37,8 @@
 #include "reply_handler.h"
 #include "log.h"
 
-swd::reply_handler::reply_handler(const swd::reply_ptr& reply) :
- reply_(reply) {
+swd::reply_handler::reply_handler(swd::reply_ptr reply) :
+ reply_(std::move(reply)) {
 }
 
 bool swd::reply_handler::encode() {
@@ -49,8 +50,8 @@ bool swd::reply_handler::encode() {
         std::vector<std::string> threats = reply_->get_threats();
 
         Json::Value output(Json::arrayValue);
-        for (std::vector<std::string>::iterator it = threats.begin(); it != threats.end(); ++it) {
-            output.append(*it);
+        for (const auto& threat: threats) {
+            output.append(threat);
         }
 
         root["threats"] = output;

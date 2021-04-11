@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -30,13 +30,15 @@
  */
 
 #include "integrity.h"
+
+#include <utility>
 #include "integrity_rule.h"
 #include "hash.h"
 #include "database.h"
 #include "log.h"
 
-swd::integrity::integrity(const swd::cache_ptr& cache) :
- cache_(cache) {
+swd::integrity::integrity(swd::cache_ptr cache) :
+ cache_(std::move(cache)) {
 }
 
 void swd::integrity::scan(swd::request_ptr& request) {
@@ -57,10 +59,7 @@ void swd::integrity::scan(swd::request_ptr& request) {
     }
 
     /* Iterate over all rules. */
-    for (swd::integrity_rules::iterator it_rule = rules.begin();
-     it_rule != rules.end(); it_rule++) {
-        swd::integrity_rule_ptr rule(*it_rule);
-
+    for (const auto& rule: rules) {
         try {
             swd::hash_ptr hash = request->get_hash(rule->get_algorithm());
 

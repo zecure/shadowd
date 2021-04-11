@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -48,28 +48,28 @@ namespace swd {
              *
              * @param id The id of the filter
              */
-            void set_id(const int& id);
+            void set_id(const unsigned int& id);
 
             /**
              * @brief Get the id of the filter.
              *
              * @return The id of the filter
              */
-            int get_id() const;
+            unsigned int get_id() const;
 
             /**
              * @brief Set the impact of the filter.
              *
              * @param impact The impact of the filter
              */
-            void set_impact(const int& impact);
+            void set_impact(const unsigned int& impact);
 
             /**
              * @brief Get the impact of the filter.
              *
              * @return The impact of the filter
              */
-            int get_impact() const;
+            unsigned int get_impact() const;
 
             /**
              * @brief Set the regular expression of the filter.
@@ -90,12 +90,12 @@ namespace swd {
             /**
              * @brief The database id of the filter.
              */
-            int id_;
+            unsigned int id_;
 
             /**
              * @brief The impact/severity of the filter.
              */
-            int impact_;
+            unsigned int impact_;
 
             /**
              * @brief The regular expression of the filter.

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,11 +31,11 @@
 
 #include "whitelist_rule.h"
 
-void swd::whitelist_rule::set_id(const int& id) {
+void swd::whitelist_rule::set_id(const unsigned int& id) {
     id_ = id;
 }
 
-int swd::whitelist_rule::get_id() const {
+unsigned int swd::whitelist_rule::get_id() const {
     return id_;
 }
 

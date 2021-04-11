@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -91,7 +91,7 @@ namespace swd {
              *
              * @param database The pointer to the database object
              */
-            cache(const swd::database_ptr& database);
+            cache(swd::database_ptr database);
 
             /**
              * @brief Start cleanup thread.
@@ -104,11 +104,16 @@ namespace swd {
             void stop();
 
             /**
-             * @brief Remove all elements from the cache.
+             * @brief Remove all elements of one profile from the cache.
              *
-             * @param profile_id The id of the profile, negative if all
+             * @param profile_id The id of the profile
              */
-            void reset(int profile_id = -1);
+            void reset_profile(unsigned int profile_id);
+
+            /**
+             * @brief Remove all elements from the cache.
+             */
+            void reset_all();
 
             /**
              * @brief Set the blacklist filters. Unit tests only.
@@ -133,7 +138,7 @@ namespace swd {
              * @param path The path of the parameter
              * @param blacklist_rules The vector of blacklist rules
              */
-            void add_blacklist_rules(const int& profile_id,
+            void add_blacklist_rules(const unsigned int& profile_id,
              const std::string& caller, const std::string& path,
              const swd::blacklist_rules& blacklist_rules);
 
@@ -145,7 +150,7 @@ namespace swd {
              * @param path The path of the parameter
              * @return The corresponding table rows
              */
-            swd::blacklist_rules get_blacklist_rules(const int& profile_id,
+            swd::blacklist_rules get_blacklist_rules(const unsigned int& profile_id,
              const std::string& caller, const std::string& path);
 
             /**
@@ -156,7 +161,7 @@ namespace swd {
              * @param path The path of the parameter
              * @param whitelist_rules The vector of whitelist rules
              */
-            void add_whitelist_rules(const int& profile_id,
+            void add_whitelist_rules(const unsigned int& profile_id,
              const std::string& caller, const std::string& path,
              const swd::whitelist_rules& whitelist_rules);
 
@@ -168,7 +173,7 @@ namespace swd {
              * @param path The path of the parameter
              * @return The corresponding table rows
              */
-            swd::whitelist_rules get_whitelist_rules(const int& profile_id,
+            swd::whitelist_rules get_whitelist_rules(const unsigned int& profile_id,
              const std::string& caller, const std::string& path);
 
             /**
@@ -178,7 +183,7 @@ namespace swd {
              * @param caller The caller (php file) that initiated the connection
              * @param integrity_rules The vector of integrity rules
              */
-            void add_integrity_rules(const int& profile_id,
+            void add_integrity_rules(const unsigned int& profile_id,
              const std::string& caller, const swd::integrity_rules&
              integrity_rules);
 
@@ -188,7 +193,7 @@ namespace swd {
              * @param profile_id The profile id of the request
              * @param caller The caller (resource) that initiated the connection
              */
-            swd::integrity_rules get_integrity_rules(const int& profile_id,
+            swd::integrity_rules get_integrity_rules(const unsigned int& profile_id,
              const std::string& caller);
 
         private:
@@ -210,19 +215,19 @@ namespace swd {
             /**
              * @brief The cache map for blacklist rules.
              */
-            std::map< int, std::map< std::string, std::map<std::string,
+            std::map< unsigned int, std::map< std::string, std::map<std::string,
              swd::cached_blacklist_rules_ptr> > > blacklist_rules_;
 
             /**
              * @brief The cache map for whitelist rules.
              */
-            std::map< int, std::map< std::string, std::map<std::string,
+            std::map< unsigned int, std::map< std::string, std::map<std::string,
              swd::cached_whitelist_rules_ptr> > > whitelist_rules_;
 
             /**
              * @brief The cache map for integrity rules.
              */
-            std::map< int, std::map<std::string,
+            std::map< unsigned int, std::map<std::string,
              swd::cached_integrity_rules_ptr> > integrity_rules_;
 
             /**

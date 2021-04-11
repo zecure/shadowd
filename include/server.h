@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -54,8 +54,8 @@ namespace swd {
              * @param storage The pointer to the storage object
              * @param cache The pointer to the cache object
              */
-            server(const swd::storage_ptr& storage,
-             const swd::database_ptr& database, const swd::cache_ptr& cache);
+            server(swd::storage_ptr storage,
+             swd::database_ptr database, swd::cache_ptr cache);
 
             /**
              * @brief Initialize the server.
