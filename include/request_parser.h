@@ -61,7 +61,7 @@ namespace swd {
              * @param end The end of the input iterator
              */
             template <typename InputIterator> boost::tuple<boost::tribool, InputIterator>
-             parse(swd::request_ptr request, InputIterator begin, InputIterator end) {
+             parse(const swd::request_ptr& request, InputIterator begin, InputIterator end) {
                 while (begin != end) {
                     boost::tribool result = consume(request, *begin++);
 
