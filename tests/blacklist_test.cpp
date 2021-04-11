@@ -36,7 +36,7 @@
 
 BOOST_AUTO_TEST_SUITE(blacklist_test)
 
-BOOST_AUTO_TEST_CASE(positive_blacklist_check) {
+BOOST_AUTO_TEST_CASE(positive_blacklist_check_limit_by_profile) {
     swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
     swd::blacklist blacklist(cache);
 
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(positive_blacklist_check) {
     BOOST_CHECK(parameter->is_threat() == true);
 }
 
-BOOST_AUTO_TEST_CASE(negative_blacklist_check) {
+BOOST_AUTO_TEST_CASE(negative_blacklist_check_limit_by_profile) {
     swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
     swd::blacklist blacklist(cache);
 
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(negative_blacklist_check) {
     BOOST_CHECK(parameter->is_threat() == false);
 }
 
-BOOST_AUTO_TEST_CASE(negative_blacklist_check_no_limit) {
+BOOST_AUTO_TEST_CASE(negative_blacklist_check_no_limit_by_rule) {
     swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
     swd::blacklist blacklist(cache);
 
@@ -134,6 +134,48 @@ BOOST_AUTO_TEST_CASE(negative_blacklist_check_no_limit) {
     blacklist.scan(request);
     BOOST_CHECK(parameter->get_blacklist_filters().size() == 1);
     BOOST_CHECK(parameter->is_threat() == false);
+}
+
+BOOST_AUTO_TEST_CASE(positive_blacklist_check_limit_by_rule) {
+    swd::cache_ptr cache(new swd::cache(swd::database_ptr()));
+    swd::blacklist blacklist(cache);
+
+    swd::request_ptr request(new swd::request);
+    request->set_caller("qux");
+    swd::parameter_ptr parameter(new swd::parameter);
+    parameter->set_path("bar");
+    parameter->set_value("foo");
+    request->add_parameter(parameter);
+
+    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+    filter->set_impact(6);
+    filter->set_regex("foo");
+
+    swd::blacklist_filters filters;
+    filters.push_back(filter);
+    cache->set_blacklist_filters(filters);
+
+    swd::blacklist_rule_ptr rule1(new swd::blacklist_rule);
+    rule1->set_threshold(40);
+    swd::blacklist_rule_ptr rule2(new swd::blacklist_rule);
+    rule2->set_threshold(-1);
+    swd::blacklist_rule_ptr rule3(new swd::blacklist_rule);
+    rule3->set_threshold(5);
+
+    swd::blacklist_rules rules;
+    rules.push_back(rule1);
+    rules.push_back(rule2);
+    rules.push_back(rule3);
+    cache->add_blacklist_rules(1, "qux", "bar", rules);
+
+    swd::profile_ptr profile(new swd::profile);
+    profile->set_id(1);
+    profile->set_blacklist_threshold(50);
+    request->set_profile(profile);
+
+    blacklist.scan(request);
+    BOOST_CHECK(parameter->get_blacklist_filters().size() == 1);
+    BOOST_CHECK(parameter->is_threat() == true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

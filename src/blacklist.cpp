@@ -73,10 +73,19 @@ void swd::blacklist::scan(swd::request_ptr& request) {
 
         /* Blacklist rules take priority over the profile threshold. */
         if (!rules.empty()) {
-            threshold = -1;
+            bool initial_value = true;
             for (const auto& rule: rules) {
-                /* Get the most secure (i.e. lowest) threshold in case of an overlap. */
-                if ((rule->get_threshold() > -1) && (rule->get_threshold() < threshold)) {
+                /**
+                 * Get the most secure (i.e. lowest) threshold in case of an overlap. Negative values disable
+                 * the protection, so they have to be considered the highest possible values.
+                 */
+                bool adds_limit = (threshold < 0) && (rule->get_threshold() > -1);
+                bool lower_value = (rule->get_threshold() > -1) && (rule->get_threshold() < threshold);
+
+                if (initial_value) {
+                    initial_value = false;
+                    threshold = rule->get_threshold();
+                } else if (adds_limit || lower_value) {
                     threshold = rule->get_threshold();
                 }
             }
