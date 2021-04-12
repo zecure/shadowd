@@ -414,6 +414,8 @@ void swd::database::add_blacklist_parameter_connector(const unsigned int& filter
     if (!res) {
         throw swd::exceptions::database_exception("Can't execute blacklist_parameter query");
     }
+
+    dbi_result_free(res);
 }
 
 void swd::database::add_whitelist_parameter_connector(const unsigned int& rule_id,
@@ -428,6 +430,8 @@ void swd::database::add_whitelist_parameter_connector(const unsigned int& rule_i
     if (!res) {
         throw swd::exceptions::database_exception("Can't execute whitelist_parameter query");
     }
+
+    dbi_result_free(res);
 }
 
 void swd::database::add_integrity_request_connector(const unsigned int& rule_id,
@@ -442,6 +446,8 @@ void swd::database::add_integrity_request_connector(const unsigned int& rule_id,
     if (!res) {
         throw swd::exceptions::database_exception("Can't execute integrity_request query");
     }
+
+    dbi_result_free(res);
 }
 
 bool swd::database::is_flooding(const std::string& client_ip,
@@ -488,6 +494,8 @@ void swd::database::set_cache_outdated(const bool& cache_outdated) {
     if (!res) {
         throw swd::exceptions::database_exception("Can't execute cache_outdated query");
     }
+
+    dbi_result_free(res);
 }
 
 void swd::database::set_cache_outdated(const unsigned int& profile_id,
@@ -502,6 +510,8 @@ void swd::database::set_cache_outdated(const unsigned int& profile_id,
     if (!res) {
         throw swd::exceptions::database_exception("Can't execute cache_outdated query");
     }
+
+    dbi_result_free(res);
 }
 
 std::string swd::database::remove_null(std::string target) {
