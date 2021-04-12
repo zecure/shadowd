@@ -37,8 +37,6 @@ RUN apt-get update && \
         libdbd-mysql \
         libssl1.1 && \
     rm -rf /var/lib/apt/lists/*
-COPY --from=builder /shadowd/misc/docker/docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
 RUN addgroup \
         --quiet \
         --system \
@@ -56,5 +54,7 @@ RUN addgroup \
     touch /etc/shadowd/shadowd.ini && \
     chown root:shadowd /etc/shadowd/shadowd.ini && \
     chmod 640 /etc/shadowd/shadowd.ini
+COPY --from=builder /shadowd/misc/docker/docker-entrypoint.sh /
 COPY --from=builder /shadowd/build/src/shadowd /usr/bin/shadowd
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/usr/bin/shadowd", "-c", "/etc/shadowd/shadowd.ini", "-U", "shadowd", "-G", "shadowd"]
