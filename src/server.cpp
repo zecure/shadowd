@@ -44,13 +44,13 @@
 
 swd::server::server(swd::storage_ptr storage,
  swd::database_ptr database, swd::cache_ptr cache) :
- storage_(std::move(storage)),
- database_(std::move(database)),
- cache_(std::move(cache)),
  signals_stop_(io_service_),
  signals_reload_(io_service_),
  acceptor_(io_service_),
- context_(boost::asio::ssl::context::sslv23) {
+ context_(boost::asio::ssl::context::sslv23),
+ storage_(std::move(storage)),
+ database_(std::move(database)),
+ cache_(std::move(cache)) {
     /**
      * Register to handle the signals that indicate when the server should exit.
      * It is safe to register for the same signal multiple times in a program,

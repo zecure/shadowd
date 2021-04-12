@@ -37,8 +37,8 @@
 #include "log.h"
 
 swd::storage::storage(swd::database_ptr database) :
- database_(std::move(database)),
- stop_(false) {
+ stop_(false),
+ database_(std::move(database)) {
 }
 
 void swd::storage::start() {

@@ -46,12 +46,12 @@ swd::connection::connection(boost::asio::io_service& io_service,
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
+ request_(boost::make_shared<swd::request>()),
+ reply_(boost::make_shared<swd::reply>()),
  ssl_(ssl),
  storage_(std::move(storage)),
  database_(std::move(database)),
- cache_(std::move(cache)),
- request_(boost::make_shared<swd::request>()),
- reply_(boost::make_shared<swd::reply>()) {
+ cache_(std::move(cache)) {
 }
 
 swd::socket& swd::connection::socket() {
