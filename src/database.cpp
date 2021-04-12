@@ -67,7 +67,7 @@ void swd::database::disconnect() {
 }
 
 void swd::database::ensure_connection() {
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     if (dbi_conn_ping(conn_) < 1) {
         swd::log::i()->send(swd::notice, "Dropped database connection");
@@ -90,7 +90,7 @@ swd::profile_ptr swd::database::get_profile(const std::string& server_ip,
     ensure_connection();
 
     /* Mutex to avoid race conditions. */
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     /**
      * First we escape server_ip. It comes from a trusted source, but better safe
@@ -143,7 +143,7 @@ swd::blacklist_rules swd::database::get_blacklist_rules(const unsigned int& prof
 
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     char *caller_esc = strdup(caller.c_str());
     dbi_conn_quote_string(conn_, &caller_esc);
@@ -183,7 +183,7 @@ swd::blacklist_filters swd::database::get_blacklist_filters() {
 
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     dbi_result res = dbi_conn_query(conn_, "SELECT id, impact, rule FROM blacklist_filters");
 
@@ -213,7 +213,7 @@ swd::whitelist_rules swd::database::get_whitelist_rules(const unsigned int& prof
 
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     char *caller_esc = strdup(caller.c_str());
     dbi_conn_quote_string(conn_, &caller_esc);
@@ -266,7 +266,7 @@ swd::integrity_rules swd::database::get_integrity_rules(const unsigned int& prof
 
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     char *caller_esc = strdup(caller.c_str());
     dbi_conn_quote_string(conn_, &caller_esc);
@@ -309,7 +309,7 @@ unsigned int swd::database::save_request(const unsigned int& profile_id, const s
 
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     char *caller_esc = strdup(remove_null(caller).c_str());
     dbi_conn_quote_string(conn_, &caller_esc);
@@ -345,7 +345,7 @@ unsigned int swd::database::save_parameter(const unsigned int& request_id, const
  const int& critical_impact, const int& threat) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     char *path_esc = strdup(remove_null(path).c_str());
     dbi_conn_quote_string(conn_, &path_esc);
@@ -377,7 +377,7 @@ unsigned int swd::database::save_hash(const unsigned int& request_id, const std:
  const std::string& digest) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     char *algorithm_esc = strdup(remove_null(algorithm).c_str());
     dbi_conn_quote_string(conn_, &algorithm_esc);
@@ -406,7 +406,7 @@ void swd::database::add_blacklist_parameter_connector(const unsigned int& filter
  const unsigned int& parameter_id) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO blacklist_parameters "
      "(filter_id, parameter_id) VALUES (%i, %i)", filter_id, parameter_id);
@@ -422,7 +422,7 @@ void swd::database::add_whitelist_parameter_connector(const unsigned int& rule_i
  const unsigned int& parameter_id) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO whitelist_parameters "
      "(rule_id, parameter_id) VALUES (%i, %i)", rule_id, parameter_id);
@@ -438,7 +438,7 @@ void swd::database::add_integrity_request_connector(const unsigned int& rule_id,
  const unsigned int& request_id) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     dbi_result res = dbi_conn_queryf(conn_, "INSERT INTO integrity_requests "
      "(rule_id, request_id) VALUES (%i, %i)", rule_id, request_id);
@@ -454,7 +454,7 @@ bool swd::database::is_flooding(const std::string& client_ip,
  const unsigned int& profile_id) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     char *client_ip_esc = strdup(client_ip.c_str());
     dbi_conn_quote_string(conn_, &client_ip_esc);
@@ -486,7 +486,7 @@ bool swd::database::is_flooding(const std::string& client_ip,
 void swd::database::set_cache_outdated(const bool& cache_outdated) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i ",
      (cache_outdated ? 1 : 0));
@@ -502,7 +502,7 @@ void swd::database::set_cache_outdated(const unsigned int& profile_id,
  const bool& cache_outdated) {
     ensure_connection();
 
-    boost::unique_lock<boost::mutex> scoped_lock(dbi_mutex_);
+    boost::unique_lock scoped_lock(dbi_mutex_);
 
     dbi_result res = dbi_conn_queryf(conn_, "UPDATE profiles SET cache_outdated = %i "
      "WHERE id = %i", (cache_outdated ? 1 : 0), profile_id);

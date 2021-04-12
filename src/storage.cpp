@@ -58,7 +58,7 @@ void swd::storage::stop() {
 
 void swd::storage::add(const swd::request_ptr& request) {
     /* Mutex to avoid race conditions. */
-    boost::unique_lock<boost::mutex> scoped_lock(queue_mutex_);
+    boost::unique_lock scoped_lock(queue_mutex_);
 
     /* Add request to end of queue. */
     queue_.push(request);
@@ -68,14 +68,14 @@ void swd::storage::add(const swd::request_ptr& request) {
 }
 
 void swd::storage::process_next() {
-    boost::unique_lock<boost::mutex> consumer_lock(consumer_mutex_);
+    boost::unique_lock consumer_lock(consumer_mutex_);
 
     while (!stop_) {
         /* Wait for a new request in the queue. */
         while (true) {
             /* Do not wait if there are still elements in the queue. */
             {
-                boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
+                boost::unique_lock queue_lock(queue_mutex_);
 
                 if (!queue_.empty()) {
                     break;
@@ -94,7 +94,7 @@ void swd::storage::process_next() {
         swd::request_ptr request;
 
         {
-            boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
+            boost::unique_lock queue_lock(queue_mutex_);
 
             request = queue_.front();
             queue_.pop();

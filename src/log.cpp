@@ -38,7 +38,7 @@
 
 void swd::log::open_file(const std::string& file) {
     /* Use mutex to avoid race conditions. */
-    boost::unique_lock<boost::mutex> scoped_lock(mutex_);
+    boost::unique_lock scoped_lock(mutex_);
 
     /* Set the file. */
     file_ = file;
@@ -75,7 +75,7 @@ void swd::log::send(const swd::log_level& level, const std::string& message) {
     line << "\t" << message << "\n";
 
     /* Use mutex to avoid race conditions. */
-    boost::unique_lock<boost::mutex> scoped_lock(mutex_);
+    boost::unique_lock scoped_lock(mutex_);
 
     /* Write the final line into a log file or stderr. */
     if (!file_.empty()) {
