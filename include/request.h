@@ -350,7 +350,7 @@ namespace swd {
     /**
      * @brief Request pointer.
      */
-    typedef boost::shared_ptr<swd::request> request_ptr;
+    using request_ptr = boost::shared_ptr<swd::request>;
 }
 
 #endif /* REQUEST_H */

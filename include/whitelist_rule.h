@@ -113,12 +113,12 @@ namespace swd {
     /**
      * @brief Whitelist rule pointer.
      */
-    typedef boost::shared_ptr<swd::whitelist_rule> whitelist_rule_ptr;
+    using whitelist_rule_ptr = boost::shared_ptr<swd::whitelist_rule>;
 
     /**
      * @brief List of whitelist rule pointers.
      */
-    typedef std::vector<swd::whitelist_rule_ptr> whitelist_rules;
+    using whitelist_rules = std::vector<swd::whitelist_rule_ptr>;
 }
 
 #endif /* WHITELIST_RULE_H */

@@ -113,12 +113,12 @@ namespace swd {
     /**
      * @brief Integrity rule pointer.
      */
-    typedef boost::shared_ptr<swd::integrity_rule> integrity_rule_ptr;
+    using integrity_rule_ptr = boost::shared_ptr<swd::integrity_rule>;
 
     /**
      * @brief List of integrity rule pointers.
      */
-    typedef std::vector<swd::integrity_rule_ptr> integrity_rules;
+    using integrity_rules = std::vector<swd::integrity_rule_ptr>;
 }
 
 #endif /* INTEGRITY_RULE_H */

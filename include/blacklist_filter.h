@@ -106,12 +106,12 @@ namespace swd {
     /**
      * @brief Blacklist filter pointer.
      */
-    typedef boost::shared_ptr<swd::blacklist_filter> blacklist_filter_ptr;
+    using blacklist_filter_ptr = boost::shared_ptr<swd::blacklist_filter>;
 
     /**
      * @brief List of blacklist filter pointers.
      */
-    typedef std::vector<swd::blacklist_filter_ptr> blacklist_filters;
+    using blacklist_filters = std::vector<swd::blacklist_filter_ptr>;
 }
 
 #endif /* BLACKLIST_FILTER_H */

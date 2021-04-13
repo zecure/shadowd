@@ -117,7 +117,7 @@ namespace swd {
     /**
      * @brief Reply pointer.
      */
-    typedef boost::shared_ptr<swd::reply> reply_ptr;
+    using reply_ptr = boost::shared_ptr<swd::reply>;
 }
 
 #endif /* REPLY_H */

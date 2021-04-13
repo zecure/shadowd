@@ -129,7 +129,7 @@ void swd::server::start(std::size_t thread_pool_size) {
      * This solution for the problem is based on the answer from Dave S at:
      * https://stackoverflow.com/questions/13476201/difference-between-boostthread-and-stdthread
      */
-    typedef std::size_t (boost::asio::io_service::*signature_type)();
+    using signature_type = std::size_t (boost::asio::io_service::*)();
     signature_type run_ptr = &boost::asio::io_service::run;
 
     /* Create a pool of threads to run all of the io_services. */

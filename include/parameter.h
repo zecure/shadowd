@@ -196,12 +196,12 @@ namespace swd {
     /**
      * @brief Parameter pointer.
      */
-    typedef boost::shared_ptr<swd::parameter> parameter_ptr;
+    using parameter_ptr = boost::shared_ptr<swd::parameter>;
 
     /**
      * @brief Map of parameter pointers. The key is the path.
      */
-    typedef std::vector<swd::parameter_ptr> parameters;
+    using parameters = std::vector<swd::parameter_ptr>;
 }
 
 #endif /* PARAMETER_H */

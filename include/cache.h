@@ -45,32 +45,32 @@ namespace swd {
     /**
      * @brief Cached blacklist rules.
      */
-    typedef swd::cached<swd::blacklist_rules> cached_blacklist_rules;
+    using cached_blacklist_rules = swd::cached<swd::blacklist_rules>;
 
     /**
      * @brief Pointer to cached blacklist rules.
      */
-    typedef boost::shared_ptr<cached_blacklist_rules> cached_blacklist_rules_ptr;
+    using cached_blacklist_rules_ptr = boost::shared_ptr<cached_blacklist_rules>;
 
     /**
      * @brief Cached whitelist rules.
      */
-    typedef swd::cached<swd::whitelist_rules> cached_whitelist_rules;
+    using cached_whitelist_rules = swd::cached<swd::whitelist_rules>;
 
     /**
      * @brief Pointer to cached whitelist rules.
      */
-    typedef boost::shared_ptr<cached_whitelist_rules> cached_whitelist_rules_ptr;
+    using cached_whitelist_rules_ptr = boost::shared_ptr<cached_whitelist_rules>;
 
     /**
      * @brief Cached integrity rules.
      */
-    typedef swd::cached<swd::integrity_rules> cached_integrity_rules;
+    using cached_integrity_rules = swd::cached<swd::integrity_rules>;
 
     /**
      * @brief Pointer to cached integrity rules.
      */
-    typedef boost::shared_ptr<cached_integrity_rules> cached_integrity_rules_ptr;
+    using cached_integrity_rules_ptr = boost::shared_ptr<cached_integrity_rules>;
 
     /**
      * @brief Interface to the database that caches results.
@@ -264,7 +264,7 @@ namespace swd {
     /**
      * @brief Cache pointer.
      */
-    typedef boost::shared_ptr<swd::cache> cache_ptr;
+    using cache_ptr = boost::shared_ptr<swd::cache>;
 }
 
 #endif /* CACHE_H */

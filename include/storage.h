@@ -120,7 +120,7 @@ namespace swd {
     /**
      * @brief Storage pointer.
      */
-    typedef boost::shared_ptr<swd::storage> storage_ptr;
+    using storage_ptr = boost::shared_ptr<swd::storage>;
 }
 
 #endif /* STORAGE_H */

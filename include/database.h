@@ -265,7 +265,7 @@ namespace swd {
     /**
      * @brief Database pointer.
      */
-    typedef boost::shared_ptr<swd::database> database_ptr;
+    using database_ptr = boost::shared_ptr<swd::database>;
 }
 
 #endif /* DATABASE_H */

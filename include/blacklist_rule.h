@@ -84,12 +84,12 @@ namespace swd {
     /**
      * @brief Blacklist rule pointer.
      */
-    typedef boost::shared_ptr<swd::blacklist_rule> blacklist_rule_ptr;
+    using blacklist_rule_ptr = boost::shared_ptr<swd::blacklist_rule>;
 
     /**
      * @brief List of blacklist rule pointers.
      */
-    typedef std::vector<swd::blacklist_rule_ptr> blacklist_rules;
+    using blacklist_rules = std::vector<swd::blacklist_rule_ptr>;
 }
 
 #endif /* BLACKLIST_RULE_H */

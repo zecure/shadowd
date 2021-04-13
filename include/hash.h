@@ -85,12 +85,12 @@ namespace swd {
     /**
      * @brief Hash pointer.
      */
-    typedef boost::shared_ptr<swd::hash> hash_ptr;
+    using hash_ptr = boost::shared_ptr<swd::hash>;
 
     /**
      * @brief Map of hashes pointers. The key is the algorithm.
      */
-    typedef std::map<std::string, swd::hash_ptr> hashes;
+    using hashes = std::map<std::string, swd::hash_ptr>;
 }
 
 #endif /* HASH_H */

@@ -90,12 +90,12 @@ namespace swd {
     /**
      * @brief Whitelist filter pointer.
      */
-    typedef boost::shared_ptr<swd::whitelist_filter> whitelist_filter_ptr;
+    using whitelist_filter_ptr = boost::shared_ptr<swd::whitelist_filter>;
 
     /**
      * @brief List of whitelist filter pointers.
      */
-    typedef std::vector<swd::whitelist_filter_ptr> whitelist_filters;
+    using whitelist_filters = std::vector<swd::whitelist_filter_ptr>;
 }
 
 #endif /* WHITELIST_FILTER_H */

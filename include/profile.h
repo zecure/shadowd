@@ -246,7 +246,7 @@ namespace swd {
     /**
      * @brief Profile pointer.
      */
-    typedef boost::shared_ptr<swd::profile> profile_ptr;
+    using profile_ptr = boost::shared_ptr<swd::profile>;
 }
 
 #endif /* PROFILE_H */
