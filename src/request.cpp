@@ -29,6 +29,7 @@
  * files in the program, then also delete it here.
  */
 
+#include <algorithm>
 #include <sstream>
 
 #include "request.h"
@@ -172,13 +173,12 @@ bool swd::request::is_threat() const {
 }
 
 bool swd::request::has_threats() const {
-    /* Iterate over all parameters and check for threats. */
-    for (const auto& parameter: parameters_) {
-        /* We only need to know if there is at least one threat. */
-        if (parameter->is_threat()) {
-            return true;
-        }
-    }
-
-    return false;
+    /* We only need to know if there is at least one threat. */
+    return std::any_of(
+            parameters_.begin(),
+            parameters_.end(),
+            [](auto parameter) {
+                return parameter->is_threat();
+            }
+    );
 }
