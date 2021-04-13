@@ -40,3 +40,6 @@ os:
 sudo: required
 
 dist: focal
+
+git:
+  depth: false
