@@ -118,7 +118,7 @@ void swd::storage::save(const swd::request_ptr& request) {
             request->get_client_ip(),
             (request->get_profile()->is_integrity_enabled() ? request->get_total_integrity_rules() : -1)
         );
-    } catch (swd::exceptions::database_exception& e) {
+    } catch (const swd::exceptions::database_exception& e) {
         swd::log::i()->send(swd::uncritical_error, e.what());
 
         /**
@@ -138,7 +138,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 hash->get_algorithm(),
                 hash->get_digest()
             );
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
             continue;
         }
@@ -153,7 +153,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 integrity_rule->get_id(),
                 request_id
             );
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
             continue;
         }
@@ -174,7 +174,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 (parameter->has_critical_blacklist_impact() ? 1 : 0 ),
                 (parameter->is_threat() ? 1 : 0 )
             );
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
             continue;
         }
@@ -188,7 +188,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                     blacklist_filter->get_id(),
                     parameter_id
                 );
-            } catch (swd::exceptions::database_exception& e) {
+            } catch (const swd::exceptions::database_exception& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
                 continue;
             }
@@ -203,7 +203,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                     whitelist_rule->get_id(),
                     parameter_id
                 );
-            } catch (swd::exceptions::database_exception& e) {
+            } catch (const swd::exceptions::database_exception& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
                 continue;
             }

@@ -191,7 +191,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
             );
 
             request_->set_profile(profile);
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
             throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
         }
@@ -265,7 +265,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 
             /* Time to analyze the request. */
             request_handler.process();
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
 
             /**
@@ -287,7 +287,7 @@ void swd::connection::handle_read(const boost::system::error_code& e,
         } else {
             reply_->set_status(STATUS_OK);
         }
-    } catch(swd::exceptions::connection_exception& e) {
+    } catch (const swd::exceptions::connection_exception& e) {
         if (!request_->get_profile()) {
             reply_->set_status(STATUS_BAD_REQUEST);
         } else if (request_->get_profile()->get_mode() == MODE_ACTIVE) {

@@ -86,7 +86,7 @@ void swd::config::parse_command_line(int argc, char** argv) {
     try {
         po::store(po::command_line_parser(argc, argv).options(combination).run(), vm_);
         po::notify(vm_);
-    } catch (boost::program_options::unknown_option& e) {
+    } catch (const boost::program_options::unknown_option& e) {
         throw swd::exceptions::config_exception(e.what());
     }
 
@@ -115,7 +115,7 @@ void swd::config::parse_config_file(const std::string& file) {
     try {
         po::store(po::parse_config_file(ifs, combination, true), vm_);
         po::notify(vm_);
-    } catch (boost::program_options::unknown_option& e) {
+    } catch (const boost::program_options::unknown_option& e) {
         throw swd::exceptions::config_exception(e.what());
     } catch (...) {
         throw swd::exceptions::config_exception("invalid configuration file");

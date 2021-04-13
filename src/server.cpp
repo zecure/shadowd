@@ -114,7 +114,7 @@ void swd::server::init() {
         acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
         acceptor_.bind(endpoint);
         acceptor_.listen();
-    } catch (boost::system::system_error &e) {
+    } catch (const boost::system::system_error &e) {
         throw swd::exceptions::core_exception(e.what());
     }
 
@@ -184,7 +184,7 @@ void swd::server::handle_accept(const boost::system::error_code& e) {
         if (!e) {
             new_connection_->start();
         }
-    } catch (boost::system::system_error &e) {
+    } catch (const boost::system::system_error &e) {
         swd::log::i()->send(swd::uncritical_error, e.what());
     }
 

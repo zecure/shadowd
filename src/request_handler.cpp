@@ -85,7 +85,7 @@ bool swd::request_handler::valid_signature() const {
         );
 
         return result;
-    } catch(const CryptoPP::Exception& e) {
+    } catch (const CryptoPP::Exception& e) {
         /* Something went wrong, so the authentication was not successful. */
         return false;
     }
@@ -150,7 +150,7 @@ bool swd::request_handler::decode() {
                     it_parameter.key().asString(),
                     (*it_parameter).asString()
                 );
-            } catch (std::runtime_error& e) {
+            } catch (const std::runtime_error& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
             }
         }
@@ -168,7 +168,7 @@ bool swd::request_handler::decode() {
                     it_hash.key().asString(),
                     (*it_hash).asString()
                 );
-            } catch (std::runtime_error& e) {
+            } catch (const std::runtime_error& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
             }
         }

@@ -159,7 +159,7 @@ void swd::cache::reset_profile(unsigned int profile_id) {
 
     try {
         database_->set_cache_outdated(profile_id, false);
-    } catch (swd::exceptions::database_exception& e) {
+    } catch (const swd::exceptions::database_exception& e) {
         swd::log::i()->send(swd::uncritical_error, e.what());
     }
 
@@ -184,7 +184,7 @@ void swd::cache::reset_all() {
 
     try {
         database_->set_cache_outdated(false);
-    } catch (swd::exceptions::database_exception& e) {
+    } catch (const swd::exceptions::database_exception& e) {
         swd::log::i()->send(swd::uncritical_error, e.what());
     }
 

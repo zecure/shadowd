@@ -141,10 +141,10 @@ int main(int argc, char** argv) {
 
         shadowd.init(argc, argv);
         shadowd.start();
-    } catch (swd::exceptions::core_exception& e) {
+    } catch (const swd::exceptions::core_exception& e) {
         swd::log::i()->send(swd::critical_error, e.what());
         return 1;
-    } catch (swd::exceptions::config_exception& e) {
+    } catch (const swd::exceptions::config_exception& e) {
         std::cerr << "Configuration error: " << e.what() << "\n";
         return 1;
     }
