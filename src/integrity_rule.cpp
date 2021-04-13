@@ -74,11 +74,11 @@ bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
     }
 
     /* Use constant-time comparison for the digests to avoid timing attacks. */
-    unsigned char result = 0;
+    std::byte result{0};
 
     for (int i = 0; i < digest_.length(); i++) {
-        result |= digest_.at(i) ^ user_digest.at(i);
+        result |= std::byte(digest_.at(i)) ^ std::byte(user_digest.at(i));
     }
 
-    return (result == 0);
+    return (std::to_integer<int>(result) == 0);
 }
