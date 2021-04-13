@@ -96,10 +96,11 @@ void swd::log::send(const swd::log_level& level, const std::string& message) {
 
 std::string swd::log::get_current_time() const {
     auto now = std::time(nullptr);
-    auto now_local = *std::localtime(&now);
+    struct tm local_time;
+    localtime_r(&now, &local_time);
 
     std::ostringstream oss;
-    oss << std::put_time(&now_local, "%Y-%m-%d %X");
+    oss << std::put_time(&local_time, "%Y-%m-%d %X");
 
     return oss.str();
 }
