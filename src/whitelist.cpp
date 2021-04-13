@@ -29,9 +29,9 @@
  * files in the program, then also delete it here.
  */
 
-#include "whitelist.h"
-
 #include <utility>
+
+#include "whitelist.h"
 #include "whitelist_rule.h"
 #include "database.h"
 #include "log.h"

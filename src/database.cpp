@@ -30,7 +30,6 @@
  */
 
 #include <sstream>
-#include <stdio.h>
 
 #include "database.h"
 #include "log.h"

@@ -29,10 +29,10 @@
  * files in the program, then also delete it here.
  */
 
+#include <json/json.h>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
-#include <json/json.h>
 
 #include "reply_handler.h"
 #include "log.h"

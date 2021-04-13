@@ -33,7 +33,6 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/hex.h>
 #include <json/json.h>
-
 #include <utility>
 
 #include "request_handler.h"

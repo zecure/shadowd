@@ -34,7 +34,6 @@
 #include <iomanip>
 #include <iostream>
 #include <ostream>
-#include <sstream>
 
 #include "log.h"
 #include "config.h"

@@ -29,12 +29,11 @@
  * files in the program, then also delete it here.
  */
 
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
+#include <string>
 #include <utility>
 
 #include "server.h"

@@ -29,9 +29,9 @@
  * files in the program, then also delete it here.
  */
 
-#include <string>
-#include <iostream>
 #include <boost/make_shared.hpp>
+#include <iostream>
+#include <string>
 
 #include "shadowd.h"
 #include "config.h"

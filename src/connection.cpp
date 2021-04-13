@@ -29,7 +29,6 @@
  * files in the program, then also delete it here.
  */
 
-#include <cstdlib>
 #include <boost/make_shared.hpp>
 #include <utility>
 

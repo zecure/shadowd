@@ -29,12 +29,11 @@
  * files in the program, then also delete it here.
  */
 
-#include "integrity.h"
-
 #include <utility>
+
+#include "integrity.h"
 #include "integrity_rule.h"
 #include "hash.h"
-#include "database.h"
 #include "log.h"
 
 swd::integrity::integrity(swd::cache_ptr cache) :
