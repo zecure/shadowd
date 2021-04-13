@@ -29,6 +29,7 @@
  * files in the program, then also delete it here.
  */
 
+#include <ctime>
 #include <fstream>
 #include <ostream>
 #include <iostream>
@@ -93,7 +94,7 @@ void swd::log::send(const swd::log_level& level, const std::string& message) {
 }
 
 std::string swd::log::get_current_time() const {
-    time_t now = time(0);
+    std::time_t now = std::time(nullptr);
     char buf[80];
     struct tm tstruct = *localtime(&now);
 
