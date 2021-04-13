@@ -31,8 +31,10 @@
 
 #include <ctime>
 #include <fstream>
-#include <ostream>
+#include <iomanip>
 #include <iostream>
+#include <ostream>
+#include <sstream>
 
 #include "log.h"
 #include "config.h"
@@ -94,10 +96,11 @@ void swd::log::send(const swd::log_level& level, const std::string& message) {
 }
 
 std::string swd::log::get_current_time() const {
-    std::time_t now = std::time(nullptr);
-    char buf[80];
-    struct tm tstruct = *localtime(&now);
+    auto now = std::time(nullptr);
+    auto now_local = *std::localtime(&now);
 
-    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
-    return buf;
+    std::ostringstream oss;
+    oss << std::put_time(&now_local, "%Y-%m-%d %X");
+
+    return oss.str();
 }
