@@ -31,12 +31,6 @@
 
 #include "parameter.h"
 
-swd::parameter::parameter() :
- threat_(false),
- critical_blacklist_impact_(false),
- total_whitelist_rules_(0) {
-}
-
 void swd::parameter::set_path(const std::string& path) {
     path_ = path;
 }

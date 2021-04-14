@@ -54,11 +54,6 @@ namespace swd {
     class request {
         public:
             /**
-             * @brief Construct a request.
-             */
-            request();
-
-            /**
              * @brief Set the pointer of the profile.
              *
              * @param profile The profile of the connection
@@ -334,7 +329,7 @@ namespace swd {
             /**
              * @brief The threat status of the request.
              */
-            bool threat_;
+            bool threat_ = false;
 
             /**
              * @brief A vector of broken integrity rules.
@@ -344,7 +339,7 @@ namespace swd {
             /**
              * @brief The total number of matching integrity rules.
              */
-            int total_integrity_rules_;
+            int total_integrity_rules_ = 0;
     };
 
     /**

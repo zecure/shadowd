@@ -253,7 +253,7 @@ namespace swd {
             /**
              * @brief Switch to exit cleanup loop.
              */
-            bool stop_;
+            bool stop_ = false;
 
             /**
              * @brief Thread that constantly checks for outdated elements.

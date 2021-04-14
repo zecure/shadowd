@@ -29,7 +29,6 @@
  * files in the program, then also delete it here.
  */
 
-#include <boost/make_shared.hpp>
 #include <utility>
 
 #include "connection.h"
@@ -45,8 +44,6 @@ swd::connection::connection(boost::asio::io_service& io_service,
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
- request_(boost::make_shared<swd::request>()),
- reply_(boost::make_shared<swd::reply>()),
  ssl_(ssl),
  storage_(std::move(storage)),
  database_(std::move(database)),

@@ -36,9 +36,10 @@
 #include <boost/asio/ssl.hpp>
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include "reply.h"
 #include "request.h"
@@ -164,12 +165,12 @@ namespace swd {
             /**
              * @brief The incoming request.
              */
-            swd::request_ptr request_;
+            swd::request_ptr request_ = boost::make_shared<swd::request>();
 
             /**
              * @brief The reply to be sent back to the client.
              */
-            swd::reply_ptr reply_;
+            swd::reply_ptr reply_ = boost::make_shared<swd::reply>();
 
             /**
              * @brief The parser for the incoming request.

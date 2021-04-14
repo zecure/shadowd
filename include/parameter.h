@@ -46,11 +46,6 @@ namespace swd {
     class parameter {
         public:
             /**
-             * @brief Construct a parameter.
-             */
-            parameter();
-
-            /**
              * @brief Set the path of the parameter.
              *
              * @param path The path of the parameter
@@ -180,17 +175,17 @@ namespace swd {
             /**
              * @brief The threat status of the parameter.
              */
-            bool threat_;
+            bool threat_ = false;
 
             /**
              * @brief The status of the impact compared to the threshold.
              */
-            bool critical_blacklist_impact_;
+            bool critical_blacklist_impact_ = false;
 
             /**
              * @brief The total number of matching whitelist rules.
              */
-            int total_whitelist_rules_;
+            int total_whitelist_rules_ = 0;
     };
 
     /**

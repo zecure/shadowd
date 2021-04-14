@@ -99,7 +99,7 @@ namespace swd {
             /**
              * @brief Switch to exit process_next loop.
              */
-            bool stop_;
+            bool stop_ = false;
 
             /**
              * @brief Notify consumer threads on new requests in the queue.

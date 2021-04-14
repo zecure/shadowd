@@ -34,11 +34,6 @@
 
 #include "request.h"
 
-swd::request::request() :
- threat_(false),
- total_integrity_rules_(0) {
-}
-
 void swd::request::set_profile(const swd::profile_ptr& profile) {
     profile_ = profile;
 }

@@ -36,8 +36,7 @@
 #include "log.h"
 
 swd::cache::cache(swd::database_ptr database) :
- database_(std::move(database)),
- stop_(false) {
+ database_(std::move(database)) {
 }
 
 void swd::cache::start() {

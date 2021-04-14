@@ -29,7 +29,6 @@
  * files in the program, then also delete it here.
  */
 
-#include <boost/make_shared.hpp>
 #include <iostream>
 #include <string>
 
@@ -39,10 +38,7 @@
 #include "database.h"
 #include "storage.h"
 
-swd::shadowd::shadowd() : 
- database_(boost::make_shared<swd::database>()),
- cache_(boost::make_shared<swd::cache>(database_)),
- storage_(boost::make_shared<swd::storage>(database_)),
+swd::shadowd::shadowd() :
  server_(storage_, database_, cache_) {
 }
 
