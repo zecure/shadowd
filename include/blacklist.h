@@ -54,9 +54,18 @@ namespace swd {
              *
              * @param request The pointer to the request object
              */
-            void scan(swd::request_ptr& request);
+            void scan(const swd::request_ptr& request);
 
         private:
+            /**
+             * @brief If available get threshold from blacklist rule, otherwise from profile.
+             *
+             * @param request The pointer to the request object
+             * @param parameter The pointer to the parameter object
+             * @return
+             */
+            int get_threshold(const swd::request_ptr& request, const swd::parameter_ptr& parameter);
+
             /**
              * @brief The pointer to the cache object.
              */
