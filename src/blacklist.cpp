@@ -71,7 +71,7 @@ void swd::blacklist::scan(const swd::request_ptr& request) {
     }
 }
 
-int swd::blacklist::get_threshold(const swd::request_ptr& request, const swd::parameter_ptr& parameter) {
+int swd::blacklist::get_threshold(const swd::request_ptr& request, const swd::parameter_ptr& parameter) const {
     swd::blacklist_rules rules = cache_->get_blacklist_rules(
         request->get_profile()->get_id(),
         request->get_caller(),

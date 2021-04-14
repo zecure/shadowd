@@ -62,9 +62,9 @@ namespace swd {
              *
              * @param request The pointer to the request object
              * @param parameter The pointer to the parameter object
-             * @return
+             * @return The threshold value for the parameter
              */
-            int get_threshold(const swd::request_ptr& request, const swd::parameter_ptr& parameter);
+            int get_threshold(const swd::request_ptr& request, const swd::parameter_ptr& parameter) const;
 
             /**
              * @brief The pointer to the cache object.
