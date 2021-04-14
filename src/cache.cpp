@@ -153,7 +153,7 @@ void swd::cache::cleanup() {
     }
 }
 
-void swd::cache::reset_profile(unsigned int profile_id) {
+void swd::cache::reset_profile(unsigned long long profile_id) {
     swd::log::i()->send(swd::notice, "Resetting the cache");
 
     try {
@@ -227,7 +227,7 @@ swd::blacklist_filters swd::cache::get_blacklist_filters() {
     return blacklist_filters_;
 }
 
-void swd::cache::add_blacklist_rules(const unsigned int& profile_id,
+void swd::cache::add_blacklist_rules(const unsigned long long& profile_id,
  const std::string& caller, const std::string& path,
  const swd::blacklist_rules& blacklist_rules) {
     boost::unique_lock scoped_lock(blacklist_rules_mutex_);
@@ -240,7 +240,7 @@ void swd::cache::add_blacklist_rules(const unsigned int& profile_id,
 }
 
 
-swd::blacklist_rules swd::cache::get_blacklist_rules(const unsigned int& profile_id,
+swd::blacklist_rules swd::cache::get_blacklist_rules(const unsigned long long& profile_id,
  const std::string& caller, const std::string& path) {
     boost::unique_lock scoped_lock(blacklist_rules_mutex_);
 
@@ -261,7 +261,7 @@ swd::blacklist_rules swd::cache::get_blacklist_rules(const unsigned int& profile
     return blacklist_rules;
 }
 
-void swd::cache::add_whitelist_rules(const unsigned int& profile_id,
+void swd::cache::add_whitelist_rules(const unsigned long long& profile_id,
  const std::string& caller, const std::string& path,
  const swd::whitelist_rules& whitelist_rules) {
     boost::unique_lock scoped_lock(whitelist_rules_mutex_);
@@ -273,7 +273,7 @@ void swd::cache::add_whitelist_rules(const unsigned int& profile_id,
     whitelist_rules_[profile_id][caller][path] = cached_whitelist_rules;
 }
 
-swd::whitelist_rules swd::cache::get_whitelist_rules(const unsigned int& profile_id,
+swd::whitelist_rules swd::cache::get_whitelist_rules(const unsigned long long& profile_id,
  const std::string& caller, const std::string& path) {
     boost::unique_lock scoped_lock(whitelist_rules_mutex_);
 
@@ -294,7 +294,7 @@ swd::whitelist_rules swd::cache::get_whitelist_rules(const unsigned int& profile
     return whitelist_rules;
 }
 
-void swd::cache::add_integrity_rules(const unsigned int& profile_id,
+void swd::cache::add_integrity_rules(const unsigned long long& profile_id,
  const std::string& caller, const swd::integrity_rules& integrity_rules) {
     boost::unique_lock scoped_lock(integrity_rules_mutex_);
 
@@ -305,7 +305,7 @@ void swd::cache::add_integrity_rules(const unsigned int& profile_id,
     integrity_rules_[profile_id][caller] = cached_integrity_rules;
 }
 
-swd::integrity_rules swd::cache::get_integrity_rules(const unsigned int& profile_id,
+swd::integrity_rules swd::cache::get_integrity_rules(const unsigned long long& profile_id,
  const std::string& caller) {
     boost::unique_lock scoped_lock(integrity_rules_mutex_);
 

@@ -33,7 +33,6 @@
 
 #include "whitelist.h"
 #include "whitelist_rule.h"
-#include "database.h"
 #include "log.h"
 
 swd::whitelist::whitelist(swd::cache_ptr cache) :
@@ -56,7 +55,7 @@ void swd::whitelist::scan(swd::request_ptr& request) {
          * The parameter needs at least one rule to pass the check. Otherwise
          * it wouldn't be a whitelist.
          */
-        parameter->set_total_whitelist_rules(rules.size());
+        parameter->set_total_whitelist_rules((int)rules.size());
 
         if (parameter->get_total_whitelist_rules() == 0) {
             parameter->set_threat(true);

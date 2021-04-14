@@ -29,9 +29,9 @@
  * files in the program, then also delete it here.
  */
 
-#include "blacklist.h"
-
 #include <utility>
+
+#include "blacklist.h"
 #include "blacklist_rule.h"
 #include "log.h"
 

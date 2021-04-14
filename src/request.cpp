@@ -87,14 +87,14 @@ void swd::request::append_profile_id(const char& input) {
     profile_id_.push_back(input);
 }
 
-void swd::request::set_profile_id(const int& profile_id) {
+void swd::request::set_profile_id(const unsigned long long& profile_id) {
     std::stringstream ss;
     ss << profile_id;
     profile_id_ = ss.str();
 }
 
-int swd::request::get_profile_id() const {
-    return atoi(profile_id_.c_str());
+unsigned long long swd::request::get_profile_id() const {
+    return stoull(profile_id_);
 }
 
 void swd::request::set_client_ip(const std::string& client_ip) {

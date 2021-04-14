@@ -35,8 +35,6 @@
 #include "shadowd.h"
 #include "config.h"
 #include "log.h"
-#include "database.h"
-#include "storage.h"
 
 swd::shadowd::shadowd() :
  server_(storage_, database_, cache_) {

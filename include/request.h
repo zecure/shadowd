@@ -152,14 +152,14 @@ namespace swd {
              *
              * @param profile_id The complete profile id
              */
-            void set_profile_id(const int& profile_id);
+            void set_profile_id(const unsigned long long& profile_id);
 
             /**
              * @brief Get the complete profile id.
              *
              * @return The complete profile id.
              */
-            int get_profile_id() const;
+            unsigned long long get_profile_id() const;
 
             /**
              * @brief Set the http client/attacker ip.

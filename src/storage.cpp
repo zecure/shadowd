@@ -29,7 +29,6 @@
  * files in the program, then also delete it here.
  */
 
-#include <iostream>
 #include <utility>
 
 #include "storage.h"
@@ -105,7 +104,7 @@ void swd::storage::process_next() {
 }
 
 void swd::storage::save(const swd::request_ptr& request) {
-    unsigned int request_id;
+    unsigned long long request_id;
 
     try {
         /* First we save the request and get its id in the database. */
@@ -162,7 +161,7 @@ void swd::storage::save(const swd::request_ptr& request) {
     swd::parameters parameters = request->get_parameters();
 
     for (const auto& parameter: parameters) {
-        unsigned int parameter_id;
+        unsigned long long parameter_id;
 
         try {
             parameter_id = database_->save_parameter(

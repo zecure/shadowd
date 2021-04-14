@@ -51,7 +51,7 @@ void swd::integrity::scan(swd::request_ptr& request) {
      * The request needs at least one rule to pass the check. Otherwise
      * it wouldn't be a whitelist.
      */
-    request->set_total_integrity_rules(rules.size());
+    request->set_total_integrity_rules((int)rules.size());
 
     if (request->get_total_integrity_rules() == 0) {
         request->set_threat(true);

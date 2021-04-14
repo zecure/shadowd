@@ -106,7 +106,7 @@ namespace swd {
              *
              * @return The total impact of all broken blacklist filters.
              */
-            int get_impact() const;
+            unsigned int get_impact() const;
 
             /**
              * @brief Define if this parameter is a threat or not.

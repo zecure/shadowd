@@ -60,14 +60,14 @@ namespace swd {
              *
              * @param id The id of the profile
              */
-            void set_id(const unsigned int& id);
+            void set_id(const unsigned long long& id);
 
             /**
              * @brief Get the id the profile.
              *
              * @return The id of the profile
              */
-            unsigned int get_id() const;
+            unsigned long long get_id() const;
 
             /**
              * @brief Set the status of the system.
@@ -199,7 +199,7 @@ namespace swd {
             /**
              * @brief The database id of the profile.
              */
-            unsigned int id_;
+            unsigned long long id_;
 
             /**
              * @brief The mode of the profile.

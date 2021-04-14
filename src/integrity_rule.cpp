@@ -31,11 +31,11 @@
 
 #include "integrity_rule.h"
 
-void swd::integrity_rule::set_id(const unsigned int& id) {
+void swd::integrity_rule::set_id(const unsigned long long& id) {
     id_ = id;
 }
 
-unsigned int swd::integrity_rule::get_id() const {
+unsigned long long swd::integrity_rule::get_id() const {
     return id_;
 }
 
@@ -74,9 +74,9 @@ bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
     }
 
     /* Use constant-time comparison for the digests to avoid timing attacks. */
-    std::byte result{0};
+    std::byte result{};
 
-    for (int i = 0; i < digest_.length(); i++) {
+    for (unsigned int i = 0; i < digest_.length(); i++) {
         result |= std::byte(digest_.at(i)) ^ std::byte(user_digest.at(i));
     }
 
