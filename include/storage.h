@@ -99,7 +99,7 @@ namespace swd {
             /**
              * @brief Switch to exit process_next loop.
              */
-            bool stop_;
+            bool stop_ = false;
 
             /**
              * @brief Notify consumer threads on new requests in the queue.
@@ -120,7 +120,7 @@ namespace swd {
     /**
      * @brief Storage pointer.
      */
-    typedef boost::shared_ptr<swd::storage> storage_ptr;
+    using storage_ptr = boost::shared_ptr<swd::storage>;
 }
 
 #endif /* STORAGE_H */

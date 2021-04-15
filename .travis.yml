@@ -31,7 +31,6 @@ script:
   - make tests && make test
   - build-wrapper-linux-x86-64 --out-dir bw-output make shadowd
   - cd ..
-  - git fetch --unshallow
   - sonar-scanner -Dsonar.cfamily.build-wrapper-output=build/bw-output -Dproject.settings=.sonarcloud.properties -Dsonar.cfamily.cache.enabled=false -Dsonar.cfamily.threads=1
 
 os:
@@ -40,3 +39,6 @@ os:
 sudo: required
 
 dist: focal
+
+git:
+  depth: false

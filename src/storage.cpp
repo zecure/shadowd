@@ -29,7 +29,6 @@
  * files in the program, then also delete it here.
  */
 
-#include <iostream>
 #include <utility>
 
 #include "storage.h"
@@ -37,8 +36,7 @@
 #include "log.h"
 
 swd::storage::storage(swd::database_ptr database) :
- database_(std::move(database)),
- stop_(false) {
+ database_(std::move(database)) {
 }
 
 void swd::storage::start() {
@@ -58,7 +56,7 @@ void swd::storage::stop() {
 
 void swd::storage::add(const swd::request_ptr& request) {
     /* Mutex to avoid race conditions. */
-    boost::unique_lock<boost::mutex> scoped_lock(queue_mutex_);
+    boost::unique_lock scoped_lock(queue_mutex_);
 
     /* Add request to end of queue. */
     queue_.push(request);
@@ -68,14 +66,14 @@ void swd::storage::add(const swd::request_ptr& request) {
 }
 
 void swd::storage::process_next() {
-    boost::unique_lock<boost::mutex> consumer_lock(consumer_mutex_);
+    boost::unique_lock consumer_lock(consumer_mutex_);
 
     while (!stop_) {
         /* Wait for a new request in the queue. */
         while (true) {
             /* Do not wait if there are still elements in the queue. */
             {
-                boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
+                boost::unique_lock queue_lock(queue_mutex_);
 
                 if (!queue_.empty()) {
                     break;
@@ -94,7 +92,7 @@ void swd::storage::process_next() {
         swd::request_ptr request;
 
         {
-            boost::unique_lock<boost::mutex> queue_lock(queue_mutex_);
+            boost::unique_lock queue_lock(queue_mutex_);
 
             request = queue_.front();
             queue_.pop();
@@ -106,7 +104,7 @@ void swd::storage::process_next() {
 }
 
 void swd::storage::save(const swd::request_ptr& request) {
-    unsigned int request_id;
+    unsigned long long request_id;
 
     try {
         /* First we save the request and get its id in the database. */
@@ -118,7 +116,7 @@ void swd::storage::save(const swd::request_ptr& request) {
             request->get_client_ip(),
             (request->get_profile()->is_integrity_enabled() ? request->get_total_integrity_rules() : -1)
         );
-    } catch (swd::exceptions::database_exception& e) {
+    } catch (const swd::exceptions::database_exception& e) {
         swd::log::i()->send(swd::uncritical_error, e.what());
 
         /**
@@ -138,7 +136,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 hash->get_algorithm(),
                 hash->get_digest()
             );
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
             continue;
         }
@@ -153,7 +151,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 integrity_rule->get_id(),
                 request_id
             );
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
             continue;
         }
@@ -163,7 +161,7 @@ void swd::storage::save(const swd::request_ptr& request) {
     swd::parameters parameters = request->get_parameters();
 
     for (const auto& parameter: parameters) {
-        unsigned int parameter_id;
+        unsigned long long parameter_id;
 
         try {
             parameter_id = database_->save_parameter(
@@ -174,7 +172,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 (parameter->has_critical_blacklist_impact() ? 1 : 0 ),
                 (parameter->is_threat() ? 1 : 0 )
             );
-        } catch (swd::exceptions::database_exception& e) {
+        } catch (const swd::exceptions::database_exception& e) {
             swd::log::i()->send(swd::uncritical_error, e.what());
             continue;
         }
@@ -188,7 +186,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                     blacklist_filter->get_id(),
                     parameter_id
                 );
-            } catch (swd::exceptions::database_exception& e) {
+            } catch (const swd::exceptions::database_exception& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
                 continue;
             }
@@ -203,7 +201,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                     whitelist_rule->get_id(),
                     parameter_id
                 );
-            } catch (swd::exceptions::database_exception& e) {
+            } catch (const swd::exceptions::database_exception& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
                 continue;
             }

@@ -31,11 +31,11 @@
 
 #include "whitelist_rule.h"
 
-void swd::whitelist_rule::set_id(const unsigned int& id) {
+void swd::whitelist_rule::set_id(const unsigned long long& id) {
     id_ = id;
 }
 
-unsigned int swd::whitelist_rule::get_id() const {
+unsigned long long swd::whitelist_rule::get_id() const {
     return id_;
 }
 
@@ -52,7 +52,7 @@ void swd::whitelist_rule::set_max_length(const int& max_length) {
 }
 
 bool swd::whitelist_rule::is_adhered_to(const std::string& value) const {
-    int length = value.length();
+    unsigned long length = value.length();
 
     if ((min_length_ > 0) && (length < min_length_)) {
         return false;

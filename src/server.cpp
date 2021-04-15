@@ -29,12 +29,11 @@
  * files in the program, then also delete it here.
  */
 
-#include <string>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
+#include <string>
 #include <utility>
 
 #include "server.h"
@@ -44,13 +43,13 @@
 
 swd::server::server(swd::storage_ptr storage,
  swd::database_ptr database, swd::cache_ptr cache) :
- storage_(std::move(storage)),
- database_(std::move(database)),
- cache_(std::move(cache)),
  signals_stop_(io_service_),
  signals_reload_(io_service_),
  acceptor_(io_service_),
- context_(boost::asio::ssl::context::sslv23) {
+ context_(boost::asio::ssl::context::sslv23),
+ storage_(std::move(storage)),
+ database_(std::move(database)),
+ cache_(std::move(cache)) {
     /**
      * Register to handle the signals that indicate when the server should exit.
      * It is safe to register for the same signal multiple times in a program,
@@ -115,7 +114,7 @@ void swd::server::init() {
         acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
         acceptor_.bind(endpoint);
         acceptor_.listen();
-    } catch (boost::system::system_error &e) {
+    } catch (const boost::system::system_error &e) {
         throw swd::exceptions::core_exception(e.what());
     }
 
@@ -130,7 +129,7 @@ void swd::server::start(std::size_t thread_pool_size) {
      * This solution for the problem is based on the answer from Dave S at:
      * https://stackoverflow.com/questions/13476201/difference-between-boostthread-and-stdthread
      */
-    typedef std::size_t (boost::asio::io_service::*signature_type)();
+    using signature_type = std::size_t (boost::asio::io_service::*)();
     signature_type run_ptr = &boost::asio::io_service::run;
 
     /* Create a pool of threads to run all of the io_services. */
@@ -185,7 +184,7 @@ void swd::server::handle_accept(const boost::system::error_code& e) {
         if (!e) {
             new_connection_->start();
         }
-    } catch (boost::system::system_error &e) {
+    } catch (const boost::system::system_error &e) {
         swd::log::i()->send(swd::uncritical_error, e.what());
     }
 

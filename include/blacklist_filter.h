@@ -48,14 +48,14 @@ namespace swd {
              *
              * @param id The id of the filter
              */
-            void set_id(const unsigned int& id);
+            void set_id(const unsigned long long& id);
 
             /**
              * @brief Get the id of the filter.
              *
              * @return The id of the filter
              */
-            unsigned int get_id() const;
+            unsigned long long get_id() const;
 
             /**
              * @brief Set the impact of the filter.
@@ -90,7 +90,7 @@ namespace swd {
             /**
              * @brief The database id of the filter.
              */
-            unsigned int id_;
+            unsigned long long id_;
 
             /**
              * @brief The impact/severity of the filter.
@@ -106,12 +106,12 @@ namespace swd {
     /**
      * @brief Blacklist filter pointer.
      */
-    typedef boost::shared_ptr<swd::blacklist_filter> blacklist_filter_ptr;
+    using blacklist_filter_ptr = boost::shared_ptr<swd::blacklist_filter>;
 
     /**
      * @brief List of blacklist filter pointers.
      */
-    typedef std::vector<swd::blacklist_filter_ptr> blacklist_filters;
+    using blacklist_filters = std::vector<swd::blacklist_filter_ptr>;
 }
 
 #endif /* BLACKLIST_FILTER_H */

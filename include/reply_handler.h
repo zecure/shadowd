@@ -53,7 +53,7 @@ namespace swd {
              *
              * @return The status of the encoding
              */
-            bool encode();
+            bool encode() const;
 
         private:
             /**

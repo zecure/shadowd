@@ -29,10 +29,10 @@
  * files in the program, then also delete it here.
  */
 
+#include <json/json.h>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
-#include <json/json.h>
 
 #include "reply_handler.h"
 #include "log.h"
@@ -41,7 +41,7 @@ swd::reply_handler::reply_handler(swd::reply_ptr reply) :
  reply_(std::move(reply)) {
 }
 
-bool swd::reply_handler::encode() {
+bool swd::reply_handler::encode() const {
     try {
         Json::Value root;
         Json::FastWriter writer;

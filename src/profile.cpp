@@ -39,11 +39,11 @@ std::string swd::profile::get_server_ip() const {
     return server_ip_;
 }
 
-void swd::profile::set_id(const unsigned int& id) {
+void swd::profile::set_id(const unsigned long long& id) {
     id_ = id;
 }
 
-unsigned int swd::profile::get_id() const {
+unsigned long long swd::profile::get_id() const {
     return id_;
 }
 

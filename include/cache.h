@@ -45,32 +45,32 @@ namespace swd {
     /**
      * @brief Cached blacklist rules.
      */
-    typedef swd::cached<swd::blacklist_rules> cached_blacklist_rules;
+    using cached_blacklist_rules = swd::cached<swd::blacklist_rules>;
 
     /**
      * @brief Pointer to cached blacklist rules.
      */
-    typedef boost::shared_ptr<cached_blacklist_rules> cached_blacklist_rules_ptr;
+    using cached_blacklist_rules_ptr = boost::shared_ptr<cached_blacklist_rules>;
 
     /**
      * @brief Cached whitelist rules.
      */
-    typedef swd::cached<swd::whitelist_rules> cached_whitelist_rules;
+    using cached_whitelist_rules = swd::cached<swd::whitelist_rules>;
 
     /**
      * @brief Pointer to cached whitelist rules.
      */
-    typedef boost::shared_ptr<cached_whitelist_rules> cached_whitelist_rules_ptr;
+    using cached_whitelist_rules_ptr = boost::shared_ptr<cached_whitelist_rules>;
 
     /**
      * @brief Cached integrity rules.
      */
-    typedef swd::cached<swd::integrity_rules> cached_integrity_rules;
+    using cached_integrity_rules = swd::cached<swd::integrity_rules>;
 
     /**
      * @brief Pointer to cached integrity rules.
      */
-    typedef boost::shared_ptr<cached_integrity_rules> cached_integrity_rules_ptr;
+    using cached_integrity_rules_ptr = boost::shared_ptr<cached_integrity_rules>;
 
     /**
      * @brief Interface to the database that caches results.
@@ -108,7 +108,7 @@ namespace swd {
              *
              * @param profile_id The id of the profile
              */
-            void reset_profile(unsigned int profile_id);
+            void reset_profile(unsigned long long profile_id);
 
             /**
              * @brief Remove all elements from the cache.
@@ -138,7 +138,7 @@ namespace swd {
              * @param path The path of the parameter
              * @param blacklist_rules The vector of blacklist rules
              */
-            void add_blacklist_rules(const unsigned int& profile_id,
+            void add_blacklist_rules(const unsigned long long& profile_id,
              const std::string& caller, const std::string& path,
              const swd::blacklist_rules& blacklist_rules);
 
@@ -150,7 +150,7 @@ namespace swd {
              * @param path The path of the parameter
              * @return The corresponding table rows
              */
-            swd::blacklist_rules get_blacklist_rules(const unsigned int& profile_id,
+            swd::blacklist_rules get_blacklist_rules(const unsigned long long& profile_id,
              const std::string& caller, const std::string& path);
 
             /**
@@ -161,7 +161,7 @@ namespace swd {
              * @param path The path of the parameter
              * @param whitelist_rules The vector of whitelist rules
              */
-            void add_whitelist_rules(const unsigned int& profile_id,
+            void add_whitelist_rules(const unsigned long long& profile_id,
              const std::string& caller, const std::string& path,
              const swd::whitelist_rules& whitelist_rules);
 
@@ -173,7 +173,7 @@ namespace swd {
              * @param path The path of the parameter
              * @return The corresponding table rows
              */
-            swd::whitelist_rules get_whitelist_rules(const unsigned int& profile_id,
+            swd::whitelist_rules get_whitelist_rules(const unsigned long long& profile_id,
              const std::string& caller, const std::string& path);
 
             /**
@@ -183,7 +183,7 @@ namespace swd {
              * @param caller The caller (php file) that initiated the connection
              * @param integrity_rules The vector of integrity rules
              */
-            void add_integrity_rules(const unsigned int& profile_id,
+            void add_integrity_rules(const unsigned long long& profile_id,
              const std::string& caller, const swd::integrity_rules&
              integrity_rules);
 
@@ -193,7 +193,7 @@ namespace swd {
              * @param profile_id The profile id of the request
              * @param caller The caller (resource) that initiated the connection
              */
-            swd::integrity_rules get_integrity_rules(const unsigned int& profile_id,
+            swd::integrity_rules get_integrity_rules(const unsigned long long& profile_id,
              const std::string& caller);
 
         private:
@@ -215,19 +215,19 @@ namespace swd {
             /**
              * @brief The cache map for blacklist rules.
              */
-            std::map< unsigned int, std::map< std::string, std::map<std::string,
+            std::map< unsigned long long, std::map< std::string, std::map<std::string,
              swd::cached_blacklist_rules_ptr> > > blacklist_rules_;
 
             /**
              * @brief The cache map for whitelist rules.
              */
-            std::map< unsigned int, std::map< std::string, std::map<std::string,
+            std::map< unsigned long long, std::map< std::string, std::map<std::string,
              swd::cached_whitelist_rules_ptr> > > whitelist_rules_;
 
             /**
              * @brief The cache map for integrity rules.
              */
-            std::map< unsigned int, std::map<std::string,
+            std::map< unsigned long long, std::map<std::string,
              swd::cached_integrity_rules_ptr> > integrity_rules_;
 
             /**
@@ -253,7 +253,7 @@ namespace swd {
             /**
              * @brief Switch to exit cleanup loop.
              */
-            bool stop_;
+            bool stop_ = false;
 
             /**
              * @brief Thread that constantly checks for outdated elements.
@@ -264,7 +264,7 @@ namespace swd {
     /**
      * @brief Cache pointer.
      */
-    typedef boost::shared_ptr<swd::cache> cache_ptr;
+    using cache_ptr = boost::shared_ptr<swd::cache>;
 }
 
 #endif /* CACHE_H */

@@ -29,20 +29,14 @@
  * files in the program, then also delete it here.
  */
 
-#include <string>
 #include <iostream>
-#include <boost/make_shared.hpp>
+#include <string>
 
 #include "shadowd.h"
 #include "config.h"
 #include "log.h"
-#include "database.h"
-#include "storage.h"
 
-swd::shadowd::shadowd() : 
- database_(boost::make_shared<swd::database>()),
- cache_(boost::make_shared<swd::cache>(database_)),
- storage_(boost::make_shared<swd::storage>(database_)),
+swd::shadowd::shadowd() :
  server_(storage_, database_, cache_) {
 }
 
@@ -141,10 +135,10 @@ int main(int argc, char** argv) {
 
         shadowd.init(argc, argv);
         shadowd.start();
-    } catch (swd::exceptions::core_exception& e) {
+    } catch (const swd::exceptions::core_exception& e) {
         swd::log::i()->send(swd::critical_error, e.what());
         return 1;
-    } catch (swd::exceptions::config_exception& e) {
+    } catch (const swd::exceptions::config_exception& e) {
         std::cerr << "Configuration error: " << e.what() << "\n";
         return 1;
     }

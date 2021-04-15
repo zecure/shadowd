@@ -49,14 +49,14 @@ namespace swd {
              *
              * @param id The id of the rule
              */
-            void set_id(const unsigned int& id);
+            void set_id(const unsigned long long& id);
 
             /**
              * @brief Get the id the rule.
              *
              * @return The id of the rule
              */
-            unsigned int get_id() const;
+            unsigned long long get_id() const;
 
             /**
              * @brief Set the hash algorithm of the rule
@@ -91,13 +91,13 @@ namespace swd {
              *
              * @param hash The pointer to the hash object that should be checked.
              */
-            bool matches(const swd::hash_ptr& hash);
+            bool matches(const swd::hash_ptr& hash) const;
 
         private:
             /**
              * @brief The database id of the rule.
              */
-            unsigned int id_;
+            unsigned long long id_;
 
             /**
              * @brief The algorithm of the rule.
@@ -113,12 +113,12 @@ namespace swd {
     /**
      * @brief Integrity rule pointer.
      */
-    typedef boost::shared_ptr<swd::integrity_rule> integrity_rule_ptr;
+    using integrity_rule_ptr = boost::shared_ptr<swd::integrity_rule>;
 
     /**
      * @brief List of integrity rule pointers.
      */
-    typedef std::vector<swd::integrity_rule_ptr> integrity_rules;
+    using integrity_rules = std::vector<swd::integrity_rule_ptr>;
 }
 
 #endif /* INTEGRITY_RULE_H */

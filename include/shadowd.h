@@ -32,6 +32,8 @@
 #ifndef SHADOWD_H
 #define SHADOWD_H
 
+#include <boost/make_shared.hpp>
+
 #include "daemon.h"
 #include "server.h"
 #include "database.h"
@@ -67,17 +69,17 @@ namespace swd {
             /**
              * @brief The pointer to the database object.
              */
-            swd::database_ptr database_;
+            swd::database_ptr database_ = boost::make_shared<swd::database>();
 
             /**
              * @brief The pointer to the cache object.
              */
-            swd::cache_ptr cache_;
+            swd::cache_ptr cache_ = boost::make_shared<swd::cache>(database_);
 
             /**
              * @brief The pointer to the storage object.
              */
-            swd::storage_ptr storage_;
+            swd::storage_ptr storage_ = boost::make_shared<swd::storage>(database_);
 
             /**
              * @brief The daemon object.

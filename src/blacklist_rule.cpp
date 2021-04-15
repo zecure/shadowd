@@ -31,11 +31,11 @@
 
 #include "blacklist_rule.h"
 
-void swd::blacklist_rule::set_id(const unsigned int& id) {
+void swd::blacklist_rule::set_id(const unsigned long long& id) {
     id_ = id;
 }
 
-unsigned int swd::blacklist_rule::get_id() const {
+unsigned long long swd::blacklist_rule::get_id() const {
     return id_;
 }
 

@@ -105,7 +105,7 @@ namespace swd {
              * @return The corresponding table row
              */
             swd::profile_ptr get_profile(const std::string& server_ip,
-             const unsigned int& profile_id);
+             const unsigned long long& profile_id);
 
             /**
              * @brief Get blacklist rules.
@@ -115,7 +115,7 @@ namespace swd {
              * @param path The path of the parameter
              * @return The corresponding table rows
              */
-            swd::blacklist_rules get_blacklist_rules(const unsigned int& profile,
+            swd::blacklist_rules get_blacklist_rules(const unsigned long long& profile,
              const std::string& caller, const std::string& path);
 
             /**
@@ -133,7 +133,7 @@ namespace swd {
              * @param path The path of the parameter
              * @return The corresponding table rows
              */
-            swd::whitelist_rules get_whitelist_rules(const unsigned int& profile,
+            swd::whitelist_rules get_whitelist_rules(const unsigned long long& profile,
              const std::string& caller, const std::string& path);
 
             /**
@@ -142,7 +142,7 @@ namespace swd {
              * @param profile The profile id of the request
              * @param caller The caller (resource) that initiated the connection
              */
-            swd::integrity_rules get_integrity_rules(const unsigned int& profile,
+            swd::integrity_rules get_integrity_rules(const unsigned long long& profile,
              const std::string& caller);
 
             /**
@@ -156,7 +156,7 @@ namespace swd {
              * @param total_integrity_rules The number of broken integrity rules
              * @return The id of the new row
              */
-            unsigned int save_request(const unsigned int& profile_id, const std::string& caller,
+            unsigned long long save_request(const unsigned long long& profile_id, const std::string& caller,
              const std::string& resource, const unsigned int& mode,
              const std::string& client_ip, const int& total_integrity_rules);
 
@@ -172,7 +172,7 @@ namespace swd {
              * @param threat The status of the analyzer
              * @return The id of the new row
              */
-            unsigned int save_parameter(const unsigned int& request_id, const std::string& path,
+            unsigned long long save_parameter(const unsigned long long& request_id, const std::string& path,
              const std::string& value, const int& total_whitelist_rules,
              const int& critical_impact, const int& threat);
 
@@ -183,7 +183,7 @@ namespace swd {
              * @param algorithm The algorithm that is used to calculate the hash
              * @param digest The output of the hash algorithm on the message
              */
-            unsigned int save_hash(const unsigned int& request_id, const std::string& algorithm,
+            unsigned long long save_hash(const unsigned long long& request_id, const std::string& algorithm,
              const std::string& digest);
 
             /**
@@ -192,8 +192,8 @@ namespace swd {
              * @param filter_id The id of the blacklist filter
              * @param parameter_id The id of the parameter
              */
-            void add_blacklist_parameter_connector(const unsigned int& filter_id,
-             const unsigned int& parameter_id);
+            void add_blacklist_parameter_connector(const unsigned long long& filter_id,
+             const unsigned long long& parameter_id);
 
             /**
              * @brief Add a many to many connector for a broken whitelist rule.
@@ -201,8 +201,8 @@ namespace swd {
              * @param rule_id The id of the whitelist rule
              * @param parameter_id The id of the parameter
              */
-            void add_whitelist_parameter_connector(const unsigned int& rule_id,
-             const unsigned int& parameter_id);
+            void add_whitelist_parameter_connector(const unsigned long long& rule_id,
+             const unsigned long long& parameter_id);
 
             /**
              * @brief Add a many to many connector for a broken integrity rule.
@@ -210,8 +210,8 @@ namespace swd {
              * @param rule_id The id of the integrity rule
              * @param request_id The id of the request
              */
-            void add_integrity_request_connector(const unsigned int& rule_id,
-             const unsigned int& request_id);
+            void add_integrity_request_connector(const unsigned long long& rule_id,
+             const unsigned long long& request_id);
 
             /**
              * @brief Get the flooding status of the client.
@@ -220,7 +220,7 @@ namespace swd {
              * @param profile_id The profile id of the request
              * @return The status of the flooding check
              */
-            bool is_flooding(const std::string& client_ip, const unsigned int& profile_id);
+            bool is_flooding(const std::string& client_ip, const unsigned long long& profile_id);
 
             /**
              * @brief Set the status of the cache for all profiles.
@@ -235,7 +235,7 @@ namespace swd {
              * @param profile_id The id of the profile
              * @param cache_outdated The status of the cache
              */
-            void set_cache_outdated(const unsigned int& profile_id,
+            void set_cache_outdated(const unsigned long long& profile_id,
              const bool& cache_outdated);
 
         private:
@@ -265,7 +265,7 @@ namespace swd {
     /**
      * @brief Database pointer.
      */
-    typedef boost::shared_ptr<swd::database> database_ptr;
+    using database_ptr = boost::shared_ptr<swd::database>;
 }
 
 #endif /* DATABASE_H */

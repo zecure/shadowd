@@ -54,7 +54,7 @@ namespace swd {
              *
              * @param request The pointer to the request object
              */
-            void scan(swd::request_ptr& request);
+            void scan(const swd::request_ptr& request) const;
 
         private:
             /**
