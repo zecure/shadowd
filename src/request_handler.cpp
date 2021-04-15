@@ -91,7 +91,7 @@ bool swd::request_handler::valid_signature() const {
     }
 }
 
-bool swd::request_handler::decode() {
+bool swd::request_handler::decode() const {
     /**
      * The daemon could crash if the json string is somehow invalid, so it is a
      * very good idea to catch exceptions.
@@ -180,7 +180,7 @@ bool swd::request_handler::decode() {
     return true;
 }
 
-void swd::request_handler::process() {
+void swd::request_handler::process() const {
     /* Analyze the request and its parameters. */
     swd::profile_ptr profile = request_->get_profile();
 

@@ -41,7 +41,7 @@ swd::reply_handler::reply_handler(swd::reply_ptr reply) :
  reply_(std::move(reply)) {
 }
 
-bool swd::reply_handler::encode() {
+bool swd::reply_handler::encode() const {
     try {
         Json::Value root;
         Json::FastWriter writer;

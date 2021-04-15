@@ -67,12 +67,12 @@ namespace swd {
              *
              * @return Status of decoding
              */
-            bool decode();
+            bool decode() const;
 
             /**
              * @brief Start the real processing of the request.
              */
-            void process();
+            void process() const;
 
             /**
              * @brief Get the threats of the processing.

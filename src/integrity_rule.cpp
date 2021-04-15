@@ -55,7 +55,7 @@ std::string swd::integrity_rule::get_digest() const {
     return digest_;
 }
 
-bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
+bool swd::integrity_rule::matches(const swd::hash_ptr& hash) const {
     /* Stop if there is no hash (for this algorithm). */
     if (!hash) {
         return false;

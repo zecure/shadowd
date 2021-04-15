@@ -39,7 +39,7 @@ swd::whitelist::whitelist(swd::cache_ptr cache) :
  cache_(std::move(cache)) {
 }
 
-void swd::whitelist::scan(swd::request_ptr& request) {
+void swd::whitelist::scan(const swd::request_ptr& request) const {
     swd::parameters parameters = request->get_parameters();
 
     /* Iterate over all parameters. */

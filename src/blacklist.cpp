@@ -39,7 +39,7 @@ swd::blacklist::blacklist(swd::cache_ptr cache) :
  cache_(std::move(cache)) {
 }
 
-void swd::blacklist::scan(const swd::request_ptr& request) {
+void swd::blacklist::scan(const swd::request_ptr& request) const {
     swd::blacklist_filters filters = cache_->get_blacklist_filters();
     swd::parameters parameters = request->get_parameters();
 

@@ -91,7 +91,7 @@ namespace swd {
              *
              * @param hash The pointer to the hash object that should be checked.
              */
-            bool matches(const swd::hash_ptr& hash);
+            bool matches(const swd::hash_ptr& hash) const;
 
         private:
             /**

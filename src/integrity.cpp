@@ -40,7 +40,7 @@ swd::integrity::integrity(swd::cache_ptr cache) :
  cache_(std::move(cache)) {
 }
 
-void swd::integrity::scan(swd::request_ptr& request) {
+void swd::integrity::scan(const swd::request_ptr& request) const {
     /* Import the rules from the database. */
     swd::integrity_rules rules = cache_->get_integrity_rules(
         request->get_profile()->get_id(),
