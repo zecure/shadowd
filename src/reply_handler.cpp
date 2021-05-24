@@ -47,13 +47,17 @@ bool swd::reply_handler::encode() const {
         Json::FastWriter writer;
 
         root["status"] = reply_->get_status();
-        std::vector<std::string> threats = reply_->get_threats();
 
+        std::string message = reply_->get_message();
+        if (!message.empty()) {
+            root["message"] = message;
+        }
+
+        std::vector<std::string> threats = reply_->get_threats();
         Json::Value output(Json::arrayValue);
         for (const auto& threat: threats) {
             output.append(threat);
         }
-
         root["threats"] = output;
 
         reply_->set_content(writer.write(root));

@@ -29,24 +29,47 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef SHARED_H
-#define SHARED_H
+#ifndef CONNECTION_EXCEPTION_H
+#define CONNECTION_EXCEPTION_H
 
-#include "build_config.h"
+#include <string>
 
-#define STATUS_OK 1
-#define STATUS_BAD_REQUEST 2
-#define STATUS_BAD_SIGNATURE 3
-#define STATUS_BAD_JSON 4
-#define STATUS_ATTACK 5
-#define STATUS_CRITICAL_ATTACK 6
+namespace swd::exceptions {
+    /**
+     * @brief Critical exception in one of the core components.
+     */
+    class connection_exception : public std::exception {
+        public:
+            /**
+             * @brief Constructs an exception.
+             */
+            connection_exception(int code, std::string message);
 
-#define STATUS_ACTIVATED 1
-#define STATUS_DEACTIVATED 2
-#define STATUS_PENDING 2
+            /**
+             * @brief Return the exception code.
+             *
+             * @return The exception code
+             */
+            int get_code() const;
 
-#define MODE_ACTIVE 1
-#define MODE_PASSIVE 2
-#define MODE_LEARNING 3
+            /**
+             * @brief Return the exception message.
+             *
+             * @return The exception message
+             */
+            std::string get_message() const;
 
-#endif /* SHARED_H */
+        private:
+            /**
+             * @brief Information about the exception.
+             */
+            int code_;
+
+            /**
+             * @brief Information about the exception.
+             */
+            std::string message_;
+    };
+}
+
+#endif /* CONNECTION_EXCEPTION_H */

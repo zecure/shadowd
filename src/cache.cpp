@@ -34,6 +34,7 @@
 
 #include "cache.h"
 #include "log.h"
+#include "database_exception.h"
 
 swd::cache::cache(swd::database_ptr database) :
  database_(std::move(database)) {
@@ -159,7 +160,7 @@ void swd::cache::reset_profile(unsigned long long profile_id) {
     try {
         database_->set_cache_outdated(profile_id, false);
     } catch (const swd::exceptions::database_exception& e) {
-        swd::log::i()->send(swd::uncritical_error, e.what());
+        swd::log::i()->send(swd::uncritical_error, e.get_message());
     }
 
     {
@@ -184,7 +185,7 @@ void swd::cache::reset_all() {
     try {
         database_->set_cache_outdated(false);
     } catch (const swd::exceptions::database_exception& e) {
-        swd::log::i()->send(swd::uncritical_error, e.what());
+        swd::log::i()->send(swd::uncritical_error, e.get_message());
     }
 
     {

@@ -40,6 +40,10 @@ add_executable(tests
     ${SHADOWD_SOURCE_DIR}/src/integrity.cpp
     ${SHADOWD_SOURCE_DIR}/src/integrity_rule.cpp
     ${SHADOWD_SOURCE_DIR}/src/hash.cpp
+    ${SHADOWD_SOURCE_DIR}/src/core_exception.cpp
+    ${SHADOWD_SOURCE_DIR}/src/config_exception.cpp
+    ${SHADOWD_SOURCE_DIR}/src/connection_exception.cpp
+    ${SHADOWD_SOURCE_DIR}/src/database_exception.cpp
     ${SHADOWD_SOURCE_DIR}/dist/jsoncpp.cpp
 )
 

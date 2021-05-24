@@ -35,6 +35,8 @@
 #include "shadowd.h"
 #include "config.h"
 #include "log.h"
+#include "core_exception.h"
+#include "config_exception.h"
 
 swd::shadowd::shadowd() :
  server_(storage_, database_, cache_) {
@@ -136,10 +138,10 @@ int main(int argc, char** argv) {
         shadowd.init(argc, argv);
         shadowd.start();
     } catch (const swd::exceptions::core_exception& e) {
-        swd::log::i()->send(swd::critical_error, e.what());
+        swd::log::i()->send(swd::critical_error, e.get_message());
         return 1;
     } catch (const swd::exceptions::config_exception& e) {
-        std::cerr << "Configuration error: " << e.what() << "\n";
+        std::cerr << "Configuration error: " << e.get_message() << "\n";
         return 1;
     }
 

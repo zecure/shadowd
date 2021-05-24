@@ -29,24 +29,12 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef SHARED_H
-#define SHARED_H
+#include "database_exception.h"
 
-#include "build_config.h"
+swd::exceptions::database_exception::database_exception(std::string message) :
+ message_(std::move(message)) {
+}
 
-#define STATUS_OK 1
-#define STATUS_BAD_REQUEST 2
-#define STATUS_BAD_SIGNATURE 3
-#define STATUS_BAD_JSON 4
-#define STATUS_ATTACK 5
-#define STATUS_CRITICAL_ATTACK 6
-
-#define STATUS_ACTIVATED 1
-#define STATUS_DEACTIVATED 2
-#define STATUS_PENDING 2
-
-#define MODE_ACTIVE 1
-#define MODE_PASSIVE 2
-#define MODE_LEARNING 3
-
-#endif /* SHARED_H */
+std::string swd::exceptions::database_exception::get_message() const {
+    return message_;
+}
