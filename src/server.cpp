@@ -40,6 +40,7 @@
 #include "config.h"
 #include "log.h"
 #include "shared.h"
+#include "core_exception.h"
 
 swd::server::server(swd::storage_ptr storage,
  swd::database_ptr database, swd::cache_ptr cache) :

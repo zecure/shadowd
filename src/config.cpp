@@ -34,6 +34,8 @@
 
 #include "config.h"
 #include "build_config.h"
+#include "core_exception.h"
+#include "config_exception.h"
 
 swd::config::config() :
  od_generic_("Generic options"),

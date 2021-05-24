@@ -33,6 +33,8 @@
 
 #include "database.h"
 #include "log.h"
+#include "core_exception.h"
+#include "database_exception.h"
 
 void swd::database::connect(const std::string& driver, const std::string& host,
  const std::string& port, const std::string& username, const std::string& password,

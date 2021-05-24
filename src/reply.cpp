@@ -39,6 +39,14 @@ int swd::reply::get_status() const {
     return status_;
 }
 
+void swd::reply::set_message(const std::string& message) {
+    message_ = message;
+}
+
+std::string swd::reply::get_message() const {
+    return message_;
+}
+
 void swd::reply::set_threats(const std::vector<std::string>& threats) {
     threats_ = threats;
 }

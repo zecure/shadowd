@@ -37,6 +37,7 @@
 
 #include "daemon.h"
 #include "shared.h"
+#include "core_exception.h"
 
 void swd::daemon::set_user(const std::string& user) const {
     struct passwd *u = getpwnam(user.c_str());

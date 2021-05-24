@@ -34,6 +34,7 @@
 #include "storage.h"
 #include "database.h"
 #include "log.h"
+#include "database_exception.h"
 
 swd::storage::storage(swd::database_ptr database) :
  database_(std::move(database)) {
@@ -117,7 +118,7 @@ void swd::storage::save(const swd::request_ptr& request) {
             (request->get_profile()->is_integrity_enabled() ? request->get_total_integrity_rules() : -1)
         );
     } catch (const swd::exceptions::database_exception& e) {
-        swd::log::i()->send(swd::uncritical_error, e.what());
+        swd::log::i()->send(swd::uncritical_error, e.get_message());
 
         /**
          * No need to continue if the request couldn't be saved, but no need to
@@ -137,7 +138,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 hash->get_digest()
             );
         } catch (const swd::exceptions::database_exception& e) {
-            swd::log::i()->send(swd::uncritical_error, e.what());
+            swd::log::i()->send(swd::uncritical_error, e.get_message());
             continue;
         }
     }
@@ -152,7 +153,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 request_id
             );
         } catch (const swd::exceptions::database_exception& e) {
-            swd::log::i()->send(swd::uncritical_error, e.what());
+            swd::log::i()->send(swd::uncritical_error, e.get_message());
             continue;
         }
     }
@@ -173,7 +174,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                 (parameter->is_threat() ? 1 : 0 )
             );
         } catch (const swd::exceptions::database_exception& e) {
-            swd::log::i()->send(swd::uncritical_error, e.what());
+            swd::log::i()->send(swd::uncritical_error, e.get_message());
             continue;
         }
 
@@ -187,7 +188,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                     parameter_id
                 );
             } catch (const swd::exceptions::database_exception& e) {
-                swd::log::i()->send(swd::uncritical_error, e.what());
+                swd::log::i()->send(swd::uncritical_error, e.get_message());
                 continue;
             }
         }
@@ -202,7 +203,7 @@ void swd::storage::save(const swd::request_ptr& request) {
                     parameter_id
                 );
             } catch (const swd::exceptions::database_exception& e) {
-                swd::log::i()->send(swd::uncritical_error, e.what());
+                swd::log::i()->send(swd::uncritical_error, e.get_message());
                 continue;
             }
         }

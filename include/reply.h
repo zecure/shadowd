@@ -60,6 +60,20 @@ namespace swd {
             int get_status() const;
 
             /**
+             * @brief Set an optional status message of the reply.
+             *
+             * @param message The status message of the reply
+             */
+            void set_message(const std::string& message);
+
+            /**
+             * Get the optional status message of the reply.
+             *
+             * @return The status message of the reply
+             */
+            std::string get_message() const;
+
+            /**
              * @brief Set a list of threat paths.
              *
              * @param threats A list of paths strings of parameters that were
@@ -102,6 +116,11 @@ namespace swd {
              * @brief The status of the reply.
              */
             int status_;
+
+            /**
+             * @brief An optional message to return additional information about the reply.
+             */
+            std::string message_;
 
             /**
              * @brief The paths of dangerous parameters.
