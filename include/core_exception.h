@@ -43,7 +43,7 @@ namespace swd::exceptions {
             /**
              * @brief Constructs an exception.
              */
-            core_exception(const std::string& message);
+            core_exception(std::string message);
 
             /**
              * @brief Return the exception message.

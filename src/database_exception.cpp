@@ -31,7 +31,7 @@
 
 #include "database_exception.h"
 
-swd::exceptions::database_exception::database_exception(const std::string& message) :
+swd::exceptions::database_exception::database_exception(std::string message) :
  message_(std::move(message)) {
 }
 

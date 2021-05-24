@@ -31,7 +31,7 @@
 
 #include "config_exception.h"
 
-swd::exceptions::config_exception::config_exception(const std::string& message) :
+swd::exceptions::config_exception::config_exception(std::string message) :
  message_(std::move(message)) {
 }
 

@@ -31,7 +31,7 @@
 
 #include "connection_exception.h"
 
-swd::exceptions::connection_exception::connection_exception(int code, const std::string& message) :
+swd::exceptions::connection_exception::connection_exception(int code, std::string message) :
  code_(code),
  message_(std::move(message)) {
 }

@@ -43,7 +43,7 @@ namespace swd::exceptions {
             /**
              * @brief Constructs an exception.
              */
-            database_exception(const std::string& message);
+            database_exception(std::string message);
 
             /**
              * @brief Return the exception message.

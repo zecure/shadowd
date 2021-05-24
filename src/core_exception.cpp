@@ -31,7 +31,7 @@
 
 #include "core_exception.h"
 
-swd::exceptions::core_exception::core_exception(const std::string& message) :
+swd::exceptions::core_exception::core_exception(std::string message) :
  message_(std::move(message)) {
 }
 

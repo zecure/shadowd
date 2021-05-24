@@ -43,7 +43,7 @@ namespace swd::exceptions {
             /**
              * @brief Constructs an exception.
              */
-            connection_exception(int code, const std::string& message);
+            connection_exception(int code, std::string message);
 
             /**
              * @brief Return the exception code.
