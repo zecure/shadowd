@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,20 +29,16 @@
  * files in the program, then also delete it here.
  */
 
-#include <string>
 #include <iostream>
-#include <boost/make_shared.hpp>
+#include <string>
 
 #include "shadowd.h"
 #include "config.h"
 #include "log.h"
-#include "database.h"
-#include "storage.h"
+#include "core_exception.h"
+#include "config_exception.h"
 
-swd::shadowd::shadowd() : 
- database_(boost::make_shared<swd::database>()),
- cache_(boost::make_shared<swd::cache>(database_)),
- storage_(boost::make_shared<swd::storage>(database_)),
+swd::shadowd::shadowd() :
  server_(storage_, database_, cache_) {
 }
 
@@ -141,11 +137,11 @@ int main(int argc, char** argv) {
 
         shadowd.init(argc, argv);
         shadowd.start();
-    } catch (swd::exceptions::core_exception& e) {
-        swd::log::i()->send(swd::critical_error, e.what());
+    } catch (const swd::exceptions::core_exception& e) {
+        swd::log::i()->send(swd::critical_error, e.get_message());
         return 1;
-    } catch (swd::exceptions::config_exception& e) {
-        std::cerr << "Configuration error: " << e.what() << "\n";
+    } catch (const swd::exceptions::config_exception& e) {
+        std::cerr << "Configuration error: " << e.get_message() << "\n";
         return 1;
     }
 

@@ -28,6 +28,10 @@ add_executable(shadowd
     integrity.cpp
     integrity_rule.cpp
     hash.cpp
+    core_exception.cpp
+    config_exception.cpp
+    connection_exception.cpp
+    database_exception.cpp
     ${SHADOWD_SOURCE_DIR}/dist/jsoncpp.cpp
 )
 

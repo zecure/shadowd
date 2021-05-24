@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -36,9 +36,10 @@
 #include <boost/asio/ssl.hpp>
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include "reply.h"
 #include "request.h"
@@ -50,22 +51,22 @@ namespace swd {
     /**
      * @brief Boost tcp acceptor.
      */
-    typedef boost::asio::ip::tcp::acceptor acceptor;
+    using acceptor = boost::asio::ip::tcp::acceptor;
 
     /**
      * @brief Boost tcp socket.
      */
-    typedef boost::asio::ip::tcp::socket socket;
+    using socket = boost::asio::ip::tcp::socket;
 
     /**
      * @brief Boost tcp ssl socket.
      */
-    typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
+    using ssl_socket = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 
     /**
      * @brief Boost ssl context.
      */
-    typedef boost::asio::ssl::context context;
+    using context = boost::asio::ssl::context;
 
     /**
      * @brief Represents a connection from a client.
@@ -85,8 +86,8 @@ namespace swd {
              * @param cache The pointer to the cache object
              */
             explicit connection(boost::asio::io_service& io_service,
-             swd::context& context, bool ssl, const swd::storage_ptr& storage,
-             const swd::database_ptr& database, const swd::cache_ptr& cache);
+             swd::context& context, bool ssl, swd::storage_ptr storage,
+             swd::database_ptr database, swd::cache_ptr cache);
 
             /**
              * @brief Get the socket associated with the connection.
@@ -164,12 +165,12 @@ namespace swd {
             /**
              * @brief The incoming request.
              */
-            swd::request_ptr request_;
+            swd::request_ptr request_ = boost::make_shared<swd::request>();
 
             /**
              * @brief The reply to be sent back to the client.
              */
-            swd::reply_ptr reply_;
+            swd::reply_ptr reply_ = boost::make_shared<swd::reply>();
 
             /**
              * @brief The parser for the incoming request.
@@ -203,7 +204,7 @@ namespace swd {
     /**
      * @brief Connection pointer.
      */
-    typedef boost::shared_ptr<swd::connection> connection_ptr;
+    using connection_ptr = boost::shared_ptr<swd::connection>;
 }
 
 #endif /* CONNECTION_H */

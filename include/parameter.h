@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -45,11 +45,6 @@ namespace swd {
      */
     class parameter {
         public:
-            /**
-             * @brief Construct a parameter.
-             */
-            parameter();
-
             /**
              * @brief Set the path of the parameter.
              *
@@ -111,7 +106,7 @@ namespace swd {
              *
              * @return The total impact of all broken blacklist filters.
              */
-            int get_impact() const;
+            unsigned int get_impact() const;
 
             /**
              * @brief Define if this parameter is a threat or not.
@@ -180,28 +175,28 @@ namespace swd {
             /**
              * @brief The threat status of the parameter.
              */
-            bool threat_;
+            bool threat_ = false;
 
             /**
              * @brief The status of the impact compared to the threshold.
              */
-            bool critical_blacklist_impact_;
+            bool critical_blacklist_impact_ = false;
 
             /**
              * @brief The total number of matching whitelist rules.
              */
-            int total_whitelist_rules_;
+            int total_whitelist_rules_ = 0;
     };
 
     /**
      * @brief Parameter pointer.
      */
-    typedef boost::shared_ptr<swd::parameter> parameter_ptr;
+    using parameter_ptr = boost::shared_ptr<swd::parameter>;
 
     /**
      * @brief Map of parameter pointers. The key is the path.
      */
-    typedef std::vector<swd::parameter_ptr> parameters;
+    using parameters = std::vector<swd::parameter_ptr>;
 }
 
 #endif /* PARAMETER_H */

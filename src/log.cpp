@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,16 +29,18 @@
  * files in the program, then also delete it here.
  */
 
+#include <ctime>
 #include <fstream>
-#include <ostream>
+#include <iomanip>
 #include <iostream>
+#include <ostream>
 
 #include "log.h"
 #include "config.h"
 
 void swd::log::open_file(const std::string& file) {
     /* Use mutex to avoid race conditions. */
-    boost::unique_lock<boost::mutex> scoped_lock(mutex_);
+    boost::unique_lock scoped_lock(mutex_);
 
     /* Set the file. */
     file_ = file;
@@ -75,7 +77,7 @@ void swd::log::send(const swd::log_level& level, const std::string& message) {
     line << "\t" << message << "\n";
 
     /* Use mutex to avoid race conditions. */
-    boost::unique_lock<boost::mutex> scoped_lock(mutex_);
+    boost::unique_lock scoped_lock(mutex_);
 
     /* Write the final line into a log file or stderr. */
     if (!file_.empty()) {
@@ -93,10 +95,12 @@ void swd::log::send(const swd::log_level& level, const std::string& message) {
 }
 
 std::string swd::log::get_current_time() const {
-    time_t now = time(0);
-    char buf[80];
-    struct tm tstruct = *localtime(&now);
+    auto now = std::time(nullptr);
+    struct tm local_time{};
+    localtime_r(&now, &local_time);
 
-    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
-    return buf;
+    std::ostringstream oss;
+    oss << std::put_time(&local_time, "%Y-%m-%d %X");
+
+    return oss.str();
 }

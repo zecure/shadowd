@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -49,14 +49,14 @@ namespace swd {
              *
              * @param id The id of the rule
              */
-            void set_id(const int& id);
+            void set_id(const unsigned long long& id);
 
             /**
              * @brief Get the id of the rule.
              *
              * @return The id of the rule
              */
-            int get_id() const;
+            unsigned long long get_id() const;
 
             /**
              * @brief Set the whitelist filter of the rule.
@@ -92,7 +92,7 @@ namespace swd {
             /**
              * @brief The database id of the rule.
              */
-            int id_;
+            unsigned long long id_;
 
             /**
              * @brief The pointer to the whitelist filter.
@@ -113,12 +113,12 @@ namespace swd {
     /**
      * @brief Whitelist rule pointer.
      */
-    typedef boost::shared_ptr<swd::whitelist_rule> whitelist_rule_ptr;
+    using whitelist_rule_ptr = boost::shared_ptr<swd::whitelist_rule>;
 
     /**
      * @brief List of whitelist rule pointers.
      */
-    typedef std::vector<swd::whitelist_rule_ptr> whitelist_rules;
+    using whitelist_rules = std::vector<swd::whitelist_rule_ptr>;
 }
 
 #endif /* WHITELIST_RULE_H */

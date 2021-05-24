@@ -29,40 +29,12 @@
  * files in the program, then also delete it here.
  */
 
-#define BOOST_TEST_DYN_LINK
-#include <boost/test/unit_test.hpp>
+#include "config_exception.h"
 
-#include "blacklist_filter.h"
-
-BOOST_AUTO_TEST_SUITE(blacklist_filter_test)
-
-BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
-    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-
-    filter->set_id(1);
-    filter->set_impact(5);
-
-    filter->set_regex("^foo$");
-    BOOST_CHECK(filter->matches("foo") == true);
-
-    filter->set_regex("foo");
-    BOOST_CHECK(filter->matches("BOOFOOBAR") == true);
-
-    filter->set_regex("(?:(foo(.*)bar))");
-    BOOST_CHECK(filter->matches("foo\nbar") == true);
+swd::exceptions::config_exception::config_exception(std::string message) :
+ message_(std::move(message)) {
 }
 
-BOOST_AUTO_TEST_CASE(not_matching_blacklist_filter) {
-    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-
-    filter->set_id(1);
-    filter->set_impact(5);
-
-    filter->set_regex("^foo$");
-    BOOST_CHECK(filter->matches("foobar") == false);
-
-    filter->set_regex("foo");
-    BOOST_CHECK(filter->matches("bar") == false);
+std::string swd::exceptions::config_exception::get_message() const {
+    return message_;
 }
-
-BOOST_AUTO_TEST_SUITE_END()

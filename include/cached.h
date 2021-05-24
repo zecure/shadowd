@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -32,7 +32,7 @@
 #ifndef CACHED_H
 #define CACHED_H
 
-#include <time.h>
+#include <ctime>
 
 namespace swd {
     /**
@@ -48,7 +48,7 @@ namespace swd {
             cached(const T& value) :
              value_(value),
              counter_(0),
-             last_(time(NULL)) {
+             last_(time(nullptr)) {
             }
 
             /**
@@ -63,7 +63,7 @@ namespace swd {
                 }
 
                 /* Update the last access time. */
-                last_ = time(NULL);
+                last_ = time(nullptr);
 
                 return value_;
             }
@@ -75,11 +75,11 @@ namespace swd {
              */
             bool is_outdated() const {
                 if (counter_ < 5) {
-                    return ((time(NULL) - last_) > 300);
+                    return ((time(nullptr) - last_) > 300);
                 } else if (counter_ < 25) {
-                    return ((time(NULL) - last_) > 600);
+                    return ((time(nullptr) - last_) > 600);
                 } else {
-                    return ((time(NULL) - last_) > 900);
+                    return ((time(nullptr) - last_) > 900);
                 }
             }
 

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -49,7 +49,7 @@ namespace swd {
              *
              * @param database The pointer to the database object
              */
-            storage(const swd::database_ptr& database);
+            storage(swd::database_ptr database);
 
             /**
              * @brief Start insert thread.
@@ -99,7 +99,7 @@ namespace swd {
             /**
              * @brief Switch to exit process_next loop.
              */
-            bool stop_;
+            bool stop_ = false;
 
             /**
              * @brief Notify consumer threads on new requests in the queue.
@@ -120,7 +120,7 @@ namespace swd {
     /**
      * @brief Storage pointer.
      */
-    typedef boost::shared_ptr<swd::storage> storage_ptr;
+    using storage_ptr = boost::shared_ptr<swd::storage>;
 }
 
 #endif /* STORAGE_H */

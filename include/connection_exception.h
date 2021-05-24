@@ -29,78 +29,47 @@
  * files in the program, then also delete it here.
  */
 
-#ifndef SHADOWD_H
-#define SHADOWD_H
+#ifndef CONNECTION_EXCEPTION_H
+#define CONNECTION_EXCEPTION_H
 
-#include <boost/make_shared.hpp>
+#include <string>
 
-#include "daemon.h"
-#include "server.h"
-#include "database.h"
-#include "cache.h"
-#include "storage.h"
-
-namespace swd {
+namespace swd::exceptions {
     /**
-     * @brief Glues everything together.
+     * @brief Critical exception in one of the core components.
      */
-    class shadowd {
+    class connection_exception : public std::exception {
         public:
             /**
-             * @brief Construct a shadowd object.
+             * @brief Constructs an exception.
              */
-            shadowd();
+            connection_exception(int code, std::string message);
 
             /**
-             * @brief Prepare the configuration, daemonization and the
-             *  initialization of the server.
+             * @brief Return the exception code.
              *
-             * @param argc The number of command line arguments
-             * @param argv The command line arguments
+             * @return The exception code
              */
-            void init(int argc, char** argv);
+            int get_code() const;
 
             /**
-             * @brief Tell the server to add threads to the thread pool.
+             * @brief Return the exception message.
+             *
+             * @return The exception message
              */
-            void start();
+            std::string get_message() const;
 
         private:
             /**
-             * @brief The pointer to the database object.
+             * @brief Information about the exception.
              */
-            swd::database_ptr database_ = boost::make_shared<swd::database>();
+            int code_;
 
             /**
-             * @brief The pointer to the cache object.
+             * @brief Information about the exception.
              */
-            swd::cache_ptr cache_ = boost::make_shared<swd::cache>(database_);
-
-            /**
-             * @brief The pointer to the storage object.
-             */
-            swd::storage_ptr storage_ = boost::make_shared<swd::storage>(database_);
-
-            /**
-             * @brief The daemon object.
-             */
-            swd::daemon daemon_;
-
-            /**
-             * @brief The server object.
-             */
-            swd::server server_;
+            std::string message_;
     };
 }
 
-#endif /* SHADOWD_H */
-
-/**
- * @mainpage Disk and Execution Monitor
- *
- * This reference is intended for developers only. If you just want to use the
- * Shadow Daemon system go to the <a href="https://shadowd.zecure.org/">user 
- * documentation</a> instead.
- *
- * @author Hendrik Buchwald
- */
+#endif /* CONNECTION_EXCEPTION_H */

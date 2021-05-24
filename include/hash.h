@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -85,12 +85,12 @@ namespace swd {
     /**
      * @brief Hash pointer.
      */
-    typedef boost::shared_ptr<swd::hash> hash_ptr;
+    using hash_ptr = boost::shared_ptr<swd::hash>;
 
     /**
      * @brief Map of hashes pointers. The key is the algorithm.
      */
-    typedef std::map<std::string, swd::hash_ptr> hashes;
+    using hashes = std::map<std::string, swd::hash_ptr>;
 }
 
 #endif /* HASH_H */

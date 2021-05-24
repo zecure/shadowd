@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,14 +29,10 @@
  * files in the program, then also delete it here.
  */
 
+#include <algorithm>
 #include <sstream>
 
 #include "request.h"
-
-swd::request::request() :
- threat_(false),
- total_integrity_rules_(0) {
-}
 
 void swd::request::set_profile(const swd::profile_ptr& profile) {
     profile_ = profile;
@@ -91,14 +87,14 @@ void swd::request::append_profile_id(const char& input) {
     profile_id_.push_back(input);
 }
 
-void swd::request::set_profile_id(const int& profile_id) {
+void swd::request::set_profile_id(const unsigned long long& profile_id) {
     std::stringstream ss;
     ss << profile_id;
     profile_id_ = ss.str();
 }
 
-int swd::request::get_profile_id() const {
-    return atoi(profile_id_.c_str());
+unsigned long long swd::request::get_profile_id() const {
+    return stoull(profile_id_);
 }
 
 void swd::request::set_client_ip(const std::string& client_ip) {
@@ -172,16 +168,12 @@ bool swd::request::is_threat() const {
 }
 
 bool swd::request::has_threats() const {
-    /* Iterate over all parameters and check for threats. */
-    for (swd::parameters::const_iterator it_parameter = parameters_.begin();
-     it_parameter != parameters_.end(); it_parameter++) {
-        swd::parameter_ptr parameter(*it_parameter);
-
-        /* We only need to know if there is at least one threat. */
-        if (parameter->is_threat()) {
-            return true;
-        }
-    }
-
-    return false;
+    /* We only need to know if there is at least one threat. */
+    return std::any_of(
+            parameters_.begin(),
+            parameters_.end(),
+            [](auto parameter) {
+                return parameter->is_threat();
+            }
+    );
 }

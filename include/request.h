@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -53,11 +53,6 @@ namespace swd {
      */
     class request {
         public:
-            /**
-             * @brief Construct a request.
-             */
-            request();
-
             /**
              * @brief Set the pointer of the profile.
              *
@@ -157,14 +152,14 @@ namespace swd {
              *
              * @param profile_id The complete profile id
              */
-            void set_profile_id(const int& profile_id);
+            void set_profile_id(const unsigned long long& profile_id);
 
             /**
              * @brief Get the complete profile id.
              *
              * @return The complete profile id.
              */
-            int get_profile_id() const;
+            unsigned long long get_profile_id() const;
 
             /**
              * @brief Set the http client/attacker ip.
@@ -334,7 +329,7 @@ namespace swd {
             /**
              * @brief The threat status of the request.
              */
-            bool threat_;
+            bool threat_ = false;
 
             /**
              * @brief A vector of broken integrity rules.
@@ -344,13 +339,13 @@ namespace swd {
             /**
              * @brief The total number of matching integrity rules.
              */
-            int total_integrity_rules_;
+            int total_integrity_rules_ = 0;
     };
 
     /**
      * @brief Request pointer.
      */
-    typedef boost::shared_ptr<swd::request> request_ptr;
+    using request_ptr = boost::shared_ptr<swd::request>;
 }
 
 #endif /* REQUEST_H */

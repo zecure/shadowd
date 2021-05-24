@@ -29,40 +29,35 @@
  * files in the program, then also delete it here.
  */
 
-#define BOOST_TEST_DYN_LINK
-#include <boost/test/unit_test.hpp>
+#ifndef CORE_EXCEPTION_H
+#define CORE_EXCEPTION_H
 
-#include "blacklist_filter.h"
+#include <string>
 
-BOOST_AUTO_TEST_SUITE(blacklist_filter_test)
+namespace swd::exceptions {
+    /**
+     * @brief Critical exception in one of the core components.
+     */
+    class core_exception : public std::exception {
+        public:
+            /**
+             * @brief Constructs an exception.
+             */
+            core_exception(std::string message);
 
-BOOST_AUTO_TEST_CASE(matching_blacklist_filter) {
-    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
+            /**
+             * @brief Return the exception message.
+             *
+             * @return The exception message
+             */
+            std::string get_message() const;
 
-    filter->set_id(1);
-    filter->set_impact(5);
-
-    filter->set_regex("^foo$");
-    BOOST_CHECK(filter->matches("foo") == true);
-
-    filter->set_regex("foo");
-    BOOST_CHECK(filter->matches("BOOFOOBAR") == true);
-
-    filter->set_regex("(?:(foo(.*)bar))");
-    BOOST_CHECK(filter->matches("foo\nbar") == true);
+        private:
+            /**
+             * @brief Information about the exception.
+             */
+            std::string message_;
+    };
 }
 
-BOOST_AUTO_TEST_CASE(not_matching_blacklist_filter) {
-    swd::blacklist_filter_ptr filter(new swd::blacklist_filter);
-
-    filter->set_id(1);
-    filter->set_impact(5);
-
-    filter->set_regex("^foo$");
-    BOOST_CHECK(filter->matches("foobar") == false);
-
-    filter->set_regex("foo");
-    BOOST_CHECK(filter->matches("bar") == false);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#endif /* CORE_EXCEPTION_H */

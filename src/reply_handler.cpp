@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,30 +29,35 @@
  * files in the program, then also delete it here.
  */
 
-#include <vector>
-#include <string>
 #include <json/json.h>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "reply_handler.h"
 #include "log.h"
 
-swd::reply_handler::reply_handler(const swd::reply_ptr& reply) :
- reply_(reply) {
+swd::reply_handler::reply_handler(swd::reply_ptr reply) :
+ reply_(std::move(reply)) {
 }
 
-bool swd::reply_handler::encode() {
+bool swd::reply_handler::encode() const {
     try {
         Json::Value root;
         Json::FastWriter writer;
 
         root["status"] = reply_->get_status();
-        std::vector<std::string> threats = reply_->get_threats();
 
-        Json::Value output(Json::arrayValue);
-        for (std::vector<std::string>::iterator it = threats.begin(); it != threats.end(); ++it) {
-            output.append(*it);
+        std::string message = reply_->get_message();
+        if (!message.empty()) {
+            root["message"] = message;
         }
 
+        std::vector<std::string> threats = reply_->get_threats();
+        Json::Value output(Json::arrayValue);
+        for (const auto& threat: threats) {
+            output.append(threat);
+        }
         root["threats"] = output;
 
         reply_->set_content(writer.write(root));

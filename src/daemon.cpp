@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,8 +37,9 @@
 
 #include "daemon.h"
 #include "shared.h"
+#include "core_exception.h"
 
-void swd::daemon::set_user(const std::string& user) {
+void swd::daemon::set_user(const std::string& user) const {
     struct passwd *u = getpwnam(user.c_str());
 
     if (!u) {
@@ -50,8 +51,8 @@ void swd::daemon::set_user(const std::string& user) {
     }
 }
 
-void swd::daemon::set_group(const std::string& group) {
-    if (setgroups(0, NULL) == -1) {
+void swd::daemon::set_group(const std::string& group) const {
+    if (setgroups(0, nullptr) == -1) {
         throw swd::exceptions::core_exception("setgroups() failed");
     }
 
@@ -66,7 +67,7 @@ void swd::daemon::set_group(const std::string& group) {
     }
 }
 
-void swd::daemon::write_pid(const std::string& file) {
+void swd::daemon::write_pid(const std::string& file) const {
     std::ofstream out_file(file.c_str());
 
     if (!out_file.is_open()) {
@@ -77,7 +78,7 @@ void swd::daemon::write_pid(const std::string& file) {
     out_file.close();
 }
 
-void swd::daemon::change_root(const std::string& directory) {
+void swd::daemon::change_root(const std::string& directory) const {
     if (chroot(directory.c_str()) < 0) {
         throw swd::exceptions::core_exception("chroot() failed");
     }
@@ -87,7 +88,7 @@ void swd::daemon::change_root(const std::string& directory) {
     }
 }
 
-void swd::daemon::detach() {
+void swd::daemon::detach() const {
     /**
      * This forks the process, changes the current working directory to the
      * root directory and closes the standard input, standard output and

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -46,7 +46,7 @@ namespace swd {
              *
              * @param cache The pointer to the cache object
              */
-            blacklist(const swd::cache_ptr& cache);
+            blacklist(swd::cache_ptr cache);
 
             /**
              * @brief Scan all parameters in the request and add connections to
@@ -54,9 +54,18 @@ namespace swd {
              *
              * @param request The pointer to the request object
              */
-            void scan(swd::request_ptr& request);
+            void scan(const swd::request_ptr& request) const;
 
         private:
+            /**
+             * @brief If available get threshold from blacklist rule, otherwise from profile.
+             *
+             * @param request The pointer to the request object
+             * @param parameter The pointer to the parameter object
+             * @return The threshold value for the parameter
+             */
+            int get_threshold(const swd::request_ptr& request, const swd::parameter_ptr& parameter) const;
+
             /**
              * @brief The pointer to the cache object.
              */

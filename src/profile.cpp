@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -39,19 +39,19 @@ std::string swd::profile::get_server_ip() const {
     return server_ip_;
 }
 
-void swd::profile::set_id(const int& id) {
+void swd::profile::set_id(const unsigned long long& id) {
     id_ = id;
 }
 
-int swd::profile::get_id() const {
+unsigned long long swd::profile::get_id() const {
     return id_;
 }
 
-void swd::profile::set_mode(const int& mode) {
+void swd::profile::set_mode(const unsigned int& mode) {
     mode_ = mode;
 }
 
-int swd::profile::get_mode() const {
+unsigned int swd::profile::get_mode() const {
     return mode_;
 }
 

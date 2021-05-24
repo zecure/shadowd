@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -34,6 +34,8 @@
 
 #include "config.h"
 #include "build_config.h"
+#include "core_exception.h"
+#include "config_exception.h"
 
 swd::config::config() :
  od_generic_("Generic options"),
@@ -86,7 +88,7 @@ void swd::config::parse_command_line(int argc, char** argv) {
     try {
         po::store(po::command_line_parser(argc, argv).options(combination).run(), vm_);
         po::notify(vm_);
-    } catch (boost::program_options::unknown_option& e) {
+    } catch (const boost::program_options::unknown_option& e) {
         throw swd::exceptions::config_exception(e.what());
     }
 
@@ -115,7 +117,7 @@ void swd::config::parse_config_file(const std::string& file) {
     try {
         po::store(po::parse_config_file(ifs, combination, true), vm_);
         po::notify(vm_);
-    } catch (boost::program_options::unknown_option& e) {
+    } catch (const boost::program_options::unknown_option& e) {
         throw swd::exceptions::config_exception(e.what());
     } catch (...) {
         throw swd::exceptions::config_exception("invalid configuration file");

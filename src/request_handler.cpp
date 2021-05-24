@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,6 +33,7 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/hex.h>
 #include <json/json.h>
+#include <utility>
 
 #include "request_handler.h"
 #include "blacklist.h"
@@ -41,11 +42,11 @@
 #include "storage.h"
 #include "log.h"
 
-swd::request_handler::request_handler(const swd::request_ptr& request,
- const swd::cache_ptr& cache, const swd::storage_ptr& storage) :
- request_(request),
- cache_(cache),
- storage_(storage) {
+swd::request_handler::request_handler(swd::request_ptr request,
+ swd::cache_ptr cache, swd::storage_ptr storage) :
+ request_(std::move(request)),
+ cache_(std::move(cache)),
+ storage_(std::move(storage)) {
 }
 
 bool swd::request_handler::valid_signature() const {
@@ -84,13 +85,13 @@ bool swd::request_handler::valid_signature() const {
         );
 
         return result;
-    } catch(const CryptoPP::Exception& e) {
+    } catch (const CryptoPP::Exception& e) {
         /* Something went wrong, so the authentication was not successful. */
         return false;
     }
 }
 
-bool swd::request_handler::decode() {
+bool swd::request_handler::decode() const {
     /**
      * The daemon could crash if the json string is somehow invalid, so it is a
      * very good idea to catch exceptions.
@@ -143,14 +144,13 @@ bool swd::request_handler::decode() {
         }
 
         /* Iterate over the input and add it to the request as parameters. */
-        for (Json::ValueIterator it_parameter = input.begin();
-         it_parameter != input.end(); it_parameter++) {
+        for (auto it_parameter = input.begin(); it_parameter != input.end(); it_parameter++) {
             try {
                 request_->add_parameter(
                     it_parameter.key().asString(),
                     (*it_parameter).asString()
                 );
-            } catch (std::runtime_error& e) {
+            } catch (const std::runtime_error& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
             }
         }
@@ -162,14 +162,13 @@ bool swd::request_handler::decode() {
             return false;
         }
 
-        for (Json::ValueIterator it_hash = hashes.begin();
-         it_hash != hashes.end(); it_hash++) {
+        for (auto it_hash = hashes.begin(); it_hash != hashes.end(); it_hash++) {
             try {
                 request_->add_hash(
                     it_hash.key().asString(),
                     (*it_hash).asString()
                 );
-            } catch (std::runtime_error& e) {
+            } catch (const std::runtime_error& e) {
                 swd::log::i()->send(swd::uncritical_error, e.what());
             }
         }
@@ -181,7 +180,7 @@ bool swd::request_handler::decode() {
     return true;
 }
 
-void swd::request_handler::process() {
+void swd::request_handler::process() const {
     /* Analyze the request and its parameters. */
     swd::profile_ptr profile = request_->get_profile();
 
@@ -216,11 +215,7 @@ std::vector<std::string> swd::request_handler::get_threats() const {
 
     swd::parameters parameters = request_->get_parameters();
 
-    for (swd::parameters::iterator it_parameter = parameters.begin();
-     it_parameter != parameters.end(); it_parameter++) {
-        /* Save the iterators in variables for the sake of readability. */
-        swd::parameter_ptr parameter(*it_parameter);
-
+    for (const auto& parameter: parameters) {
         if (parameter->is_threat()) {
             threats.push_back(parameter->get_path());
         }

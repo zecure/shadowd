@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,8 +29,7 @@
  * files in the program, then also delete it here.
  */
 
-#include <cstdlib>
-#include <boost/make_shared.hpp>
+#include <utility>
 
 #include "connection.h"
 #include "profile.h"
@@ -38,19 +37,19 @@
 #include "reply_handler.h"
 #include "config.h"
 #include "log.h"
+#include "database_exception.h"
+#include "connection_exception.h"
 
 swd::connection::connection(boost::asio::io_service& io_service,
- swd::context& context, bool ssl, const swd::storage_ptr& storage,
- const swd::database_ptr& database, const swd::cache_ptr& cache) :
+ swd::context& context, bool ssl, swd::storage_ptr storage,
+ swd::database_ptr database, swd::cache_ptr cache) :
  strand_(io_service),
  socket_(io_service),
  ssl_socket_(io_service, context),
  ssl_(ssl),
- storage_(storage),
- database_(database),
- cache_(cache),
- request_(boost::make_shared<swd::request>()),
- reply_(boost::make_shared<swd::reply>()) {
+ storage_(std::move(storage)),
+ database_(std::move(database)),
+ cache_(std::move(cache)) {
 }
 
 swd::socket& swd::connection::socket() {
@@ -178,9 +177,10 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 
     try {
         if (!result) {
-            swd::log::i()->send(swd::warning, "Bad request from "
-             + remote_address_.to_string());
-            throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+            throw swd::exceptions::connection_exception(
+                STATUS_BAD_REQUEST,
+                "Bad request from " + remote_address_.to_string()
+            );
         }
 
         /* Try to add a profile for the request. */
@@ -191,9 +191,11 @@ void swd::connection::handle_read(const boost::system::error_code& e,
             );
 
             request_->set_profile(profile);
-        } catch (swd::exceptions::database_exception& e) {
-            swd::log::i()->send(swd::uncritical_error, e.what());
-            throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+        } catch (const swd::exceptions::database_exception& e) {
+            throw swd::exceptions::connection_exception(
+                STATUS_BAD_REQUEST,
+                "Database error when fetching profile: " + e.get_message()
+            );
         }
 
         /* The handler used to process the incoming request. */
@@ -201,9 +203,10 @@ void swd::connection::handle_read(const boost::system::error_code& e,
 
         /* Only continue processing the reply if it is signed correctly. */
         if (!request_handler.valid_signature()) {
-            swd::log::i()->send(swd::warning, "Bad signature from "
-             + remote_address_.to_string());
-            throw swd::exceptions::connection_exception(STATUS_BAD_SIGNATURE);
+            throw swd::exceptions::connection_exception(
+                STATUS_BAD_SIGNATURE,
+                "Bad signature from " + remote_address_.to_string()
+            );
         }
 
         /**
@@ -211,16 +214,17 @@ void swd::connection::handle_read(const boost::system::error_code& e,
          * from the encoded json string to a swd::parameters list.
          */
         if (!request_handler.decode()) {
-            swd::log::i()->send(swd::warning, "Bad json from "
-             + remote_address_.to_string());
-            throw swd::exceptions::connection_exception(STATUS_BAD_JSON);
+            throw swd::exceptions::connection_exception(
+                STATUS_BAD_JSON,
+                "Bad json from " + remote_address_.to_string()
+            );
         }
 
         /* Check profile for outdated cache. */
         swd::profile_ptr profile = request_->get_profile();
 
         if (profile->is_cache_outdated()) {
-            cache_->reset(profile->get_id());
+            cache_->reset_profile(profile->get_id());
         }
 
         /* Process the request. */
@@ -229,53 +233,57 @@ void swd::connection::handle_read(const boost::system::error_code& e,
         try {
             swd::parameters parameters = request_->get_parameters();
 
-            /**
-             * Check security limitations first.
-             */
+            /** Check security limitations first. */
             int max_params = swd::config::i()->get<int>("max-parameters");
 
             if ((max_params > -1) && (parameters.size() > max_params)) {
-                swd::log::i()->send(swd::notice, "Too many parameters");
-                throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+                throw swd::exceptions::connection_exception(
+                    STATUS_BAD_REQUEST,
+                    "Too many parameters"
+                );
             }
 
             int max_length_path = swd::config::i()->get<int>("max-length-path");
             int max_length_value = swd::config::i()->get<int>("max-length-value");
 
             if ((max_length_path > -1) || (max_length_value > -1)) {
-                for (swd::parameters::iterator it_parameter = parameters.begin();
-                 it_parameter != parameters.end(); it_parameter++) {
-                    swd::parameter_ptr parameter(*it_parameter);
-
+                for (const auto& parameter: parameters) {
                     if ((max_length_path > -1) && (parameter->get_path().length() > max_length_path)) {
-                        swd::log::i()->send(swd::notice, "Too long parameter path");
-                        throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+                        throw swd::exceptions::connection_exception(
+                            STATUS_BAD_REQUEST,
+                            "Too long parameter path"
+                        );
                     }
 
                     if ((max_length_value > -1) && (parameter->get_value().length() > max_length_value)) {
-                        swd::log::i()->send(swd::notice, "Too long parameter value");
-                        throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+                        throw swd::exceptions::connection_exception(
+                            STATUS_BAD_REQUEST,
+                            "Too long parameter value"
+                        );
                     }
                 }
             }
 
             if (profile->is_flooding_enabled()) {
                 if (database_->is_flooding(request_->get_client_ip(), profile->get_id())) {
-                    swd::log::i()->send(swd::notice, "Too many requests");
-                    throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+                    throw swd::exceptions::connection_exception(
+                        STATUS_BAD_REQUEST,
+                        "Too many requests"
+                    );
                 }
             }
 
             /* Time to analyze the request. */
             request_handler.process();
-        } catch (swd::exceptions::database_exception& e) {
-            swd::log::i()->send(swd::uncritical_error, e.what());
-
+        } catch (const swd::exceptions::database_exception& e) {
             /**
              * Problems with the database result in a bad request. If protection
              * is enabled access to the site will not be granted.
              */
-            throw swd::exceptions::connection_exception(STATUS_BAD_REQUEST);
+            throw swd::exceptions::connection_exception(
+                STATUS_BAD_REQUEST,
+                "Database error: " + e.get_message()
+            );
         }
 
         if (profile->get_mode() == MODE_ACTIVE) {
@@ -290,11 +298,12 @@ void swd::connection::handle_read(const boost::system::error_code& e,
         } else {
             reply_->set_status(STATUS_OK);
         }
-    } catch(swd::exceptions::connection_exception& e) {
-        if (!request_->get_profile()) {
-            reply_->set_status(STATUS_BAD_REQUEST);
-        } else if (request_->get_profile()->get_mode() == MODE_ACTIVE) {
-            reply_->set_status(e.code());
+    } catch (const swd::exceptions::connection_exception& e) {
+        swd::log::i()->send(swd::warning, e.get_message());
+
+        if (!request_->get_profile() || request_->get_profile()->get_mode() == MODE_ACTIVE) {
+            reply_->set_status(e.get_code());
+            reply_->set_message(e.get_message());
         } else {
             reply_->set_status(STATUS_OK);
         }

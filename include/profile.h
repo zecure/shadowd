@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -60,28 +60,28 @@ namespace swd {
              *
              * @param id The id of the profile
              */
-            void set_id(const int& id);
+            void set_id(const unsigned long long& id);
 
             /**
              * @brief Get the id the profile.
              *
              * @return The id of the profile
              */
-            int get_id() const;
+            unsigned long long get_id() const;
 
             /**
              * @brief Set the status of the system.
              *
              * @param mode The status of the system
              */
-            void set_mode(const int& mode);
+            void set_mode(const unsigned int& mode);
 
             /**
              * @brief Get the status of the system.
              *
              * @return The status of the system
              */
-            int get_mode() const;
+            unsigned int get_mode() const;
 
             /**
              * @brief Set the status of the whitelist check for the profile.
@@ -199,12 +199,12 @@ namespace swd {
             /**
              * @brief The database id of the profile.
              */
-            int id_;
+            unsigned long long id_;
 
             /**
              * @brief The mode of the profile.
              */
-            int mode_;
+            unsigned int mode_;
 
             /**
              * @brief The status of the whitelist check.
@@ -246,7 +246,7 @@ namespace swd {
     /**
      * @brief Profile pointer.
      */
-    typedef boost::shared_ptr<swd::profile> profile_ptr;
+    using profile_ptr = boost::shared_ptr<swd::profile>;
 }
 
 #endif /* PROFILE_H */

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -37,6 +37,14 @@ void swd::reply::set_status(const int& status) {
 
 int swd::reply::get_status() const {
     return status_;
+}
+
+void swd::reply::set_message(const std::string& message) {
+    message_ = message;
+}
+
+std::string swd::reply::get_message() const {
+    return message_;
 }
 
 void swd::reply::set_threats(const std::vector<std::string>& threats) {

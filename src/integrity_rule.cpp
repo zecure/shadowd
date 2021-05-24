@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -31,11 +31,11 @@
 
 #include "integrity_rule.h"
 
-void swd::integrity_rule::set_id(const int& id) {
+void swd::integrity_rule::set_id(const unsigned long long& id) {
     id_ = id;
 }
 
-int swd::integrity_rule::get_id() const {
+unsigned long long swd::integrity_rule::get_id() const {
     return id_;
 }
 
@@ -55,7 +55,7 @@ std::string swd::integrity_rule::get_digest() const {
     return digest_;
 }
 
-bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
+bool swd::integrity_rule::matches(const swd::hash_ptr& hash) const {
     /* Stop if there is no hash (for this algorithm). */
     if (!hash) {
         return false;
@@ -74,11 +74,11 @@ bool swd::integrity_rule::matches(const swd::hash_ptr& hash) {
     }
 
     /* Use constant-time comparison for the digests to avoid timing attacks. */
-    unsigned char result = 0;
+    std::byte result{};
 
-    for (int i = 0; i < digest_.length(); i++) {
-        result |= digest_.at(i) ^ user_digest.at(i);
+    for (unsigned int i = 0; i < digest_.length(); i++) {
+        result |= std::byte(digest_.at(i)) ^ std::byte(user_digest.at(i));
     }
 
-    return (result == 0);
+    return (std::to_integer<int>(result) == 0);
 }

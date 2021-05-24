@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -52,8 +52,8 @@ namespace swd {
              * @param cache The pointer to the cache object
              * @param storage The pointer to the storage object
              */
-            request_handler(const swd::request_ptr& request,
-             const swd::cache_ptr& cache, const swd::storage_ptr& storage);
+            request_handler(swd::request_ptr request,
+             swd::cache_ptr cache, swd::storage_ptr storage);
 
             /**
              * @brief Check if the signature of the request is valid.
@@ -67,12 +67,12 @@ namespace swd {
              *
              * @return Status of decoding
              */
-            bool decode();
+            bool decode() const;
 
             /**
              * @brief Start the real processing of the request.
              */
-            void process();
+            void process() const;
 
             /**
              * @brief Get the threats of the processing.

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -60,6 +60,20 @@ namespace swd {
             int get_status() const;
 
             /**
+             * @brief Set an optional status message of the reply.
+             *
+             * @param message The status message of the reply
+             */
+            void set_message(const std::string& message);
+
+            /**
+             * Get the optional status message of the reply.
+             *
+             * @return The status message of the reply
+             */
+            std::string get_message() const;
+
+            /**
              * @brief Set a list of threat paths.
              *
              * @param threats A list of paths strings of parameters that were
@@ -104,6 +118,11 @@ namespace swd {
             int status_;
 
             /**
+             * @brief An optional message to return additional information about the reply.
+             */
+            std::string message_;
+
+            /**
              * @brief The paths of dangerous parameters.
              */
             std::vector<std::string> threats_;
@@ -117,7 +136,7 @@ namespace swd {
     /**
      * @brief Reply pointer.
      */
-    typedef boost::shared_ptr<swd::reply> reply_ptr;
+    using reply_ptr = boost::shared_ptr<swd::reply>;
 }
 
 #endif /* REPLY_H */

@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2020 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -45,33 +45,33 @@ namespace swd {
              *
              * @param user The name of the user
              */
-            void set_user(const std::string& user);
+            void set_user(const std::string& user) const;
 
             /**
              * @brief Change the gid of the process.
              *
              * @param group The name of the group
              */
-            void set_group(const std::string& group);
+            void set_group(const std::string& group) const;
 
             /**
              * @brief Write the pid to a file.
              *
              * @param file The file that the pid gets written to
              */
-            void write_pid(const std::string& file);
+            void write_pid(const std::string& file) const;
 
             /**
              * @brief Change the root directory of the process.
              *
              * @param directory The directory that is used for chroot
              */
-            void change_root(const std::string& directory);
+            void change_root(const std::string& directory) const;
 
             /**
              * @brief Detach the process and make him silent.
              */
-            void detach();
+            void detach() const;
     };
 }
 
