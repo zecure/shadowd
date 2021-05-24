@@ -70,7 +70,7 @@ namespace swd {
             /**
              * @brief Add a parameter object to the request.
              *
-             * @param path The parameter
+             * @param parameter The parameter
              */
             void add_parameter(const swd::parameter_ptr& parameter);
 

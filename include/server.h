@@ -52,6 +52,7 @@ namespace swd {
              * @brief Construct an object and connect the attributes.
              *
              * @param storage The pointer to the storage object
+             * @param database The pointer to the database object
              * @param cache The pointer to the cache object
              */
             server(swd::storage_ptr storage,

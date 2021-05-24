@@ -83,6 +83,7 @@ namespace swd {
              * @param context The (possible empty) ssl context
              * @param ssl True if ssl is enabled
              * @param storage The pointer to the storage object
+             * @param database The pointer to the database object
              * @param cache The pointer to the cache object
              */
             explicit connection(boost::asio::io_service& io_service,
