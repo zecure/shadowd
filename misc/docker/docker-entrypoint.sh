@@ -3,6 +3,8 @@ set -e
 
 SHADOWD_CONFIG="/etc/shadowd/shadowd.ini"
 
+cat /dev/null > $SHADOWD_CONFIG
+
 if [ -n "$SHADOWD_ADDRESS" ]; then
     echo "address=$SHADOWD_ADDRESS" >> $SHADOWD_CONFIG
 fi
