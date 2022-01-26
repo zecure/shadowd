@@ -34,6 +34,9 @@
 
 #include "build_config.h"
 
+// Avoid collision with std::byte (https://www.cryptopp.com/wiki/Std::byte)
+typedef unsigned char byte;
+
 #define STATUS_OK 1
 #define STATUS_BAD_REQUEST 2
 #define STATUS_BAD_SIGNATURE 3
