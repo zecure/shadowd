@@ -49,7 +49,7 @@ void swd::blacklist::scan(const swd::request_ptr& request) const {
             /* If there is catastrophic backtracking boost throws an exception. */
             try {
                 /* Add pointers to all filters that match to the parameter. */
-                if (filter->matches(parameter->get_value())) {
+                if (filter->matches(parameter->get_value()) || filter->matches(parameter->get_path())) {
                     parameter->add_blacklist_filter(filter);
                 }
             } catch (...) {
