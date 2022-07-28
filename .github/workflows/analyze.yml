@@ -1,0 +1,16 @@
+name: Analyze
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  blacklist:
+    name: Blacklist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compare regular expressions with samples
+        run: |
+          ./misc/blacklist/helper.py --test
