@@ -51,7 +51,7 @@ jobs:
           sudo apt-get install -y build-essential cmake libssl-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev libboost-regex-dev libboost-test-dev libasio-dev libjsoncpp-dev libcrypto++-dev libdbi-dev
       - name: Run cmake
         run: |
-          cmake
+          cmake .
       - name: Run unit tests
         run: |
           make tests && make test
