@@ -11,6 +11,7 @@ jobs:
     name: Blacklist
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Compare regular expressions with samples
         run: |
           ./misc/blacklist/helper.py --test
