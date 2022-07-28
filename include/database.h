@@ -68,11 +68,12 @@ namespace swd {
              * @param password The database password, originating from the config
              * @param name The database name, originating from the config
              * @param encoding The database encoding, originating from the config
+             * @param wait Retry connecting to the database
              */
             void connect(const std::string& driver, const std::string& host,
              const std::string& port, const std::string& username,
              const std::string& password, const std::string& name,
-             const std::string& encoding);
+             const std::string& encoding, bool wait);
 
             /**
              * @brief Close the database connection.

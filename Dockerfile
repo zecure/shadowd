@@ -57,4 +57,4 @@ RUN addgroup \
 COPY --from=builder /shadowd/misc/docker/docker-entrypoint.sh /
 COPY --from=builder /shadowd/build/src/shadowd /usr/bin/shadowd
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/usr/bin/shadowd", "-c", "/etc/shadowd/shadowd.ini", "-U", "shadowd", "-G", "shadowd"]
+CMD ["/usr/bin/shadowd", "-c", "/etc/shadowd/shadowd.ini", "-U", "shadowd", "-G", "shadowd", "-W"]
