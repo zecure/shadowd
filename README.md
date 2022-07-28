@@ -1,13 +1,10 @@
-![Logo](http://shadowd.zecure.org/img/logo_small.png)
+![Logo](https://shadowd.zecure.org/img/logo_small.png)
 
 [![Build Status](https://github.com/zecure/shadowd/actions/workflows/analyze.yml/badge.svg)](https://github.com/zecure/shadowd/actions/workflows/analyze.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=zecure_shadowd&metric=alert_status)](https://sonarcloud.io/dashboard?id=zecure_shadowd)
 
-**Shadow Daemon** is a collection of tools to **detect**, **record** and **prevent** **attacks** on *web applications*.
-Technically speaking, Shadow Daemon is a **web application firewall** that intercepts requests and filters out malicious parameters.
-It is a modular system that separates web application, analysis and interface to increase security, flexibility and expandability.
-
-This is the main component that handles the analysis and storage of requests.
+**Shadow Daemon** is a *web application firewall* that protects on application-level.
+This repository contains the main component of Shadow Daemon that handles the analysis and storage of requests.
 
 # Documentation
 For the full documentation please refer to [shadowd.zecure.org](https://shadowd.zecure.org/).
