@@ -72,6 +72,7 @@ swd::config::config() :
         ("max-length-value", po::value<int>()->default_value(-1), "max length of parameter values");
 
     od_database_.add_options()
+        ("db-wait,W", "wait for database")
         ("db-driver", po::value<std::string>()->default_value("pgsql"))
         ("db-host", po::value<std::string>()->default_value("127.0.0.1"))
         ("db-port", po::value<std::string>()->default_value("5432"))
@@ -83,7 +84,12 @@ swd::config::config() :
 
 void swd::config::parse_command_line(int argc, char** argv) {
     po::options_description combination;
-    combination.add(od_generic_).add(od_server_).add(od_daemon_).add(od_security_);
+    combination
+     .add(od_generic_)
+     .add(od_server_)
+     .add(od_daemon_)
+     .add(od_security_)
+     .add(od_database_);
 
     try {
         po::store(po::command_line_parser(argc, argv).options(combination).run(), vm_);

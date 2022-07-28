@@ -30,6 +30,8 @@
  */
 
 #include <sstream>
+#include <thread>
+#include <chrono>
 
 #include "database.h"
 #include "log.h"
@@ -38,7 +40,7 @@
 
 void swd::database::connect(const std::string& driver, const std::string& host,
  const std::string& port, const std::string& username, const std::string& password,
- const std::string& name, const std::string& encoding) {
+ const std::string& name, const std::string& encoding, bool wait) {
 #if defined(HAVE_DBI_NEW)
     dbi_initialize_r(nullptr, &instance_);
     conn_ = dbi_conn_new_r(driver.c_str(), instance_);
@@ -54,10 +56,25 @@ void swd::database::connect(const std::string& driver, const std::string& host,
     dbi_conn_set_option(conn_, "dbname", name.c_str());
     dbi_conn_set_option(conn_, "encoding", encoding.c_str());
 
-    /* If the initial connection can not be established the process is shut down. */
-    if (dbi_conn_connect(conn_) < 0) {
-        throw swd::exceptions::core_exception("Can't connect to database server");
-    }
+    bool retry = true;
+    int attempt = 0;
+    do {
+        if (dbi_conn_connect(conn_) < 0) {
+            if (!wait) {
+                throw swd::exceptions::core_exception("Can't connect to database server");
+            }
+
+            attempt++;
+            int sleep_time = attempt + 2;
+            swd::log::i()->send(
+                swd::uncritical_error,
+                "Can't connect to database server, retrying in " + std::to_string(sleep_time) + " seconds"
+            );
+            std::this_thread::sleep_for(std::chrono::seconds(sleep_time));
+        } else {
+            retry = false;
+        }
+    } while (retry);
 }
 
 void swd::database::disconnect() {
