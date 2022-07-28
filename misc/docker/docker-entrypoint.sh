@@ -37,7 +37,6 @@ if [ -n "$SHADOWD_DB_PASSWORD" ]; then
     echo "db-password=$SHADOWD_DB_PASSWORD" >> $SHADOWD_CONFIG
 fi
 
-sleep 15
 echo "Starting command $@"
 exec "$@"
 

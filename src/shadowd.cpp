@@ -99,7 +99,8 @@ void swd::shadowd::init(int argc, char** argv) {
         swd::config::i()->get<std::string>("db-user"),
         swd::config::i()->get<std::string>("db-password"),
         swd::config::i()->get<std::string>("db-name"),
-        swd::config::i()->get<std::string>("db-encoding")
+        swd::config::i()->get<std::string>("db-encoding"),
+        swd::config::i()->defined("db-wait")
     );
 
     /**
