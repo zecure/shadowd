@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/zecure/shadowd/actions/workflows/analyze.yml/badge.svg)](https://github.com/zecure/shadowd/actions/workflows/analyze.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=zecure_shadowd&metric=alert_status)](https://sonarcloud.io/dashboard?id=zecure_shadowd)
 
-**Shadow Daemon** is a *web application firewall* that protects on application-level.
+**Shadow Daemon** is a *web application firewall* that intercepts requests at application-level.
 This repository contains the main component of Shadow Daemon that handles the analysis and storage of requests.
 
 # Documentation
