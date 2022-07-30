@@ -4,7 +4,7 @@ set -e
 SHADOWD_CONFIG="/etc/shadowd/shadowd.ini"
 
 remove_newline () {
-    echo "$1" | sed -e 's/[\r\n]//g'
+    echo "$1" | tr --delete '\n'
 }
 
 reset_config () {
@@ -32,4 +32,3 @@ set_value db-password $SHADOWD_DB_PASSWORD
 
 echo "Starting command $@"
 exec "$@"
-
