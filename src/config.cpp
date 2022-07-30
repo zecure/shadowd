@@ -73,13 +73,13 @@ swd::config::config() :
 
     od_database_.add_options()
         ("db-wait,W", "wait for database")
-        ("db-driver", po::value<std::string>()->default_value("pgsql"))
-        ("db-host", po::value<std::string>()->default_value("127.0.0.1"))
-        ("db-port", po::value<std::string>()->default_value("5432"))
-        ("db-name", po::value<std::string>()->default_value("shadowd"))
-        ("db-user", po::value<std::string>()->default_value("shadowd"))
-        ("db-password", po::value<std::string>()->default_value(""))
-        ("db-encoding", po::value<std::string>()->default_value("UTF-8"));
+        ("db-driver", po::value<std::string>()->default_value("pgsql"), "database driver")
+        ("db-host", po::value<std::string>()->default_value("127.0.0.1"), "database host")
+        ("db-port", po::value<std::string>()->default_value("5432"), "database port")
+        ("db-name", po::value<std::string>()->default_value("shadowd"), "database name")
+        ("db-user", po::value<std::string>()->default_value("shadowd"), "database user")
+        ("db-password", po::value<std::string>()->default_value(""), "database password")
+        ("db-encoding", po::value<std::string>()->default_value("UTF-8"), "database encoding");
 }
 
 void swd::config::parse_command_line(int argc, char** argv) {
