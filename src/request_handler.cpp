@@ -118,11 +118,11 @@ bool swd::request_handler::decode() const {
 
         request_->set_client_ip(client_ip.asString());
 
-        /* The same is true for the caller, the target script on the observed system. */
+        /* The target script on the observed system. Should not be empty but might in rare cases. */
         Json::Value caller = root["caller"];
 
         if (!caller) {
-            return false;
+            caller = "";
         }
 
         request_->set_caller(caller.asString());
