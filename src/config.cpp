@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2022 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -72,18 +72,24 @@ swd::config::config() :
         ("max-length-value", po::value<int>()->default_value(-1), "max length of parameter values");
 
     od_database_.add_options()
-        ("db-driver", po::value<std::string>()->default_value("pgsql"))
-        ("db-host", po::value<std::string>()->default_value("127.0.0.1"))
-        ("db-port", po::value<std::string>()->default_value("5432"))
-        ("db-name", po::value<std::string>()->default_value("shadowd"))
-        ("db-user", po::value<std::string>()->default_value("shadowd"))
-        ("db-password", po::value<std::string>()->default_value(""))
-        ("db-encoding", po::value<std::string>()->default_value("UTF-8"));
+        ("db-wait,W", "wait for database")
+        ("db-driver", po::value<std::string>()->default_value("pgsql"), "database driver")
+        ("db-host", po::value<std::string>()->default_value("127.0.0.1"), "database host")
+        ("db-port", po::value<std::string>()->default_value("5432"), "database port")
+        ("db-name", po::value<std::string>()->default_value("shadowd"), "database name")
+        ("db-user", po::value<std::string>()->default_value("shadowd"), "database user")
+        ("db-password", po::value<std::string>()->default_value(""), "database password")
+        ("db-encoding", po::value<std::string>()->default_value("UTF-8"), "database encoding");
 }
 
 void swd::config::parse_command_line(int argc, char** argv) {
     po::options_description combination;
-    combination.add(od_generic_).add(od_server_).add(od_daemon_).add(od_security_);
+    combination
+     .add(od_generic_)
+     .add(od_server_)
+     .add(od_daemon_)
+     .add(od_security_)
+     .add(od_database_);
 
     try {
         po::store(po::command_line_parser(argc, argv).options(combination).run(), vm_);

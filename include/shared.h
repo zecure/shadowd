@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2022 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,6 +33,9 @@
 #define SHARED_H
 
 #include "build_config.h"
+
+// Avoid collision with std::byte (https://www.cryptopp.com/wiki/Std::byte)
+typedef unsigned char byte;
 
 #define STATUS_OK 1
 #define STATUS_BAD_REQUEST 2

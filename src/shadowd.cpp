@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2022 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -99,7 +99,8 @@ void swd::shadowd::init(int argc, char** argv) {
         swd::config::i()->get<std::string>("db-user"),
         swd::config::i()->get<std::string>("db-password"),
         swd::config::i()->get<std::string>("db-name"),
-        swd::config::i()->get<std::string>("db-encoding")
+        swd::config::i()->get<std::string>("db-encoding"),
+        swd::config::i()->defined("db-wait")
     );
 
     /**

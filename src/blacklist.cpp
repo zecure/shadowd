@@ -1,7 +1,7 @@
 /**
  * Shadow Daemon -- Web Application Firewall
  *
- *   Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
+ *   Copyright (C) 2014-2022 Hendrik Buchwald <hb@zecure.org>
  *
  * This file is part of Shadow Daemon. Shadow Daemon is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -49,7 +49,7 @@ void swd::blacklist::scan(const swd::request_ptr& request) const {
             /* If there is catastrophic backtracking boost throws an exception. */
             try {
                 /* Add pointers to all filters that match to the parameter. */
-                if (filter->matches(parameter->get_value())) {
+                if (filter->matches(parameter->get_value()) || filter->matches(parameter->get_path())) {
                     parameter->add_blacklist_filter(filter);
                 }
             } catch (...) {

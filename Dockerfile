@@ -1,4 +1,4 @@
-FROM ubuntu:focal AS builder
+FROM ubuntu:20.04 AS builder
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
        build-essential \
@@ -21,7 +21,7 @@ RUN cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .. && \
     make shadowd
 
 
-FROM ubuntu:focal
+FROM ubuntu:20.04
 MAINTAINER Hendrik Buchwald
 ENV SHADOWD_ADDRESS 0.0.0.0
 EXPOSE 9115
@@ -57,4 +57,4 @@ RUN addgroup \
 COPY --from=builder /shadowd/misc/docker/docker-entrypoint.sh /
 COPY --from=builder /shadowd/build/src/shadowd /usr/bin/shadowd
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/usr/bin/shadowd", "-c", "/etc/shadowd/shadowd.ini", "-U", "shadowd", "-G", "shadowd"]
+CMD ["/usr/bin/shadowd", "-c", "/etc/shadowd/shadowd.ini", "-U", "shadowd", "-G", "shadowd", "-W"]
