@@ -34,7 +34,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
 #include <boost/array.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/make_shared.hpp>
