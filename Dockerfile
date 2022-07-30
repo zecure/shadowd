@@ -1,4 +1,4 @@
-FROM ubuntu:focal AS builder
+FROM ubuntu:22.04 AS builder
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
        build-essential \
@@ -21,21 +21,21 @@ RUN cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .. && \
     make shadowd
 
 
-FROM ubuntu:focal
+FROM ubuntu:22.04
 MAINTAINER Hendrik Buchwald
 ENV SHADOWD_ADDRESS 0.0.0.0
 EXPOSE 9115
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        libboost-program-options1.71.0 \
-        libboost-regex1.71.0 \
-        libboost-system1.71.0 \
-        libboost-thread1.71.0 \
-        libcrypto++6 \
+        libboost-program-options1.74.0 \
+        libboost-regex1.74.0 \
+        libboost-system1.74.0 \
+        libboost-thread1.74.0 \
+        libcrypto++8 \
         libdbi1 \
         libdbd-pgsql \
         libdbd-mysql \
-        libssl1.1 && \
+        libssl3 && \
     rm -rf /var/lib/apt/lists/*
 RUN addgroup \
         --quiet \
