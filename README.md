@@ -24,17 +24,5 @@ If cmake is successful it creates a makefile. Use it to compile and install the 
     make shadowd
     make install
 
-## Database
-Install and configure a database server. At the moment shadowd officially supports PostgreSQL and MySQL.
-Afterwards create a new user and database for shadowd and import the correct layout.
-
-If you are using PostgreSQL you can use `psql` to import the layout.
-
-    psql -Ushadowd shadowd < /usr/share/shadowd/pgsql_layout.sql
-
-If you are using MySQL you can use `mysql` to import the layout. The user requires the `CREATE ROUTINE` privilege.
-
-    mysql -ushadowd -p shadowd < /usr/share/shadowd/mysql_layout.sql
-
 # Configuration
-The installer copies the configuration file to */etc/shadowd/shadowd.ini*. The file is annotated and should be self-explanatory.
+During the installation the configuration file is copied to */etc/shadowd/shadowd.ini*. The file is annotated and should be self-explanatory.
