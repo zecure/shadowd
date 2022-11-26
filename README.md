@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/zecure/shadowd/actions/workflows/analyze.yml/badge.svg)](https://github.com/zecure/shadowd/actions/workflows/analyze.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=zecure_shadowd&metric=alert_status)](https://sonarcloud.io/dashboard?id=zecure_shadowd)
 
-**Shadow Daemon** is a *web application firewall* that intercepts requests at application-level.
+**Shadow Daemon** is a *web application firewall* that intercepts requests at the application level.
 This repository contains the main component of Shadow Daemon that handles the analysis and storage of requests.
 
 # Documentation
@@ -26,7 +26,7 @@ If cmake is successful it creates a makefile. Use it to compile and install the 
 
 ## Database
 Install and configure a database server. At the moment shadowd officially supports PostgreSQL and MySQL.
-Afterwards create a new user and database for shadowd and import the correct layout.
+Afterward, create a new user and database for shadowd and import the correct layout.
 
 If you are using PostgreSQL you can use `psql` to import the layout.
 
